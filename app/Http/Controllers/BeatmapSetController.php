@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BeatmapSet;
 use App\Services\BeatmapService;
-use Illuminate\Http\Request;
 
 class BeatmapSetController extends Controller
 {
@@ -18,6 +16,15 @@ class BeatmapSetController extends Controller
     public function show($setId)
     {
         $beatmapSet = $this->beatmapService->getBeatmapSet($setId);
-        return view('beatmaps.show', compact('beatmapSet'));
+        $beatmapSet->beatmaps = $beatmapSet->beatmaps
+            ->sortBy([
+                ['mode', 'asc'],
+                ['sr', 'desc'],
+            ])
+            ->values();
+
+        $diffCreatorLabels = $this->beatmapService->getCreatorLabelsForManyBeatmaps($beatmapSet->beatmaps);
+
+        return view('beatmaps.show', compact('beatmapSet', 'diffCreatorLabels'));
     }
 }
