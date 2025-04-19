@@ -1,0 +1,49 @@
+$primary: #a365f0;
+$body-bg: #1a1423;
+$body-color: #f0e6f6;
+
+@import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+:root {
+    // ...
+    --bs-navbar-bg: #2f1a45;
+    --bs-navbar-text: #f0e6f6;
+}
+
+.navbar,
+footer,
+.bg-dark {
+    background-color: var(--bs-navbar-bg) !important;
+    color: var(--bs-navbar-text);
+}
+
+.navbar .nav-link,
+.navbar .navbar-brand,
+.btn-outline-light {
+    color: var(--bs-navbar-text) !important;
+}
+
+.btn-outline-light {
+    border-color: var(--bs-primary) !important;
+}
+
+.btn-outline-light:hover {
+    background-color: var(--bs-primary) !important;
+    color: #fff !important;
+}
+
+.list-group-item-action:not(.active):hover, .list-group-item-action:not(.active):focus {
+    color: inherit !important;
+    background-color: var(--bs-navbar-bg) !important;
+}
+
+.disabled > .page-link {
+    background-color: $body-bg !important;
+}
+
+.chart-beatmap-card {
+    border: 1px solid $body-color;
+    background-size: cover;
+    background-position: center;
+}
