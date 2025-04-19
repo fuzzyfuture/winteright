@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\BeatmapService;
 use App\Services\ChartsService;
-use Illuminate\Http\Request;
 
 class ChartsController extends Controller
 {
-    protected ChartsService $beatmapService;
+    protected ChartsService $chartsService;
+    protected BeatmapService $beatmapService;
 
-    public function __construct(ChartsService $beatmaps)
+    public function __construct(ChartsService $chartsService, BeatmapService $beatmapService)
     {
-        $this->beatmapService = $beatmaps;
+        $this->chartsService = $chartsService;
+        $this->beatmapService = $beatmapService;
     }
 
     public function index()
     {
-        $topBeatmaps = $this->beatmapService->getTopAllTime();
-        return view('charts.index', compact('topBeatmaps'));
+        $topBeatmaps = $this->chartsService->getTopAllTime();
+        $creatorLabels = $this->beatmapService->getCreatorLabelsForManyBeatmaps($topBeatmaps->getCollection());
+        return view('charts.index', compact('topBeatmaps', 'creatorLabels'));
     }
 }
