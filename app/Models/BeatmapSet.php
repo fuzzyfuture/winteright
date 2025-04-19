@@ -77,4 +77,9 @@ class BeatmapSet extends Model
         };
     }
 
+    public function getCreatorLabelAttribute(): ?array
+    {
+        $creator = $this->creator;
+        return $creator ? [ 'osu_id' => $creator->osu_id, 'name' => $creator->name ] : null;
+    }
 }
