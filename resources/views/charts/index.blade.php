@@ -28,7 +28,21 @@
                         </h5>
 
                         <small class="text-light d-block">
-                            @if ($beatmap->set->creator)
+                            @php
+                                $labels = $creatorLabels[$beatmap->beatmap_id] ?? [];
+                            @endphp
+
+                            @if ($labels)
+                                Mapped by:
+                                @foreach ($labels as $index => $creator)
+                                    @if ($creator['name'])
+                                        <a href="{{ url('/users/' . $creator['osu_id']) }}">{{ $creator['name'] }}</a>
+                                    @else
+                                        {{ $creator['osu_id'] }}
+                                    @endif
+                                    {{ $index < count($labels) - 1 ? ', ' : '' }}
+                                @endforeach
+                            @elseif ($beatmap->set->creator)
                                 Mapped by: <a href="{{ url("/users/".$beatmap->set->creator_id) }}">{{ $beatmap->set->creator->name }}</a>
                             @else
                                 Mapped by: Unknown
