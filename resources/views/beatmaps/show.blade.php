@@ -4,7 +4,14 @@
     <div class="mb-4 text-center">
         <h1 class="display-5">{{ $beatmapSet->artist }} - {{ $beatmapSet->title }}</h1>
         <p class="text-muted">
-            mapped by <strong>{{ $beatmapSet->creator->name ?? 'Unknown' }}</strong>
+            mapset by
+            <strong>
+                @if ($beatmapSet->creator_label)
+                    <a href="{{ url('/users/' . $beatmapSet->creator_label['osu_id']) }}">{{ $beatmapSet->creator_label['name'] }}</a>
+                @else
+                    {{ $beatmapSet->creator_id }}
+                @endif
+            </strong>
         </p>
         <img src="https://assets.ppy.sh/beatmaps/{{ $beatmapSet->set_id }}/covers/cover.jpg"
              class="img-fluid rounded shadow-sm mb-4"
@@ -38,7 +45,30 @@
         @foreach ($beatmapSet->beatmaps as $beatmap)
             <div class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
-                    <h5 class="mb-1">{{ $beatmap->difficulty_name }}</h5>
+                    <div class="d-inline-flex gap-2 mb-1 align-items-baseline">
+                        <h5 class="mb-0">{{ $beatmap->difficulty_name }}</h5>
+                        <small class="text-muted">
+                            @php
+                                $labels = $creatorLabels[$beatmap->beatmap_id] ?? [];
+                                $isRedundant =
+                                    count($labels) === 1 &&
+                                    isset($labels[0]['osu_id'], $beatmap->set->creator_id) &&
+                                    $labels[0]['osu_id'] === $beatmap->set->creator_id;
+                            @endphp
+
+                            @if ($labels && !$isRedundant)
+                                by
+                                @foreach ($labels as $index => $creator)
+                                    @if ($creator['name'])
+                                        <a href="{{ url('/users/' . $creator['osu_id']) }}">{{ $creator['name'] }}</a>
+                                    @else
+                                        {{ $creator['osu_id'] }}
+                                    @endif
+                                    {{ $index < count($labels) - 1 ? ', ' : '' }}
+                                @endforeach
+                            @endif
+                        </small>
+                    </div> <br />
                     <small class="text-muted">
                         sr: {{ number_format($beatmap->sr, 2) }} |
                         status: {{ $beatmap->status_label ?? 'Unknown' }} |
