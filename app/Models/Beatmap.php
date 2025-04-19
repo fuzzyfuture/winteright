@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Beatmap extends Model
@@ -17,6 +18,11 @@ class Beatmap extends Model
     public function set(): BelongsTo
     {
         return $this->belongsTo(BeatmapSet::class, 'set_id', 'set_id');
+    }
+
+    public function creators(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'beatmap_creators', 'beatmap_id', 'creator_id', 'beatmap_id', 'osu_id');
     }
 
     public function ratings(): HasMany|Beatmap
