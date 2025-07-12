@@ -55,7 +55,7 @@ class SyncRecentRankedBeatmaps extends Command
             ? Carbon::parse($since)->toDateTimeString()
             : $this->siteInfoService->getLastSyncedRankedBeatmaps();
 
-        $this->info("Last synced: " . $lastSynced);
+        $this->info('Last synced: '.$lastSynced);
 
         $newestRanked = Carbon::parse($lastSynced);
         $token = $this->osuApiService->getAccessToken();
@@ -67,7 +67,6 @@ class SyncRecentRankedBeatmaps extends Command
                 'status' => 'ranked',
                 'cursor_string' => $cursor,
                 'sort' => 'ranked_desc',
-                'mode' => 0
             ]);
 
             $data = $response->json();
@@ -75,24 +74,24 @@ class SyncRecentRankedBeatmaps extends Command
             foreach ($data['beatmapsets'] ?? [] as $setData) {
                 $rankedDate = $setData['ranked_date'];
 
-                $this->info("Importing: " . $setData['artist'] . " - " . $setData['title'] . ", ranked: " . $rankedDate . "...");
+                $this->info('Importing: '.$setData['artist'].' - '.$setData['title'].', ranked: '.$rankedDate.'...');
 
                 if (Carbon::parse($rankedDate) <= $newestRanked) {
                     break 2;
                 }
 
                 if ($skipUpdates && $this->beatmapService->beatmapSetExists($setData['id'])) {
-                    $this->info("Skipped.");
+                    $this->info('Skipped.');
                     continue;
                 }
 
                 usleep(1100000); // 1.1-second delay between requests (~55 req/min), per osu! api guidelines. you're welcome peppy
-                $fullDetails = Http::withToken($token)->get("https://osu.ppy.sh/api/v2/beatmapsets/{$setData['id']}")->json();
+                $fullDetails = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/'.$setData['id'])->json();
 
                 $this->beatmapService->storeBeatmapSetAndBeatmaps($setData, $fullDetails);
 
                 $imported++;
-                $this->info("Done.");
+                $this->info('Done.');
             }
 
             $cursor = $data['cursor_string'] ?? null;
@@ -100,6 +99,6 @@ class SyncRecentRankedBeatmaps extends Command
 
         $this->siteInfoService->storeLastSyncedRankedBeatmaps(Carbon::now()->toDateTimeString());
 
-        $this->info("Import complete! Imported {$imported} beatmap sets.");
+        $this->info('Import complete! Imported '.$imported.' beatmap sets.');
     }
 }
