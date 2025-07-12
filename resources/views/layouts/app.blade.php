@@ -7,19 +7,17 @@
     @vite(['resources/js/app.js'])
 </head>
 <body class="d-flex flex-column min-vh-100">
-
-@include('partials.header')
-
-<main class="flex-grow-1 py-4">
-    <div class="container">
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @yield('content')
+    <div class="flex-grow-1 py-4">
+        <div class="container" id="mainContainer">
+            @include('partials.header')
+            @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            <main class="content p-4">
+                @yield('content')
+            </main>
+            @include('partials.footer')
+        </div>
     </div>
-</main>
-
-@include('partials.footer')
-
 </body>
 </html>
