@@ -7,9 +7,17 @@ use App\Models\BeatmapSet;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class BeatmapService
 {
+    protected BlacklistService $blacklistService;
+
+    public function __construct(BlacklistService $blacklistService)
+    {
+        $this->blacklistService = $blacklistService;
+    }
+
     /**
      * Retrieves a beatmap set with the specified ID. Includes the set owner, the ratings for all difficulties, and
      * the current user's rating for all difficulties. Intended for showing full details of a beatmap set.
@@ -41,35 +49,54 @@ class BeatmapService
      * @param $setData
      * @param $fullDetails
      * @return void
+     * @throws Throwable
      */
     public function storeBeatmapSetAndBeatmaps($setData, $fullDetails): void
     {
-        $set = BeatmapSet::updateOrCreate(
-            ['set_id' => $setData['id']],
-            [
-                'title' => $setData['title'],
-                'artist' => $setData['artist'],
-                'creator_id' => $setData['user_id'],
-                'date_ranked' => $setData['ranked_date'],
-                'has_video' => $fullDetails['video'] ?? false,
-                'has_storyboard' => $setData['storyboard'] ?? false,
-                'genre' => $fullDetails['genre']['id'] ?? null,
-                'lang' => $fullDetails['language']['id'] ?? null,
-            ]
-        );
-
-        foreach ($setData['beatmaps'] as $map) {
-            Beatmap::updateOrCreate(
-                ['beatmap_id' => $map['id']],
+        DB::transaction(function () use ($setData, $fullDetails) {
+            $blacklist = $this->blacklistService->getBlacklist();
+            $set = BeatmapSet::updateOrCreate(
+                ['set_id' => $setData['id']],
                 [
-                    'set_id' => $set->set_id,
-                    'difficulty_name' => $map['version'],
-                    'mode' => $map['mode_int'],
-                    'status' => $map['ranked'],
-                    'sr' => $map['difficulty_rating'],
+                    'title' => $setData['title'],
+                    'artist' => $setData['artist'],
+                    'creator_id' => $setData['user_id'],
+                    'date_ranked' => $setData['ranked_date'],
+                    'has_video' => $fullDetails['video'] ?? false,
+                    'has_storyboard' => $setData['storyboard'] ?? false,
+                    'genre' => $fullDetails['genre']['id'] ?? null,
+                    'lang' => $fullDetails['language']['id'] ?? null,
                 ]
             );
-        }
+
+            foreach ($fullDetails['beatmaps'] as $map) {
+                $shouldBlacklist = false;
+                $creatorIds = [];
+
+                foreach ($map['owners'] as $owner) {
+                    $creatorIds[] = $owner['id'];
+
+                    if (in_array($owner['id'], $blacklist)) {
+                        $shouldBlacklist = true;
+                    }
+                }
+
+                Beatmap::updateOrCreate(
+                    ['beatmap_id' => $map['id']],
+                    [
+                        'set_id' => $set->set_id,
+                        'difficulty_name' => $map['version'],
+                        'mode' => $map['mode_int'],
+                        'status' => $map['ranked'],
+                        'sr' => $map['difficulty_rating'],
+                        'blacklisted' => $shouldBlacklist,
+                        'blacklist_reason' => $shouldBlacklist ? 'Mapper requested blacklist.' : null,
+                    ]
+                );
+
+                $this->addCreators($map['id'], $creatorIds);
+            }
+        });
     }
 
     /**
@@ -86,12 +113,11 @@ class BeatmapService
     }
 
     /**
-     * Retrieves a list of mapper labels for a collection of beatmaps. If the mapper has used OMDB, their username will
+     * Applies creator labels to each beatmap in a collection. If the mapper has used OMDB, their username will
      * be displayed - otherwise, just their ID. Used for efficient display of mappers per map on the charts.
      * @param Collection $beatmaps The list of beatmaps to lookup mappers for.
-     * @return array The array of creator labels.
      */
-    public function getCreatorLabelsForManyBeatmaps(Collection $beatmaps): array
+    public function applyCreatorLabels(Collection $beatmaps): void
     {
         $beatmapIds = $beatmaps->pluck('beatmap_id')->all();
 
@@ -103,10 +129,8 @@ class BeatmapService
         $users = User::whereIn('osu_id', $osuIds)->get()->keyBy('osu_id');
         $grouped = $rawCreators->groupBy('beatmap_id');
 
-        $result = [];
-
         foreach ($grouped as $beatmapId => $creators) {
-            $result[$beatmapId] = $creators->map(function ($creator) use ($users) {
+            $labels = $creators->map(function ($creator) use ($users) {
                 $user = $users[$creator->creator_id] ?? null;
 
                 return [
@@ -114,15 +138,72 @@ class BeatmapService
                     'name' => $user?->name,
                 ];
             })->toArray();
-        }
 
-        return $result;
+            $beatmap = $beatmaps->firstWhere('beatmap_id', $beatmapId);
+            if ($beatmap && method_exists($beatmap, 'setExternalCreatorLabels')) {
+                $beatmap->setExternalCreatorLabels($labels);
+            }
+        }
     }
 
+    /**
+     * Adds a beatmap creator entry. Typically used for crediting guest difficulties, although each beatmap should
+     * have a creator entry with its mapset's owner, if the difficulty is not a GD.
+     * @param int $beatmapId The ID of the beatmap.
+     * @param int $creatorId The ID of the creator.
+     * @return void
+     */
     public function addCreator(int $beatmapId, int $creatorId): void
     {
         DB::table('beatmap_creators')->updateOrInsert(
             ['beatmap_id' => $beatmapId, 'creator_id' => $creatorId]
         );
+    }
+
+    /**
+     * Adds multiple beatmap creators to a single beatmap in one query.
+     * @param int $beatmapId The beatmap ID.
+     * @param array $creatorIds The IDs of the creators.
+     * @return void
+     */
+    public function addCreators(int $beatmapId, array $creatorIds): void
+    {
+        if (empty($creatorIds)) return;
+
+        $rows = array_map(fn($creatorId) => [
+            'beatmap_id' => $beatmapId,
+            'creator_id' => $creatorId
+        ], array_unique($creatorIds));
+
+        DB::table('beatmap_creators')->upsert($rows, ['beatmap_id', 'creator_id']);
+    }
+
+    /**
+     * Retrieves a list of a user's created beatmaps that are not blacklisted. Used for auditing the blacklist.
+     * @param int $osuId The user's osu! ID.
+     * @return Collection The list of beatmaps.
+     */
+    public function getUnblacklistedForUser(int $osuId): Collection
+    {
+        return Beatmap::with('set')
+            ->join('beatmap_creators', 'beatmaps.beatmap_id', '=', 'beatmap_creators.beatmap_id')
+            ->where('beatmap_creators.creator_id', $osuId)
+            ->where('beatmaps.blacklisted', false)
+            ->select('beatmaps.beatmap_id', 'beatmaps.difficulty_name', 'beatmaps.set_id')
+            ->get();
+    }
+
+    /**
+     * Marks a list of beatmaps as blacklisted.
+     * @param array $beatmapIds The beatmaps to mark as blacklisted.
+     * @return void
+     */
+    public function markAsBlacklisted(array $beatmapIds): void
+    {
+        Beatmap::whereIn('beatmap_id', $beatmapIds)
+            ->update([
+                'blacklisted' => true,
+                'blacklist_reason' => 'Mapper requested blacklist.',
+            ]);
     }
 }
