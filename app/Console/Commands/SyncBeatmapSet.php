@@ -41,19 +41,19 @@ class SyncBeatmapSet extends Command
     {
         $setId = $this->argument('setId');
 
-        $this->info("Fetching beatmap set $setId...");
+        $this->info('Fetching beatmap set '.$setId.'...');
 
         $token = $this->osuApiService->getAccessToken();
-        $response = Http::withToken($token)->get("https://osu.ppy.sh/api/v2/beatmapsets/$setId");
+        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/'.$setId);
 
         if ($response->failed()) {
-            $this->error("Failed to fetch beatmap set with ID $setId.");
+            $this->error('Failed to fetch beatmap set with ID '.$setId.'.');
             return;
         }
 
         $fullDetails = $response->json();
         $this->beatmapService->storeBeatmapSetAndBeatmaps($fullDetails, $fullDetails);
 
-        $this->info("Successfully synced beatmap set with ID $setId.");
+        $this->info('Successfully synced beatmap set '.$fullDetails['artist'].' - '.$fullDetails['title'].'.');
     }
 }
