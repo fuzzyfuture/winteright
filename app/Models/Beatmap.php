@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\HtmlString;
 
 class Beatmap extends Model
 {
@@ -14,6 +15,8 @@ class Beatmap extends Model
         'rating', 'chart_rank', 'chart_year_rank', 'rating_count', 'weighted_avg', 'bayesian_avg',
         'blacklisted', 'blacklist_reason', 'controversy'
     ];
+
+    protected array $externalCreatorLabels = [];
 
     public function set(): BelongsTo
     {
@@ -38,11 +41,11 @@ class Beatmap extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            -2 => 'Graveyard',
-            1 => 'Ranked',
-            2 => 'Approved',
-            3 => 'Qualified',
-            4 => 'Loved',
+            -2 => 'graveyard',
+            1 => 'ranked',
+            2 => 'approved',
+            3 => 'qualified',
+            4 => 'loved',
             default => 'unknown',
         };
     }
@@ -50,10 +53,59 @@ class Beatmap extends Model
     public function getDateLabelAttribute(): string
     {
         return match ($this->status) {
-            1, 2 => 'Ranked',
-            3 => 'Qualified',
-            4 => 'Loved',
-            default => 'Submitted',
+            1, 2 => 'ranked',
+            3 => 'qualified',
+            4 => 'loved',
+            default => 'submitted',
         };
+    }
+
+    public function setExternalCreatorLabels(array $labels): void
+    {
+        $this->externalCreatorLabels = $labels;
+    }
+
+    public function getCreatorLabelAttribute(): HtmlString
+    {
+        $labels = $this->externalCreatorLabels;
+
+        if (empty($labels) && $this->set?->creator) {
+            $url = url('/users/' . $this->set->creator_id);
+            return new HtmlString('<a href="'.$url.'">'.e($this->set->creator->name).'</a>'.
+                '<a href="https://osu.ppy.sh/users/'.$this->set->creator_id.'"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   title="view on osu!"
+                   class="opacity-50 small">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                </a>');
+        }
+
+        if (empty($labels)) {
+            return new HtmlString('unknown');
+        }
+
+        $output = '';
+        $chunks = [];
+
+        foreach ($labels as $creator) {
+            if (!empty($creator['name'])) {
+                $localLink = '<a href="'.url('/users/'.$creator['osu_id']).'">'.e($creator['name']).'</a>';
+            } else {
+                $localLink = e($creator['osu_id']);
+            }
+
+            $chunks[] = $localLink.
+                '<a href="https://osu.ppy.sh/users/'.$creator['osu_id'].'"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   title="view on osu!"
+                   class="opacity-50 small">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                </a>';
+        }
+
+        $output .= implode(', ', $chunks);
+        return new HtmlString($output);
     }
 }
