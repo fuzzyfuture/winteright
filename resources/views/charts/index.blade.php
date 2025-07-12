@@ -1,81 +1,65 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="mb-4">Top beatmaps of all-time</h1>
-    <div class="mb-4">
+    <h1 class="mb-4">top beatmaps of all-time</h1>
+    <div>
         {{ $topBeatmaps->links() }}
     </div>
-    @forelse ($topBeatmaps as $beatmap)
-        <div class="row p-0 p-0 rounded overflow-hidden shadow-sm mb-3 bg-dark chart-beatmap-card">
-            <div class="col-md-2 rounded chart-beatmap-card"
-                 style="background-image: url('https://assets.ppy.sh/beatmaps/{{ $beatmap->set->set_id }}/covers/cover.jpg');">
-            </div>
-            <div class="col-md-10 p-3 bg-dark">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <div>
-                        <h5 class="mb-1 d-flex align-items-center gap-2">
-                            <a href="{{ url("/mapsets/{$beatmap->set->set_id}") }}"
-                               class="text-decoration-none text-light">
-                                {{ $beatmap->set->artist ?? '?' }} - {{ $beatmap->set->title . ' [' . $beatmap->difficulty_name . ']' ?? '?' }}
-                            </a>
-                            <a href="https://osu.ppy.sh/beatmapsets/{{ $beatmap->set->set_id }}#osu/{{ $beatmap->beatmap_id }}"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               title="view on osu!"
-                               class="text-light opacity-50 small">
-                                <i class="bi bi-box-arrow-up-right"></i>
-                            </a>
-                        </h5>
-
-                        <small class="text-light d-block">
-                            @php
-                                $labels = $creatorLabels[$beatmap->beatmap_id] ?? [];
-                            @endphp
-
-                            @if ($labels)
-                                Mapped by:
-                                @foreach ($labels as $index => $creator)
-                                    @if ($creator['name'])
-                                        <a href="{{ url('/users/' . $creator['osu_id']) }}">{{ $creator['name'] }}</a>
-                                    @else
-                                        {{ $creator['osu_id'] }}
-                                    @endif
-                                    {{ $index < count($labels) - 1 ? ', ' : '' }}
-                                @endforeach
-                            @elseif ($beatmap->set->creator)
-                                Mapped by: <a href="{{ url("/users/".$beatmap->set->creator_id) }}">{{ $beatmap->set->creator->name }}</a>
-                            @else
-                                Mapped by: Unknown
-                            @endif
-                        </small>
-                        <small class="text-light d-block">Status: {{ $beatmap->status_label }}</small>
-                        @if ($beatmap->set->date_ranked)
-                            <small class="text-light d-block">{{ $beatmap->date_label }}: {{ $beatmap->set->date_ranked->format('Y-m-d') }}</small>
-                        @endif
+    <div class="container">
+        @forelse ($topBeatmaps as $beatmap)
+            <div class="row p-0 rounded overflow-hidden shadow-sm mb-2 chart-beatmap-card">
+                <div class="col-md-2 p-2">
+                    <div class="chart-beatmap-img w-100 h-100"
+                         style="background-image: url('https://assets.ppy.sh/beatmaps/{{ $beatmap->set->set_id }}/covers/cover.jpg');">
                     </div>
-
-                    <div class="text-end">
+                </div>
+                <div class="col-md-10 p-3 ps-1">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
                         <div>
-                            <span class="badge bg-primary">{{ number_format($beatmap->weighted_avg, 2) }}</span>
-                        </div>
-                        <div class="mt-1">
-                            <small class="text-light">{{ $beatmap->ratings_count ?? $beatmap->rating_count }} ratings</small>
-                        </div>
-                        @auth
-                            @if ($beatmap->userRating)
-                                <div>
-                                    <small class="text-success">You rated: {{ number_format($beatmap->userRating->score / 2, 1) }}</small>
-                                </div>
+                            <h5 class="mb-1 d-flex align-items-center gap-2">
+                                <a href="{{ url("/mapsets/{$beatmap->set->set_id}") }}">
+                                    {{ $beatmap->set->artist ?? '?' }} - {{ $beatmap->set->title . ' [' . $beatmap->difficulty_name . ']' ?? '?' }}
+                                </a>
+                                <a href="https://osu.ppy.sh/beatmapsets/{{ $beatmap->set->set_id }}#osu/{{ $beatmap->beatmap_id }}"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   title="view on osu!"
+                                   class="opacity-50 small">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                            </h5>
+
+                            <div>
+                                mapped by: {{ $beatmap->creator_label }}
+                            </div>
+                            <div>status: {{ $beatmap->status_label }}</div>
+                            @if ($beatmap->set->date_ranked)
+                                <div>{{ $beatmap->date_label }}: {{ $beatmap->set->date_ranked->format('Y-m-d') }}</div>
                             @endif
-                        @endauth
+                        </div>
+
+                        <div class="text-end">
+                            <div>
+                                <span class="badge bg-main fs-5">{{ number_format($beatmap->weighted_avg, 2) }}</span>
+                            </div>
+                            <div class="mt-1">
+                                {{ $beatmap->ratings_count ?? $beatmap->rating_count }} ratings
+                            </div>
+                            @auth
+                                @if ($beatmap->userRating)
+                                    <div class="text-success">you rated: {{ number_format($beatmap->userRating->score / 2, 1) }}
+                                    </div>
+                                @endif
+                            @endauth
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    @empty
-        <p class="text-muted">No beatmaps found.</p>
-    @endforelse
-    <div class="mt-4">
+        @empty
+            <p class="text-muted">no beatmaps found</p>
+        @endforelse
+    </div>
+    <div>
         {{ $topBeatmaps->links() }}
     </div>
 @endsection
