@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Rating;
-use Illuminate\Support\Facades\Auth;
 
 class RatingService
 {
