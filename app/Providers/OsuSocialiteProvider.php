@@ -65,7 +65,7 @@ class OsuSocialiteProvider extends AbstractProvider
     {
         $response = $this->getHttpClient()->get('https://osu.ppy.sh/api/v2/me', [
             'headers' => [
-                'Authorization' => 'Bearer ' . $token,
+                'Authorization' => 'Bearer '.$token,
                 'Accept' => 'application/json',
             ],
         ]);
@@ -77,8 +77,7 @@ class OsuSocialiteProvider extends AbstractProvider
     {
         return (new User())->setRaw($user)->map([
             'id' => $user['id'],
-            'name' => $user['username'],
-            'avatar' => $user['avatar_url'],
+            'name' => $user['username']
         ]);
     }
 }
