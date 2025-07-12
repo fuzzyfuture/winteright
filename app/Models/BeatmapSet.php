@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\HtmlString;
 
 class BeatmapSet extends Model
 {
@@ -35,51 +36,66 @@ class BeatmapSet extends Model
             return Beatmap::statusLabel($statuses->first());
         }
 
-        return 'Mixed';
+        return 'mixed';
     }
 
     public function getGenreLabelAttribute(): string
     {
         return match ($this->genre) {
-            2 => 'Video Game',
-            3 => 'Anime',
-            4 => 'Rock',
-            5 => 'Pop',
-            6 => 'Other Genre',
-            7 => 'Novelty',
-            9 => 'Hip Hop',
-            10 => 'Electronic',
-            11 => 'Metal',
-            12 => 'Classical',
-            13 => 'Folk',
-            14 => 'Jazz',
-            default => 'Unknown',
+            2 => 'video game',
+            3 => 'anime',
+            4 => 'rock',
+            5 => 'pop',
+            6 => 'other genre',
+            7 => 'novelty',
+            9 => 'hip hop',
+            10 => 'electronic',
+            11 => 'metal',
+            12 => 'classical',
+            13 => 'folk',
+            14 => 'jazz',
+            default => 'unknown',
         };
     }
 
     public function getLanguageLabelAttribute(): string
     {
         return match ($this->lang) {
-            2 => 'English',
-            3 => 'Japanese',
-            4 => 'Chinese',
-            5 => 'Instrumental',
-            6 => 'Korean',
-            7 => 'French',
-            8 => 'German',
-            9 => 'Swedish',
-            10 => 'Spanish',
-            11 => 'Italian',
-            12 => 'Russian',
-            13 => 'Polish',
-            14 => 'Other Language',
-            default => 'Unknown',
+            2 => 'english',
+            3 => 'japanese',
+            4 => 'chinese',
+            5 => 'instrumental',
+            6 => 'korean',
+            7 => 'french',
+            8 => 'german',
+            9 => 'swedish',
+            10 => 'spanish',
+            11 => 'italian',
+            12 => 'russian',
+            13 => 'polish',
+            14 => 'other language',
+            default => 'unknown',
         };
     }
 
-    public function getCreatorLabelAttribute(): ?array
+    public function getCreatorLabelAttribute(): HtmlString
     {
-        $creator = $this->creator;
-        return $creator ? [ 'osu_id' => $creator->osu_id, 'name' => $creator->name ] : null;
+        if ($this->creator) {
+            $url = url('/users/'.$this->creator->osu_id);
+            $name = e($this->creator->name);
+            $localLink = '<a href="'.$url.'">'.$name.'</a>';
+        } else {
+            $localLink = e($this->creator_id);
+        }
+
+        $extLink = '<a href="https://osu.ppy.sh/users/'.$this->creator_id.'"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       title="view on osu!"
+                       class="opacity-50 small">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>';
+
+        return new HtmlString($localLink.$extLink);
     }
 }
