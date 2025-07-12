@@ -23,8 +23,8 @@ class BeatmapSetController extends Controller
             ])
             ->values();
 
-        $diffCreatorLabels = $this->beatmapService->getCreatorLabelsForManyBeatmaps($beatmapSet->beatmaps);
+        $this->beatmapService->applyCreatorLabels($beatmapSet->beatmaps);
 
-        return view('beatmaps.show', compact('beatmapSet', 'diffCreatorLabels'));
+        return view('beatmaps.show', compact('beatmapSet'));
     }
 }
