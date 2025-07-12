@@ -13,7 +13,7 @@ class OsuApiService
      */
     public function getAccessToken(): string
     {
-        return Cache::remember('osu_api_token', 3000, function() {
+        return Cache::remember('osu_api_token', 3600, function() {
             $response = Http::asForm()->post('https://osu.ppy.sh/oauth/token', [
                 'client_id' => config('services.osu.client_id'),
                 'client_secret' => config('services.osu.client_secret'),
