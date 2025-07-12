@@ -5,13 +5,7 @@
         <h1 class="display-5">{{ $beatmapSet->artist }} - {{ $beatmapSet->title }}</h1>
         <p class="text-muted">
             mapset by
-            <strong>
-                @if ($beatmapSet->creator_label)
-                    <a href="{{ url('/users/' . $beatmapSet->creator_label['osu_id']) }}">{{ $beatmapSet->creator_label['name'] }}</a>
-                @else
-                    {{ $beatmapSet->creator_id }}
-                @endif
-            </strong>
+            <strong>{!! $beatmapSet->creatorLabel !!}</strong>
         </p>
         <img src="https://assets.ppy.sh/beatmaps/{{ $beatmapSet->set_id }}/covers/cover.jpg"
              class="img-fluid rounded shadow-sm mb-4"
@@ -19,17 +13,17 @@
              alt="{{ $beatmapSet->artist }} - {{ $beatmapSet->title }} banner">
     </div>
 
-    <div class="row mb-4">
+    <div class="row mb-0">
         <div class="col-md-6">
-            <h4>Info</h4>
-            <ul class="list-unstyled">
-                <li><strong>Genre:</strong> {{ $beatmapSet->genre_label }}</li>
-                <li><strong>Language:</strong> {{ $beatmapSet->language_label }}</li>
-                <li><strong>Storyboard:</strong> {{ $beatmapSet->has_storyboard ? 'Yes' : 'No' }}</li>
-                <li><strong>Video:</strong> {{ $beatmapSet->has_video ? 'Yes' : 'No' }}</li>
+            <h4>info</h4>
+            <ul class="list-unstyled mb-0">
+                <li><strong>date ranked:</strong> {{ $beatmapSet->date_ranked }}</li>
+                <li><strong>genre:</strong> {{ $beatmapSet->genre_label }}</li>
+                <li><strong>language:</strong> {{ $beatmapSet->language_label }}</li>
+                <li><strong>storyboard:</strong> {{ $beatmapSet->has_storyboard ? 'yes' : 'no' }}</li>
+                <li><strong>video:</strong> {{ $beatmapSet->has_video ? 'yes' : 'no' }}</li>
             </ul>
         </div>
-
         <div class="col-md-6">
             <h4>osu! link</h4>
             <a href="https://osu.ppy.sh/beatmapsets/{{ $beatmapSet->set_id }}" target="_blank">
@@ -40,35 +34,18 @@
 
     <hr>
 
-    <h3 class="mb-3">Difficulties</h3>
+    <h4 class="mb-3">difficulties</h4>
     <div class="list-group">
         @foreach ($beatmapSet->beatmaps as $beatmap)
             <div class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="d-inline-flex gap-2 mb-1 align-items-baseline">
-                        <h5 class="mb-0">{{ $beatmap->difficulty_name }}</h5>
+                    <div class="d-inline-flex gap-1 align-items-baseline">
+                        <div class="fw-bold">{{ $beatmap->difficulty_name }}</div>
                         <small class="text-muted">
-                            @php
-                                $labels = $creatorLabels[$beatmap->beatmap_id] ?? [];
-                                $isRedundant =
-                                    count($labels) === 1 &&
-                                    isset($labels[0]['osu_id'], $beatmap->set->creator_id) &&
-                                    $labels[0]['osu_id'] === $beatmap->set->creator_id;
-                            @endphp
-
-                            @if ($labels && !$isRedundant)
-                                by
-                                @foreach ($labels as $index => $creator)
-                                    @if ($creator['name'])
-                                        <a href="{{ url('/users/' . $creator['osu_id']) }}">{{ $creator['name'] }}</a>
-                                    @else
-                                        {{ $creator['osu_id'] }}
-                                    @endif
-                                    {{ $index < count($labels) - 1 ? ', ' : '' }}
-                                @endforeach
-                            @endif
+                            by {{ $beatmap->creator_label }}
                         </small>
-                    </div> <br />
+                    </div>
+                    <br/>
                     <small class="text-muted">
                         sr: {{ number_format($beatmap->sr, 2) }} |
                         status: {{ $beatmap->status_label ?? 'Unknown' }} |
@@ -76,11 +53,14 @@
                     </small>
                 </div>
                 @auth
-                    <div class="text-end">
-                        <form method="POST" action="{{ route('ratings.update', $beatmap->id) }}" class="d-flex align-items-center gap-2">
+                    <div class="text-end d-flex flex-row">
+                        <span class="badge bg-main fs-5 me-3">{{ number_format($beatmap->weighted_avg, 2) }}</span>
+                        <form method="POST" action="{{ route('ratings.update', $beatmap->id) }}"
+                              class="d-flex align-items-center gap-2">
                             @csrf
-                            <select name="score" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
-                                <option value="">Unrated</option>
+                            <select name="score" class="form-select form-select-sm w-auto"
+                                    onchange="this.form.submit()">
+                                <option value="">unrated</option>
                                 @foreach (range(0, 10) as $i)
                                     <option value="{{ $i }}" @selected(optional($beatmap->userRating)->score === $i)>
                                         {{ number_format($i / 2, 1) }}
