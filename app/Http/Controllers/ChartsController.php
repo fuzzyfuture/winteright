@@ -19,7 +19,7 @@ class ChartsController extends Controller
     public function index()
     {
         $topBeatmaps = $this->chartsService->getTopAllTime();
-        $creatorLabels = $this->beatmapService->getCreatorLabelsForManyBeatmaps($topBeatmaps->getCollection());
-        return view('charts.index', compact('topBeatmaps', 'creatorLabels'));
+        $this->beatmapService->applyCreatorLabels($topBeatmaps->getCollection());
+        return view('charts.index', compact('topBeatmaps'));
     }
 }
