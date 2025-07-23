@@ -22,7 +22,7 @@ Route::controller(OsuController::class)
 Route::controller(UserController::class)
     ->as('users.')
     ->group(function () {
-        Route::get('/users/{osuId}', [UserController::class, 'showByOsuId'])->name('show');
+        Route::get('/users/{id}', [UserController::class, 'show'])->name('show');
     });
 
 Route::get('/charts', [ChartsController::class, 'index'])->name('charts.index');
