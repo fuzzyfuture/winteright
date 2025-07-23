@@ -38,7 +38,7 @@ class AuditBlacklist extends Command
      */
     public function handle(): void
     {
-        $blacklistedUserIds = $this->blacklistService->GetBlacklist();
+        $blacklistedUserIds = $this->blacklistService->getBlacklist();
 
         $this->info('Auditing blacklist...');
         $totalIssues = 0;
