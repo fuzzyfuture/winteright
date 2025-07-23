@@ -11,7 +11,7 @@
         <div class="container" id="mainContainer">
             @include('partials.header')
             @if (session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+                <div class="alert alert-primary m-3" data-bs-theme="dark">{{ session('success') }}</div>
             @endif
             <main class="content p-4">
                 @yield('content')
