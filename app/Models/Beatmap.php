@@ -25,7 +25,7 @@ class Beatmap extends Model
 
     public function creators(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'beatmap_creators', 'beatmap_id', 'creator_id', 'beatmap_id', 'osu_id');
+        return $this->belongsToMany(User::class, 'beatmap_creators', 'beatmap_id', 'creator_id', 'beatmap_id', 'id');
     }
 
     public function ratings(): HasMany|Beatmap
@@ -90,13 +90,13 @@ class Beatmap extends Model
 
         foreach ($labels as $creator) {
             if (!empty($creator['name'])) {
-                $localLink = '<a href="'.url('/users/'.$creator['osu_id']).'">'.e($creator['name']).'</a>';
+                $localLink = '<a href="'.url('/users/'.$creator['id']).'">'.e($creator['name']).'</a>';
             } else {
-                $localLink = e($creator['osu_id']);
+                $localLink = e($creator['id']);
             }
 
             $chunks[] = $localLink.
-                '<a href="https://osu.ppy.sh/users/'.$creator['osu_id'].'"
+                '<a href="https://osu.ppy.sh/users/'.$creator['id'].'"
                    target="_blank"
                    rel="noopener noreferrer"
                    title="view on osu!"
