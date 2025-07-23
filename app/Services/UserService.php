@@ -20,7 +20,7 @@ class UserService
      */
     public function getByOsuId(int $osuId): User
     {
-        return User::where('osu_id', $osuId)->firstOrFail();
+        return User::where('id', $osuId)->firstOrFail();
     }
 
     /**
