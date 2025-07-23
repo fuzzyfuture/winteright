@@ -2,7 +2,7 @@
 
 @section('content')
     <h1>winteright</h1>
-    <p class="lead mb-4">a community-powered beatmap rating platform for osu!</p>
+    <p class="lead mb-4">a beatmap rating platform for osu!</p>
     <div class="d-flex flex-row gap-5 mb-4">
         <div class="text-center">
             <h2 class="text-primary">{{ number_format($stats['beatmapSets']) }}</h2>
@@ -19,7 +19,7 @@
     </div>
     <div class="mb-4">
         <h3>why "winteright"?</h3>
-        <p>I was playing <a href="https://osu.ppy.sh/beatmapsets/1281337#osu/2661429" target="_blank">this map</a> when I decided I want to actually start this project.</p>
+        <p>i was playing <a href="https://osu.ppy.sh/beatmapsets/1281337#osu/2661429" target="_blank">this map</a> when i decided i want to actually start this project!</p>
     </div>
     <div class="row">
         <div class="col-md-6">
