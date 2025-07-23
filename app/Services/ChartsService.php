@@ -3,34 +3,44 @@
 namespace App\Services;
 
 use App\Models\Beatmap;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ChartsService
 {
-    /**
-     * Retrieves paginated data for the top beatmaps of all-time. Intended for display on the charts page.
-     * @param int $perPage The amount of results to display per page.
-     * @param int $maxPages The maximum amount of pages to display.
-     * @return LengthAwarePaginator The paginated data.
-     */
-    public function getTopAllTime(int $perPage = 25, int $maxPages = 50): LengthAwarePaginator
+    public function getTopBeatmaps($year = null, $excludeRated = false, $user = null, $offset = 0, $limit = 50): Collection
     {
-        $page = request()->input('page', 1);
-        $maxResults = $perPage * $maxPages;
-
-        $all = Beatmap::with(['set', 'userRating'])
-            ->where('blacklisted', false)
-            ->where('rating_count', '>', 0)
-            ->orderBy('bayesian_avg', 'desc')
-            ->limit($maxResults)
+        return $this->topBeatmapsBaseQuery($year, $excludeRated, $user)
+            ->skip($offset)
+            ->take($limit)
             ->get();
+    }
 
-        return new LengthAwarePaginator(
-            $all->forPage($page, $perPage),
-            $all->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
+    public function getTopBeatmapsCount($year = null, $excludeRated = false, $user = null): int
+    {
+        return $this->topBeatmapsBaseQuery($year, $excludeRated, $user)->count();
+    }
+
+    private function topBeatmapsBaseQuery($year = null, $excludeRated = false, $user = null)
+    {
+        $query = Beatmap::with(['set', 'userRating'])
+            ->withCount('ratings')
+            ->where('blacklisted', false)
+            ->whereHas('ratings')
+            ->orderBy('bayesian_avg', 'desc');
+
+        if ($year) {
+            $query->whereHas('set', function ($query) use ($year) {
+                $query->whereYear('date_ranked', $year);
+            });
+        }
+
+        if ($excludeRated && $user) {
+            $query->whereDoesntHave('ratings', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            });
+        }
+
+        return $query;
     }
 }
