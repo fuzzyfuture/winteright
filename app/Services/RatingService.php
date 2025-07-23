@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Rating;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class RatingService
 {
@@ -37,5 +39,21 @@ class RatingService
         Rating::where('user_id', $userId)
             ->where('beatmap_id', $beatmapId)
             ->delete();
+    }
+
+    /**
+     * Retrieves recent ratings.
+     * @param int $limit The amount of recent ratings to retrieve. Defaults to 20.
+     * @return Collection The recent ratings.
+     */
+    public function getRecent(int $limit = 10): Collection
+    {
+        return Cache::remember('recent_'.$limit.'_ratings', 30, function () use ($limit) {
+            return Rating::orderByDesc('updated_at')
+                ->with('user')
+                ->with('beatmap.set')
+                ->limit($limit)
+                ->get();
+        });
     }
 }
