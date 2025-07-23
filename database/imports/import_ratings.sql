@@ -4,5 +4,5 @@ INSERT IGNORE INTO winteright.ratings (
 SELECT
     u.id, b.id, ROUND(r.Score * 2), r.date, r.date
 FROM omdb_old.ratings r
-    JOIN winteright.users u ON r.UserID = u.osu_id
+    JOIN winteright.users u ON r.UserID = u.id
     JOIN winteright.beatmaps b ON r.BeatmapID = b.beatmap_id;
