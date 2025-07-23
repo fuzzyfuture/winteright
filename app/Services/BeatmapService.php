@@ -6,6 +6,7 @@ use App\Models\Beatmap;
 use App\Models\BeatmapSet;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -100,16 +101,19 @@ class BeatmapService
     }
 
     /**
-     * Retrieves recently ranked beatmaps.
-     * @param int $limit The amount of recently ranked beatmaps to retrieve. Defaults to 10.
-     * @return Collection The recently ranked beatmaps.
+     * Retrieves recently ranked beatmap sets.
+     * @param int $limit The amount of recently ranked beatmap sets to retrieve. Defaults to 10.
+     * @return Collection The recently ranked beatmap sets.
      */
-    public function getRecentBeatmaps(int $limit = 10): Collection
+    public function getRecentBeatmapSets(int $limit = 10): Collection
     {
-        return BeatmapSet::withCount('beatmaps')
-            ->orderByDesc('date_ranked')
-            ->limit($limit)
-            ->get();
+        return Cache::remember('recent_'.$limit.'_beatmap_sets', 43200, function () use ($limit) {
+            return BeatmapSet::withCount('beatmaps')
+                ->with('creator')
+                ->orderByDesc('date_ranked')
+                ->limit($limit)
+                ->get();
+        });
     }
 
     /**
@@ -125,8 +129,8 @@ class BeatmapService
             ->whereIn('beatmap_id', $beatmapIds)
             ->get();
 
-        $osuIds = $rawCreators->pluck('creator_id')->unique()->all();
-        $users = User::whereIn('osu_id', $osuIds)->get()->keyBy('osu_id');
+        $ids = $rawCreators->pluck('creator_id')->unique()->all();
+        $users = User::whereIn('id', $ids)->get()->keyBy('id');
         $grouped = $rawCreators->groupBy('beatmap_id');
 
         foreach ($grouped as $beatmapId => $creators) {
@@ -134,15 +138,13 @@ class BeatmapService
                 $user = $users[$creator->creator_id] ?? null;
 
                 return [
-                    'osu_id' => $creator->creator_id,
+                    'id' => $creator->creator_id,
                     'name' => $user?->name,
                 ];
             })->toArray();
 
             $beatmap = $beatmaps->firstWhere('beatmap_id', $beatmapId);
-            if ($beatmap && method_exists($beatmap, 'setExternalCreatorLabels')) {
-                $beatmap->setExternalCreatorLabels($labels);
-            }
+            $beatmap->setExternalCreatorLabels($labels);
         }
     }
 
@@ -180,14 +182,14 @@ class BeatmapService
 
     /**
      * Retrieves a list of a user's created beatmaps that are not blacklisted. Used for auditing the blacklist.
-     * @param int $osuId The user's osu! ID.
+     * @param int $id The user's osu! ID.
      * @return Collection The list of beatmaps.
      */
-    public function getUnblacklistedForUser(int $osuId): Collection
+    public function getUnblacklistedForUser(int $id): Collection
     {
         return Beatmap::with('set')
             ->join('beatmap_creators', 'beatmaps.beatmap_id', '=', 'beatmap_creators.beatmap_id')
-            ->where('beatmap_creators.creator_id', $osuId)
+            ->where('beatmap_creators.creator_id', $id)
             ->where('beatmaps.blacklisted', false)
             ->select('beatmaps.beatmap_id', 'beatmaps.difficulty_name', 'beatmaps.set_id')
             ->get();
