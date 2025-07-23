@@ -2,15 +2,13 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Beatmap;
-use App\Models\BeatmapSet;
 use App\Services\BeatmapService;
 use App\Services\OsuApiService;
 use App\Services\SiteInfoService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Throwable;
 
 class SyncRecentRankedBeatmaps extends Command
 {
@@ -63,11 +61,16 @@ class SyncRecentRankedBeatmaps extends Command
         $imported = 0;
 
         do {
-            $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/search', [
-                'status' => 'ranked',
-                'cursor_string' => $cursor,
-                'sort' => 'ranked_desc',
-            ]);
+            try {
+                $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/search', [
+                    'status' => 'ranked',
+                    'cursor_string' => $cursor,
+                    'sort' => 'ranked_desc',
+                ]);
+            } catch (Throwable $e) {
+                $this->error('Error while retrieving latest ranked beatmaps at position '.$cursor.': '.$e->getMessage());
+                continue;
+            }
 
             $data = $response->json();
 
@@ -85,10 +88,24 @@ class SyncRecentRankedBeatmaps extends Command
                     continue;
                 }
 
-                usleep(1100000); // 1.1-second delay between requests (~55 req/min), per osu! api guidelines. you're welcome peppy
-                $fullDetails = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/'.$setData['id'])->json();
+                // 1.1-second delay between requests (~55 req/min), per osu! api guidelines. you're welcome peppy
+                usleep(1100000);
 
-                $this->beatmapService->storeBeatmapSetAndBeatmaps($setData, $fullDetails);
+                $fullDetails = null;
+
+                try {
+                    $fullDetails = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/'.$setData['id'])->json();
+                } catch (Throwable $e) {
+                    $this->error('Error while retrieving details for beatmap set '.$setData['id'].': '.$e->getMessage());
+                    continue;
+                }
+
+                try {
+                    $this->beatmapService->storeBeatmapSetAndBeatmaps($setData, $fullDetails);
+                } catch (Throwable $e) {
+                    $this->error('Error while storing beatmap set '.$setData['id'].': '.$e->getMessage());
+                    continue;
+                }
 
                 $imported++;
                 $this->info('Done.');
