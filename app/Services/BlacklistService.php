@@ -8,23 +8,23 @@ use Illuminate\Support\Facades\DB;
 class BlacklistService
 {
     /**
-     * Returns true if the user with the given osu! ID is blacklisted.
-     * @param int $osuId The osu! ID to check.
-     * @return bool True if the user with the given osu! ID is blacklisted, false if not.
+     * Returns true if the user with the given ID is blacklisted.
+     * @param int $id The ID to check.
+     * @return bool True if the user with the given ID is blacklisted, false if not.
      */
-    public function IsBlacklisted(int $osuId): bool
+    public function isBlacklisted(int $id): bool
     {
-        return DB::table('blacklist')->where('osu_id', $osuId)->exists();
+        return DB::table('blacklist')->where('user_id', $id)->exists();
     }
 
     /**
-     * Returns the blacklist as an array of osu! user IDs.
-     * @return array The array of osu! user IDs in the blacklist.
+     * Returns the blacklist as an array of user IDs.
+     * @return array The array of user IDs in the blacklist.
      */
-    public function GetBlacklist(): array
+    public function getBlacklist(): array
     {
         return Cache::remember('blacklist', 3600, function() {
-            return DB::table('blacklist')->pluck('osu_id')->toArray();
+            return DB::table('blacklist')->pluck('user_id')->toArray();
         });
     }
 }
