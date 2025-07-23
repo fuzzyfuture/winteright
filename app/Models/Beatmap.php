@@ -6,14 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 
 class Beatmap extends Model
 {
     protected $fillable = [
         'beatmap_id', 'set_id', 'difficulty_name', 'mode', 'status', 'sr',
-        'rating', 'chart_rank', 'chart_year_rank', 'rating_count', 'weighted_avg', 'bayesian_avg',
-        'blacklisted', 'blacklist_reason', 'controversy'
+        'weighted_avg', 'bayesian_avg',
+        'blacklisted', 'blacklist_reason',
     ];
 
     protected array $externalCreatorLabels = [];
@@ -35,7 +36,7 @@ class Beatmap extends Model
 
     public function userRating()
     {
-        return $this->hasOne(Rating::class)->where('user_id', auth()->id());
+        return $this->hasOne(Rating::class)->where('user_id', Auth::id());
     }
 
     public function getStatusLabelAttribute(): string
