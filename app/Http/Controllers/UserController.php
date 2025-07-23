@@ -14,9 +14,9 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
-    public function showByOsuId(string|int $osuId)
+    public function show(string|int $id)
     {
-        $user = User::where('osu_id', $osuId)->firstOrFail();
+        $user = User::where('id', $id)->firstOrFail();
 
         return view('users.show', $this->userService->getProfileData($user));
     }
