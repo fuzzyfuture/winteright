@@ -16,10 +16,9 @@ class AuthService
     public function resolveUserFromOsu(SocialiteUser $osuUser): User
     {
         return User::updateOrCreate(
-            ['osu_id' => $osuUser->getId()],
+            ['id' => $osuUser->getId()],
             [
-                'name' => $osuUser->getName(),
-                'avatar' => $osuUser->avatar,
+                'name' => $osuUser->getName()
             ]
         );
     }
