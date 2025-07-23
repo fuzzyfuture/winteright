@@ -25,7 +25,7 @@ class BeatmapSet extends Model
 
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'creator_id', 'osu_id');
+        return $this->belongsTo(User::class, 'creator_id', 'id');
     }
 
     public function getStatusLabelAttribute(): string
@@ -81,7 +81,7 @@ class BeatmapSet extends Model
     public function getCreatorLabelAttribute(): HtmlString
     {
         if ($this->creator) {
-            $url = url('/users/'.$this->creator->osu_id);
+            $url = url('/users/'.$this->creator->id);
             $name = e($this->creator->name);
             $localLink = '<a href="'.$url.'">'.$name.'</a>';
         } else {
