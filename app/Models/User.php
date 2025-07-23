@@ -20,15 +20,8 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'osu_id'
-    ];
-
-    public function ratingLabels(): HasOne|User
-    {
-        return $this->hasOne(RatingLabel::class);
-    }
+    protected $fillable = ['id', 'name'];
+    public $incrementing = false;
 
     public function ratings(): HasMany
     {
