@@ -208,4 +208,16 @@ class BeatmapService
                 'blacklist_reason' => 'Mapper requested blacklist.',
             ]);
     }
+
+    /**
+     * Retrieves an array of years when beatmaps were ranked.
+     * @return Collection An array of years when beatmaps were ranked.
+     */
+    public function getBeatmapYears(): Collection
+    {
+        return BeatmapSet::selectRaw('DATE_FORMAT(date_ranked, "%Y") as year')
+            ->groupBy('year')
+            ->orderByDesc('year')
+            ->pluck('year');
+    }
 }
