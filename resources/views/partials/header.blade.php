@@ -17,8 +17,8 @@
             <ul class="navbar-nav ms-auto">
                 @if (Auth::check())
                     <li class="nav-item">
-                        <a href="{{ url("/users/".Auth::user()->osu_id) }}" class="nav-link">
-                            <img src="{{ Auth::user()->avatar }}" class="me-1" width="16" height="16" alt="Avatar">
+                        <a href="{{ url("/users/".Auth::user()->id) }}" class="nav-link">
+                            <img src="https://a.ppy.sh/{{ Auth::user()->id }}" class="me-1" width="16" height="16" alt="Avatar">
                             <span class="text-body">{{ Auth::user()->name }}</span>
                         </a>
                     </li>
