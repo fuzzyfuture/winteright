@@ -20,7 +20,7 @@ class RecalculateBayesianAverages extends Command
      *
      * @var string
      */
-    protected $description = 'Recalculate and update Bayesian average for all beatmaps.';
+    protected $description = 'Recalculate and update Bayesian averages for all beatmaps.';
 
     /**
      * Execute the console command.
@@ -38,7 +38,7 @@ class RecalculateBayesianAverages extends Command
         $this->info('Recalculating Bayesian averages...');
 
         Beatmap::withSum('ratings', 'score')
-            ->chunkById(10000, function ($beatmaps, $page) use ($totalRatings, $averageRating) {
+            ->chunkById(10000, function ($beatmaps) use ($totalRatings, $averageRating) {
                 foreach ($beatmaps as $beatmap) {
                     $ratingsCount = $beatmap->rating_count ?? 0;
                     $totalScore = $beatmap->ratings_sum_score ?? 0;
