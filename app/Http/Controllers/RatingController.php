@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Rating;
 use App\Services\RatingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Throwable;
 
 class RatingController extends Controller
 {
@@ -17,18 +19,26 @@ class RatingController extends Controller
 
     public function update(Request $request, int $beatmapId)
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
+        $validated = $request->validate([
+            'score' => ['nullable', 'integer', 'between:0,10'],
+        ]);
 
         if ($request->score === null || $request->score === '') {
-            $this->ratingService->clear($userId, $beatmapId);
+            try {
+                $this->ratingService->clear($userId, $beatmapId);
+            } catch (Throwable $e) {
+                return back()->withErrors('Error while clearing rating for beatmap '.$beatmapId.': '.$e->getMessage());
+            }
+
             return back()->with('success', 'Rating removed.');
         }
 
-        $validated = $request->validate([
-            'score' => ['required', 'integer', 'between:0,10'],
-        ]);
-
-        $this->ratingService->set($userId, $beatmapId, $validated['score']);
+        try {
+            $this->ratingService->set($userId, $beatmapId, $validated['score']);
+        } catch (Throwable $e) {
+            return back()->withErrors('Error while rating '.$beatmapId.': '.$e->getMessage());
+        }
 
         return back()->with('success', 'Rating saved!');
     }
