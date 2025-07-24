@@ -19,7 +19,7 @@
     </div>
     <div class="mb-4">
         <h3>why "winteright"?</h3>
-        <p>i was playing <a href="https://osu.ppy.sh/beatmapsets/1281337#osu/2661429" target="_blank">this map</a> when i decided i want to actually start this project!</p>
+        <p>i was playing <a href="https://osu.ppy.sh/beatmapsets/1281337#osu/2661429" target="_blank">this map</a> when i decided i want to actually start this project! <small class="text-muted">great map :-)</small></p>
     </div>
     <div class="row g-4">
         <div class="col-lg-5">
@@ -27,21 +27,18 @@
             <ul class="list-group mb-3">
                 @foreach ($recentRatings as $rating)
                     <div class="list-group-item d-flex align-items-center">
-                        <a href="{{ url("/users/".$rating->user->id) }}" class="d-flex flex-nowrap">
+                        <a href="{{ url("/users/".$rating->user->id) }}" class="d-flex align-items-start flex-nowrap ms-1">
                             <img src="https://a.ppy.sh/{{ $rating->user->id }}" width="16" height="16" alt="Avatar">
-                            <span class="d-block ms-1">{{ $rating->user->name }}</span>
+                            <small class="ms-1">{{ $rating->user->name }}</small>
                         </a>
-                        <span class="ms-2">rated</span>
-                        <a href="{{ url('/mapsets/'.$rating->beatmap->set->set_id) }}" class="ms-2">
-                            <strong>{{ $rating->beatmap->set->title }} [{{ $rating->beatmap->difficulty_name }}]</strong>
+                        <small class="ms-1">rated</small>
+                        <a href="{{ url('/mapsets/'.$rating->beatmap->set->id) }}" class="ms-1 d-flex">
+                            <small>{{ $rating->beatmap->set->title }} [{{ $rating->beatmap->difficulty_name }}]</small>
                         </a>
-                        <span class="ms-auto badge bg-main fs-6">{{ number_format($rating->score / 2, 1) }}</span>
+                        <span class="ms-auto badge bg-main fs-6"><small>{{ number_format($rating->score / 2, 1) }}</small></span>
+                        <small class="ms-1 text-nowrap" title="{{ $rating->updated_at }}">{{ $rating->updated_at->diffForHumans() }}</small>
                     </div>
                 @endforeach
-            </ul>
-            <h3 class="mb-3">recent comments</h3>
-            <ul class="list-group">
-
             </ul>
         </div>
         <div class="col-lg-7">
@@ -54,10 +51,10 @@
             <ul class="list-group">
                 @foreach ($recentlyRanked as $set)
                     <div class="list-group-item d-flex align-items-center">
-                        <img src="https://assets.ppy.sh/beatmaps/{{ $set->set_id }}/covers/cover.jpg" alt="beatmap bg" width="175" />
+                        <img src="https://assets.ppy.sh/beatmaps/{{ $set->id }}/covers/cover.jpg" alt="beatmap bg" width="175" />
                         <div class="ms-2">
-                            <a href="{{ url("/mapsets/$set->set_id") }}"><strong>{{ $set->artist }} - {{ $set->title }}</strong></a>
-                            <a href="https://osu.ppy.sh/beatmapsets/{{ $set->set_id }}#osu"
+                            <a href="{{ url("/mapsets/$set->id") }}"><strong>{{ $set->artist }} - {{ $set->title }}</strong></a>
+                            <a href="https://osu.ppy.sh/beatmapsets/{{ $set->id }}#osu"
                                target="_blank"
                                rel="noopener noreferrer"
                                title="view on osu!"
