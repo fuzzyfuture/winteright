@@ -45,6 +45,7 @@ class AuditBlacklist extends Command
         $problemBeatmaps = [];
 
         foreach ($blacklistedUserIds as $userId) {
+            $this->info('Checking '.$userId.'...');
             $unblacklistedBeatmaps = $this->beatmapService->getUnblacklistedForUser($userId);
 
             if ($unblacklistedBeatmaps->isNotEmpty()) {
@@ -64,7 +65,7 @@ class AuditBlacklist extends Command
             $this->line('User '.$userId.':');
             foreach ($maps as $map) {
                 $this->line('   '.$map->set->artist.' - '.$map->set->title.' ['.$map->difficulty_name.']');
-                $this->line('   set '.$map->set->set_id.', map '.$map->beatmap_id.', ranked '.$map->set->date_ranked);
+                $this->line('   set '.$map->set->id.', map '.$map->id.', ranked '.$map->set->date_ranked);
                 $this->newLine();
             }
         }
@@ -73,7 +74,7 @@ class AuditBlacklist extends Command
             $fixCount = 0;
 
             foreach ($problemBeatmaps as $maps) {
-                $beatmapIds = $maps->pluck('beatmap_id')->toArray();
+                $beatmapIds = $maps->pluck('id')->toArray();
                 $this->beatmapService->markAsBlacklisted($beatmapIds);
                 $fixCount += count($beatmapIds);
             }
