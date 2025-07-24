@@ -1,10 +1,10 @@
 INSERT INTO winteright.users (
-    id, name, banned, weight, hide_ratings,
-    bio, title, last_seen_at, ip_address,
+    id, name, banned, hide_ratings,
+    bio, title,
     created_at, updated_at
 )
 SELECT
-    UserID, Username, COALESCE(banned, 0), Weight, COALESCE(HideRatings, 0),
-    CustomDescription, UserTitle, NULL, NULL,
+    UserID, Username, COALESCE(banned, 0), COALESCE(HideRatings, 0),
+    CustomDescription, UserTitle,
     NOW(), NOW()
 FROM omdb_old.users;
