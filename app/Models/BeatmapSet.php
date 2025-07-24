@@ -10,7 +10,7 @@ use Illuminate\Support\HtmlString;
 class BeatmapSet extends Model
 {
     protected $fillable = [
-        'set_id', 'creator_id', 'date_ranked', 'genre', 'lang',
+        'id', 'creator_id', 'date_ranked', 'genre', 'lang',
         'artist', 'title', 'has_storyboard', 'has_video'
     ];
 
@@ -20,7 +20,7 @@ class BeatmapSet extends Model
 
     public function beatmaps(): BeatmapSet|HasMany
     {
-        return $this->hasMany(Beatmap::class, 'set_id', 'set_id');
+        return $this->hasMany(Beatmap::class, 'set_id', 'id');
     }
 
     public function creator(): BelongsTo
