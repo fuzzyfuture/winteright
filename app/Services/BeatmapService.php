@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Beatmap;
 use App\Models\BeatmapSet;
+use App\Models\Rating;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -31,7 +32,7 @@ class BeatmapService
             'creator',
             'beatmaps.ratings',
             'beatmaps.userRating',
-        ])->where('set_id', $setId)->firstOrFail();
+        ])->where('id', $setId)->firstOrFail();
     }
 
     /**
@@ -41,7 +42,7 @@ class BeatmapService
      */
     public function beatmapSetExists(int $setId): bool
     {
-        return BeatmapSet::where('set_id', $setId)->exists();
+        return BeatmapSet::where('id', $setId)->exists();
     }
 
     /**
@@ -54,10 +55,10 @@ class BeatmapService
      */
     public function storeBeatmapSetAndBeatmaps($setData, $fullDetails): void
     {
+        $blacklist = $this->blacklistService->getBlacklist();
         DB::transaction(function () use ($setData, $fullDetails) {
-            $blacklist = $this->blacklistService->getBlacklist();
-            $set = BeatmapSet::updateOrCreate(
-                ['set_id' => $setData['id']],
+            return BeatmapSet::updateOrCreate(
+                ['id' => $setData['id']],
                 [
                     'title' => $setData['title'],
                     'artist' => $setData['artist'],
@@ -69,23 +70,25 @@ class BeatmapService
                     'lang' => $fullDetails['language']['id'] ?? null,
                 ]
             );
+        });
 
-            foreach ($fullDetails['beatmaps'] as $map) {
-                $shouldBlacklist = false;
-                $creatorIds = [];
+        foreach ($fullDetails['beatmaps'] as $map) {
+            $shouldBlacklist = false;
+            $creatorIds = [];
 
-                foreach ($map['owners'] as $owner) {
-                    $creatorIds[] = $owner['id'];
+            foreach ($map['owners'] as $owner) {
+                $creatorIds[] = $owner['id'];
 
-                    if (in_array($owner['id'], $blacklist)) {
-                        $shouldBlacklist = true;
-                    }
+                if (in_array($owner['id'], $blacklist)) {
+                    $shouldBlacklist = true;
                 }
+            }
 
+            DB::transaction(function () use ($map, $setData, $shouldBlacklist) {
                 Beatmap::updateOrCreate(
-                    ['beatmap_id' => $map['id']],
+                    ['id' => $map['id']],
                     [
-                        'set_id' => $set->set_id,
+                        'set_id' => $setData['id'],
                         'difficulty_name' => $map['version'],
                         'mode' => $map['mode_int'],
                         'status' => $map['ranked'],
@@ -94,10 +97,10 @@ class BeatmapService
                         'blacklist_reason' => $shouldBlacklist ? 'Mapper requested blacklist.' : null,
                     ]
                 );
+            });
 
-                $this->addCreators($map['id'], $creatorIds);
-            }
-        });
+            $this->addCreators($map['id'], $creatorIds);
+        }
     }
 
     /**
@@ -123,11 +126,12 @@ class BeatmapService
      */
     public function applyCreatorLabels(Collection $beatmaps): void
     {
-        $beatmapIds = $beatmaps->pluck('beatmap_id')->all();
+        $beatmapIds = $beatmaps->pluck('id')->all();
 
         $rawCreators = DB::table('beatmap_creators')
             ->whereIn('beatmap_id', $beatmapIds)
-            ->get();
+            ->get()
+            ->unique();
 
         $ids = $rawCreators->pluck('creator_id')->unique()->all();
         $users = User::whereIn('id', $ids)->get()->keyBy('id');
@@ -143,7 +147,7 @@ class BeatmapService
                 ];
             })->toArray();
 
-            $beatmap = $beatmaps->firstWhere('beatmap_id', $beatmapId);
+            $beatmap = $beatmaps->firstWhere('id', $beatmapId);
             $beatmap->setExternalCreatorLabels($labels);
         }
     }
@@ -188,10 +192,10 @@ class BeatmapService
     public function getUnblacklistedForUser(int $id): Collection
     {
         return Beatmap::with('set')
-            ->join('beatmap_creators', 'beatmaps.beatmap_id', '=', 'beatmap_creators.beatmap_id')
+            ->join('beatmap_creators', 'beatmaps.id', '=', 'beatmap_creators.beatmap_id')
             ->where('beatmap_creators.creator_id', $id)
             ->where('beatmaps.blacklisted', false)
-            ->select('beatmaps.beatmap_id', 'beatmaps.difficulty_name', 'beatmaps.set_id')
+            ->select('beatmaps.id', 'beatmaps.difficulty_name', 'beatmaps.set_id')
             ->get();
     }
 
@@ -219,5 +223,23 @@ class BeatmapService
             ->groupBy('year')
             ->orderByDesc('year')
             ->pluck('year');
+    }
+
+    /**
+     *
+     * @param $id
+     * @return void
+     * @throws Throwable
+     */
+    public function updateWeightedAverage($id): void
+    {
+        $newAverage = Rating::selectRaw('AVG(score / 2) as average')
+            ->where('beatmap_id', $id)
+            ->value('average');
+
+        DB::transaction(function () use ($id, $newAverage) {
+            Beatmap::where('id', $id)
+                ->update(['weighted_avg' => $newAverage]);
+        });
     }
 }
