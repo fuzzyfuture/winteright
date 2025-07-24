@@ -12,7 +12,7 @@ use Illuminate\Support\HtmlString;
 class Beatmap extends Model
 {
     protected $fillable = [
-        'beatmap_id', 'set_id', 'difficulty_name', 'mode', 'status', 'sr',
+        'id', 'set_id', 'difficulty_name', 'mode', 'status', 'sr',
         'weighted_avg', 'bayesian_avg',
         'blacklisted', 'blacklist_reason',
     ];
@@ -21,12 +21,12 @@ class Beatmap extends Model
 
     public function set(): BelongsTo
     {
-        return $this->belongsTo(BeatmapSet::class, 'set_id', 'set_id');
+        return $this->belongsTo(BeatmapSet::class, 'set_id', 'id');
     }
 
     public function creators(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'beatmap_creators', 'beatmap_id', 'creator_id', 'beatmap_id', 'id');
+        return $this->belongsToMany(User::class, 'beatmap_creators', 'beatmap_id', 'creator_id', 'id', 'id');
     }
 
     public function ratings(): HasMany|Beatmap
