@@ -13,13 +13,6 @@ use Throwable;
 
 class BeatmapService
 {
-    protected BlacklistService $blacklistService;
-
-    public function __construct(BlacklistService $blacklistService)
-    {
-        $this->blacklistService = $blacklistService;
-    }
-
     /**
      * Retrieves a beatmap set with the specified ID. Includes the set owner, the ratings for all difficulties, and
      * the current user's rating for all difficulties. Intended for showing full details of a beatmap set.
