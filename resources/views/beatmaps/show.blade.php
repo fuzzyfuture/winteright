@@ -39,43 +39,63 @@
         </div>
     </div>
     <hr>
-    <h4 class="mb-3">difficulties</h4>
-    <div class="list-group">
-        @foreach ($beatmapSet->beatmaps as $beatmap)
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="d-inline-flex gap-1 align-items-baseline">
-                        <div class="fw-bold">{{ $beatmap->difficulty_name }}</div>
-                        <small class="text-muted">
-                            by {{ $beatmap->creator_label }}
-                        </small>
+    <div class="row">
+        <div class="col-md-8">
+            <h4 class="mb-3">difficulties</h4>
+            @if ($beatmapSet->beatmaps->contains('blacklisted', true))
+                <div class="alert alert-sm alert-primary" data-bs-theme="dark">
+                    note: some beatmaps in this set are blacklisted - you are still able to rate them, but their average ratings
+                    are hidden and they will not appear on the charts.
+                </div>
+            @endif
+            <div class="list-group">
+                @foreach ($beatmapSet->beatmaps as $beatmap)
+                    <div class="list-group-item d-flex justify-content-between align-items-center{{ $beatmap->blacklisted ? ' opacity-50' : '' }}">
+                        <div>
+                            <div class="d-inline-flex gap-1 align-items-baseline">
+                                <div class="fw-bold">{{ $beatmap->difficulty_name }}</div>
+                                <small class="text-muted">
+                                    by {{ $beatmap->creator_label }}
+                                </small>
+                            </div>
+                            <br/>
+                            <small class="text-muted">
+                                sr: {{ number_format($beatmap->sr, 2) }} |
+                                status: {{ $beatmap->status_label ?? 'Unknown' }}
+                                @if (!$beatmap->blacklisted)
+                                    | ratings: {{ $beatmap->ratings->count()}}
+                                @endif
+                            </small>
+                        </div>
+                        <div class="text-end d-flex flex-row">
+                            @if (!$beatmap->blacklisted)
+                                <span class="badge bg-main fs-5">{{ number_format($beatmap->weighted_avg, 2) }}</span>
+                            @endif
+                            @auth
+                                <form method="POST" action="{{ route('ratings.update', $beatmap->id) }}"
+                                      class="d-flex align-items-center gap-2 ms-3">
+                                    @csrf
+                                    <select name="score" class="form-select form-select-sm w-auto"
+                                            onchange="this.form.submit()">
+                                        <option value="">unrated</option>
+                                        @foreach (range(0, 10) as $i)
+                                            <option value="{{ $i }}" @selected(optional($beatmap->userRating)->score === $i)>
+                                                {{ number_format($i / 2, 1) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </form>
+                            @endauth
+                        </div>
                     </div>
-                    <br/>
-                    <small class="text-muted">
-                        sr: {{ number_format($beatmap->sr, 2) }} |
-                        status: {{ $beatmap->status_label ?? 'Unknown' }} |
-                        ratings: {{ $beatmap->ratings->count()}}
-                    </small>
-                </div>
-                <div class="text-end d-flex flex-row">
-                    <span class="badge bg-main fs-5">{{ number_format($beatmap->weighted_avg, 2) }}</span>
-                    @auth
-                        <form method="POST" action="{{ route('ratings.update', $beatmap->id) }}"
-                              class="d-flex align-items-center gap-2 ms-3">
-                            @csrf
-                            <select name="score" class="form-select form-select-sm w-auto"
-                                    onchange="this.form.submit()">
-                                <option value="">unrated</option>
-                                @foreach (range(0, 10) as $i)
-                                    <option value="{{ $i }}" @selected(optional($beatmap->userRating)->score === $i)>
-                                        {{ number_format($i / 2, 1) }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </form>
-                    @endauth
-                </div>
+                @endforeach
             </div>
-        @endforeach
+        </div>
+        <div class="col-md-4">
+            <h4 class="mb-3">ratings</h4>
+            <div id='ratings'>
+                @include('partials.beatmapset.ratings')
+            </div>
+        </div>
     </div>
 @endsection
