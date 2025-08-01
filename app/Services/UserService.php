@@ -30,7 +30,8 @@ class UserService
             ->take(5)
             ->get();
 
-        $this->beatmapService->applyCreatorLabels($recentRatings->pluck('beatmap'));
+        $beatmapService = app(BeatmapService::class);
+        $beatmapService->applyCreatorLabels($recentRatings->pluck('beatmap'));
 
         $ratingSpread = $user->ratings()
             ->selectRaw('score as rating_bin, COUNT(*) as count')
