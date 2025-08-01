@@ -6,13 +6,6 @@ use App\Models\User;
 
 class UserService
 {
-    protected BeatmapService $beatmapService;
-
-    public function __construct(BeatmapService $beatmapService)
-    {
-        $this->beatmapService = $beatmapService;
-    }
-
     /**
      * Retrieves a user by their osu! ID.
      * @param int $osuId The user's osu! ID.
