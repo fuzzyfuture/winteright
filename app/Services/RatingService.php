@@ -68,6 +68,7 @@ class RatingService
             return Rating::orderByDesc('updated_at')
                 ->with('user')
                 ->with('beatmap.set')
+                ->whereRelation('beatmap', 'blacklisted', false)
                 ->limit($limit)
                 ->get();
         });
