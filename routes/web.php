@@ -24,10 +24,12 @@ Route::controller(UserController::class)
     ->as('users.')
     ->group(function () {
         Route::get('/users/{id}', [UserController::class, 'show'])->name('show');
+        Route::get('/users/{id}/ratings', [UserController::class, 'ratings'])->name('ratings');
     });
 
 Route::get('/charts', [ChartsController::class, 'index'])->name('charts.index');
 Route::get('/search', [SearchController::class, 'index'])->name('search.index');
+
 Route::get('/mapsets/{set}', [BeatmapSetController::class, 'show'])->name('beatmaps.show');
 Route::get('/mapsets/{set}/ratings', [BeatmapSetController::class, 'ratings'])->name('beatmaps.ratings');
 
