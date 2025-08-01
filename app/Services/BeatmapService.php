@@ -141,7 +141,7 @@ class BeatmapService
      */
     public function getRecentBeatmapSets(int $limit = 10): Collection
     {
-        return Cache::remember('recent_'.$limit.'_beatmap_sets', 43200, function () use ($limit) {
+        return Cache::tags(['recent_beatmap_sets'])->remember('recent_'.$limit.'_beatmap_sets', 43200, function () use ($limit) {
             return BeatmapSet::withCount('beatmaps')
                 ->with('creator')
                 ->orderByDesc('date_ranked')
