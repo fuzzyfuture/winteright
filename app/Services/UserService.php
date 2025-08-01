@@ -7,13 +7,13 @@ use App\Models\User;
 class UserService
 {
     /**
-     * Retrieves a user by their osu! ID.
-     * @param int $osuId The user's osu! ID.
-     * @return User The user object.
+     * Checks if a user with the given ID exists. Returns true if the user exists.
+     * @param int $id The user ID to check.
+     * @return bool True if the user exists.
      */
-    public function getByOsuId(int $osuId): User
+    public function exists(int $id): bool
     {
-        return User::where('id', $osuId)->firstOrFail();
+        return User::whereId($id)->exists();
     }
 
     /**
