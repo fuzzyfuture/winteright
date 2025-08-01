@@ -77,7 +77,9 @@ class BeatmapService
      */
     public function storeBeatmapSetAndBeatmaps($setData, $fullDetails): void
     {
-        $blacklist = $this->blacklistService->getBlacklist();
+        $blacklistService = app(BlacklistService::class);
+        $blacklist = $blacklistService->getBlacklist();
+
         DB::transaction(function () use ($setData, $fullDetails) {
             return BeatmapSet::updateOrCreate(
                 ['id' => $setData['id']],
@@ -94,6 +96,8 @@ class BeatmapService
             );
         });
 
+        $userService = app(UserService::class);
+
         foreach ($fullDetails['beatmaps'] as $map) {
             $shouldBlacklist = false;
             $creatorIds = [];
@@ -103,6 +107,10 @@ class BeatmapService
 
                 if (in_array($owner['id'], $blacklist)) {
                     $shouldBlacklist = true;
+                }
+
+                if (!$userService->exists($owner['id'])) {
+                    $this->addCreatorName($owner['id'], $owner['username']);
                 }
             }
 
