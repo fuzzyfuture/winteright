@@ -74,6 +74,12 @@ class RatingService
         });
     }
 
+    /**
+     * Retrieves all ratings for a given list of beatmap IDs.
+     * @param Collection $ids The list of beatmap IDs.
+     * @param int $perPage The amount of ratings to display per page.
+     * @return Paginator The paginated ratings.
+     */
     public function getForBeatmaps(Collection $ids, int $perPage = 15): Paginator
     {
         return Rating::orderByDesc('updated_at')
@@ -82,5 +88,25 @@ class RatingService
             ->whereIn('beatmap_id', $ids)
             ->whereRelation('beatmap', 'blacklisted', false)
             ->simplePaginate($perPage);
+    }
+
+    /**
+     * Retrieves all ratings for a given user.
+     * @param int $userId The user's ID.
+     * @param int $perPage The amount of ratings to display per page.
+     * @return LengthAwarePaginator The paginated ratings.
+     */
+    public function getForUser(int $userId, ?float $score, int $perPage = 50): LengthAwarePaginator
+    {
+        $query = Rating::orderByDesc('updated_at')
+            ->with('beatmap.set')
+            ->where('user_id', $userId)
+            ->whereRelation('beatmap', 'blacklisted', false);
+
+        if (!is_null($score)) {
+            $query->whereRaw('score / 2 = '.$score);
+        }
+
+        return $query->paginate($perPage);
     }
 }
