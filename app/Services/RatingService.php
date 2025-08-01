@@ -12,13 +12,6 @@ use Throwable;
 
 class RatingService
 {
-    protected BeatmapService $beatmapService;
-
-    public function __construct(BeatmapService $beatmapService)
-    {
-        $this->beatmapService = $beatmapService;
-    }
-
     /**
      * Sets a rating.
      * @param int $userId The user ID to set a rating for.
