@@ -26,6 +26,7 @@ Route::controller(UserController::class)
     });
 
 Route::get('/charts', [ChartsController::class, 'index'])->name('charts.index');
+Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 Route::get('/mapsets/{set}', [BeatmapSetController::class, 'show'])->name('beatmaps.show');
 
 Route::middleware('auth')->post('/beatmaps/{beatmap}/rate', [RatingController::class, 'update'])->name('ratings.update');
