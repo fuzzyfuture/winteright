@@ -5,6 +5,7 @@ use App\Http\Controllers\BeatmapSetController;
 use App\Http\Controllers\ChartsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,5 +29,6 @@ Route::controller(UserController::class)
 Route::get('/charts', [ChartsController::class, 'index'])->name('charts.index');
 Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 Route::get('/mapsets/{set}', [BeatmapSetController::class, 'show'])->name('beatmaps.show');
+Route::get('/mapsets/{set}/ratings', [BeatmapSetController::class, 'ratings'])->name('beatmaps.ratings');
 
 Route::middleware('auth')->post('/beatmaps/{beatmap}/rate', [RatingController::class, 'update'])->name('ratings.update');
