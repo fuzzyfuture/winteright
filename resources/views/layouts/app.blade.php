@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <title>winteright</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta property="og:title" content="winteright">
+    <meta property="og:description" content="a beatmap rating platform for osu!">
+    <meta property="og:url" content="https://winteright.net/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="winteright">
+
     @vite(['resources/js/app.js'])
 </head>
 <body class="d-flex flex-column min-vh-100">
