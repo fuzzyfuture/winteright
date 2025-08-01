@@ -151,9 +151,25 @@ class BeatmapService
     }
 
     /**
-     * Applies creator labels to each beatmap in a collection. If the mapper has used OMDB, their username will
-     * be displayed - otherwise, just their ID. Used for efficient display of mappers per map on the charts.
+     * Returns the raw creator data (beatmap ID, user ID) for a list of beatmap IDs.
+     * @param array $beatmapIds The list of beatmap IDs.
+     * @return Collection The raw creator data (beatmap ID, user ID)
+     */
+    public function getRawCreators(array $beatmapIds): Collection
+    {
+        return DB::table('beatmap_creators')
+            ->whereIn('beatmap_id', $beatmapIds)
+            ->get()
+            ->unique();
+    }
+
+    /**
+     * Applies creator labels to each beatmap in a collection. If the mapper has used OMDB or winteright, their
+     * username will be linked and displayed. If they are present in the beatmap creators table, their unlinked
+     * username will be displayed. Otherwise, their ID is displayed. See `applyCreatorLabelsToSets()` for a similar
+     * method for beatmap sets.
      * @param Collection $beatmaps The list of beatmaps to lookup mappers for.
+     * @return void
      */
     public function applyCreatorLabels(Collection $beatmaps): void
     {
