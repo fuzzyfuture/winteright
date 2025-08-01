@@ -175,14 +175,12 @@ class BeatmapService
     {
         $beatmapIds = $beatmaps->pluck('id')->all();
 
-        $rawCreators = DB::table('beatmap_creators')
-            ->whereIn('beatmap_id', $beatmapIds)
-            ->get()
-            ->unique();
+        $rawCreators = $this->getRawCreators($beatmapIds);
+        $grouped = $rawCreators->groupBy('beatmap_id');
 
         $ids = $rawCreators->pluck('creator_id')->unique()->all();
         $users = User::whereIn('id', $ids)->get()->keyBy('id');
-        $grouped = $rawCreators->groupBy('beatmap_id');
+        $names = DB::table('beatmap_creator_names')->whereIn('id', $ids)->get()->keyBy('id');
 
         foreach ($grouped as $beatmapId => $creators) {
             $labels = $creators->map(function ($creator) use ($users) {
@@ -192,6 +190,7 @@ class BeatmapService
                     'id' => $creator->creator_id,
                     'name' => $user?->name,
                 ];
+                return $this->resolveLabel($creator->creator_id, $users, $names);
             })->toArray();
 
             $beatmap = $beatmaps->firstWhere('id', $beatmapId);
