@@ -10,7 +10,7 @@
                     <a class="nav-link" href="{{ route('charts.index') }}">charts</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">search</a>
+                    <a class="nav-link" href="{{ route('search.index') }}">search</a>
                 </li>
             </ul>
 
