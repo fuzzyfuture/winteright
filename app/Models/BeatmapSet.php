@@ -98,7 +98,7 @@ class BeatmapSet extends Model
                 $isWinteright = true;
             } else {
                 $beatmapService = app(BeatmapService::class);
-                $name = $beatmapService->getCreatorName($this->creator_id) ?? '';
+                $name = $beatmapService->getCreatorName($this->creator_id);
                 $isWinteright = false;
             }
 
