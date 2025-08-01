@@ -90,8 +90,10 @@ class Beatmap extends Model
         $chunks = [];
 
         foreach ($labels as $creator) {
-            if (!empty($creator['name'])) {
-                $localLink = '<a href="'.url('/users/'.$creator['id']).'">'.e($creator['name']).'</a>';
+            if ($creator['isWinteright']) {
+                $localLink = '<a href="' . url('/users/' . $creator['id']) . '">' . e($creator['name']) . '</a>';
+            } else if (!empty($creator['name'])) {
+                $localLink = e($creator['name']);
             } else {
                 $localLink = e($creator['id']);
             }
