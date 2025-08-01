@@ -7,6 +7,7 @@ use App\Services\OsuApiService;
 use App\Services\SiteInfoService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Throwable;
 
@@ -115,6 +116,8 @@ class SyncRecentRankedBeatmaps extends Command
         } while ($cursor);
 
         $this->siteInfoService->storeLastSyncedRankedBeatmaps(Carbon::now()->toDateTimeString());
+
+        Cache::tags(['recent_beatmap_sets'])->flush();
 
         $this->info('Import complete! Imported '.$imported.' beatmap sets.');
     }
