@@ -65,7 +65,7 @@ class BeatmapService
      */
     public function getCreatorName(int $id): string
     {
-        return DB::table('beatmap_creator_names')->where('id', $id)->value('name');
+        return DB::table('beatmap_creator_names')->where('id', $id)->value('name') ?? '';
     }
 
     /**
