@@ -34,7 +34,8 @@ class RatingService
             );
         });
 
-        $this->beatmapService->updateWeightedAverage($beatmapId);
+        $beatmapService = app(BeatmapService::class);
+        $beatmapService->updateWeightedAverage($beatmapId);
     }
 
     /**
@@ -52,7 +53,8 @@ class RatingService
                 ->delete();
         });
 
-        $this->beatmapService->updateWeightedAverage($beatmapId);
+        $beatmapService = app(BeatmapService::class);
+        $beatmapService->updateWeightedAverage($beatmapId);
     }
 
     /**
