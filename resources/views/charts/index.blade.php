@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="col-md-9">
-            <h2>top beatmaps of all-time</h2>
+            <h2>top {{ $excludeRated ? 'unrated ' : '' }}beatmaps of {{ $year ?? 'all-time' }}</h2>
             <div>
                 {{ $topBeatmaps->links() }}
             </div>
