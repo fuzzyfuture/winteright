@@ -73,4 +73,14 @@ class RatingService
                 ->get();
         });
     }
+
+    public function getForBeatmaps(Collection $ids, int $perPage = 15): Paginator
+    {
+        return Rating::orderByDesc('updated_at')
+            ->with('user')
+            ->with('beatmap.set')
+            ->whereIn('beatmap_id', $ids)
+            ->whereRelation('beatmap', 'blacklisted', false)
+            ->simplePaginate($perPage);
+    }
 }
