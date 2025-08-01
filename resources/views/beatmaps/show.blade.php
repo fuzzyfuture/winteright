@@ -3,7 +3,16 @@
 @section('content')
     <div class="row">
         <div class="col-md-6">
-            <h1>{{ $beatmapSet->title }}</h1>
+            <h1>
+                {{ $beatmapSet->title }}
+                <a href="https://osu.ppy.sh/beatmapsets/{{ $beatmapSet->id }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   title="view on osu!"
+                   class="opacity-50 small">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                </a>
+            </h1>
             <h3>{{ $beatmapSet->artist }}</h3>
             <p class="text-muted">
                 mapset by
