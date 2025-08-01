@@ -18,6 +18,16 @@ class UserService
     }
 
     /**
+     * Retrieves the user with the given ID.
+     * @param int $id The user's ID.
+     * @return User The user.
+     */
+    public function get(int $id): User
+    {
+        return User::whereId($id)->firstOrFail();
+    }
+
+    /**
      * Retrieves user data for the profile page. Includes their 5 latest ratings and an array of counts for each
      * rating value.
      * @param User $user The user.

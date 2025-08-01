@@ -25,7 +25,10 @@
             <p class="mb-4">{{ $user->bio }}</p>
         @endif
 
-        <h4 class="mb-3">rating distribution</h4>
+        <div class="mb-3">
+            <h4 class="d-inline mb-0 me-3">ratings</h4>
+            <a href="{{ url('/users/'.$user->id.'/ratings') }}">view all</a>
+        </div>
         <div class="mb-4">
             @for ($i = 10; $i >= 0; $i--)
                 @php
@@ -36,7 +39,11 @@
                 @endphp
 
                 <div class="d-flex align-items-center mb-1">
-                    <div class="me-2" style="width: 3em;">{{ number_format($rating, 1) }}</div>
+                    <div class="me-2" style="width: 3em;">
+                        <a href="{{ url('/users/'.$user->id.'/ratings?score='.number_format($rating, 1)) }}">
+                            {{ number_format($rating, 1) }}
+                        </a>
+                    </div>
                     <div class="progress flex-grow-1 bg-main" style="height: 1.25rem;">
                         <div class="progress-bar" role="progressbar" style="width: {{ $width }}%"></div>
                         <small class="ms-2">{{ $count }}</small>
