@@ -39,6 +39,35 @@ class BeatmapService
     }
 
     /**
+     * Adds a creator name to the beatmap_creator_names table. Used to display mapper names for mappers who are not
+     * Winteright users.
+     * @param int $id The ID of the user.
+     * @param string $name The user's name.
+     * @throws Throwable
+     */
+    public function addCreatorName(int $id, string $name): void
+    {
+        DB::transaction(function () use ($id, $name) {
+           DB::table('beatmap_creator_names')->upsert([
+               'id' => $id,
+               'name' => $name
+           ], ['id']);
+        });
+    }
+
+    /**
+     * Retrieves the beatmap's creator name from the beatmap creator names table. Should only be used if it's
+     * already known that the beatmap's creator is not a winteright user - otherwise, the name should be pulled from
+     * the users table.
+     * @param int $id The beatmap creator's ID.
+     * @return string The name of the beatmap creator.
+     */
+    public function getCreatorName(int $id): string
+    {
+        return DB::table('beatmap_creator_names')->where('id', $id)->value('name');
+    }
+
+    /**
      * Stores a beatmap set in the database, along with its difficulties (beatmaps). Intended for use while syncing
      * with the osu! API; assumes the parameters are structured as received from the osu! API.
      * @param $setData
