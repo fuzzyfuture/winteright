@@ -26,17 +26,17 @@
             <h3 class="mb-3">recent ratings</h3>
             <ul class="list-group mb-3">
                 @foreach ($recentRatings as $rating)
-                    <div class="list-group-item d-flex align-items-center">
+                    <div class="list-group-item d-flex align-items-center ps-1 pe-2">
                         <a href="{{ url("/users/".$rating->user->id) }}" class="d-flex align-items-start flex-nowrap ms-1">
                             <img src="https://a.ppy.sh/{{ $rating->user->id }}" width="16" height="16" alt="Avatar">
-                            <small class="ms-1">{{ $rating->user->name }}</small>
+                            <small class="ms-2">{{ $rating->user->name }}</small>
                         </a>
                         <small class="ms-1">rated</small>
                         <a href="{{ url('/mapsets/'.$rating->beatmap->set->id) }}" class="ms-1 d-flex">
                             <small>{{ $rating->beatmap->set->title }} [{{ $rating->beatmap->difficulty_name }}]</small>
                         </a>
                         <span class="ms-auto badge bg-main fs-6"><small>{{ number_format($rating->score / 2, 1) }}</small></span>
-                        <small class="ms-1 text-nowrap" title="{{ $rating->updated_at }}">{{ $rating->updated_at->diffForHumans() }}</small>
+                        <small class="ms-2 text-nowrap" title="{{ $rating->updated_at }}">{{ $rating->updated_at->diffForHumans() }}</small>
                     </div>
                 @endforeach
             </ul>
