@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\BeatmapService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +18,8 @@ class BeatmapSet extends Model
     protected $casts = [
         'date_ranked' => 'datetime',
     ];
+
+    protected array $externalCreatorLabel = [];
 
     public function beatmaps(): BeatmapSet|HasMany
     {
@@ -78,17 +81,45 @@ class BeatmapSet extends Model
         };
     }
 
+    public function setExternalCreatorLabel(array $label): void
+    {
+        $this->externalCreatorLabel = $label;
+    }
+
     public function getCreatorLabelAttribute(): HtmlString
     {
-        if ($this->creator) {
-            $url = url('/users/'.$this->creator->id);
-            $name = e($this->creator->name);
-            $localLink = '<a href="'.$url.'">'.$name.'</a>';
-        } else {
-            $localLink = e($this->creator_id);
+        $label = $this->externalCreatorLabel;
+
+        if (empty($label)) {
+            $id = $this->creator_id;
+
+            if ($this->creator) {
+                $name = e($this->creator->name);
+                $isWinteright = true;
+            } else {
+                $beatmapService = app(BeatmapService::class);
+                $name = $beatmapService->getCreatorName($this->creator_id) ?? '';
+                $isWinteright = false;
+            }
+
+            $label = [
+              'id' => $id,
+              'name' => $name,
+              'isWinteright' => $isWinteright,
+            ];
         }
 
-        $extLink = '<a href="https://osu.ppy.sh/users/'.$this->creator_id.'"
+        if ($label['isWinteright']) {
+            $url = url('/users/'.$label['id']);
+            $name = e($label['name']);
+            $localLink = '<a href="'.$url.'">'.$name.'</a>';
+        } else if (!blank($label['name'])) {
+            $localLink = e($label['name']);
+        } else {
+            $localLink = e($label['id']);
+        }
+
+        $extLink = '<a href="https://osu.ppy.sh/users/'.$label['id'].'"
                        target="_blank"
                        rel="noopener noreferrer"
                        title="view on osu!"
