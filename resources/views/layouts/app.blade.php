@@ -16,6 +16,7 @@
             <main class="content p-4">
                 @yield('content')
             </main>
+            @yield('scripts')
             @include('partials.footer')
         </div>
     </div>
