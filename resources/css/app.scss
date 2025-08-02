@@ -19,7 +19,7 @@ $gradient-4: #8e78e1;
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
 body {
-    background-image: url('../img/bg-stars.png');
+    background-image: url('../../public/img/bg-stars.png');
 }
 
 .bg-main {
@@ -100,7 +100,7 @@ body {
 
 footer {
     padding: 10px 5px 5px 5px;
-    background: $footer url('../img/bg-dots.png') repeat-x !important;
+    background: $footer url('../../public/img/bg-dots.png') repeat-x !important;
 }
 
 .page-item.disabled .page-link {
