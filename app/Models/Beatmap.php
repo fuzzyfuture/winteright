@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\HtmlString;
 
 class Beatmap extends Model
@@ -59,6 +60,18 @@ class Beatmap extends Model
             4 => 'loved',
             default => 'submitted',
         };
+    }
+
+    public function getModeIconAttribute(): string
+    {
+        $fileName = match ($this->mode) {
+            0 => 'mode-osu-small',
+            1 => 'mode-taiko-small',
+            2 => 'mode-fruits-small',
+            3 => 'mode-mania-small',
+        };
+
+        return '<img src="'.asset('/img/modes/'.$fileName.'.png').'"/>';
     }
 
     public function setExternalCreatorLabels(array $labels): void
