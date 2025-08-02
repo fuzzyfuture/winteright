@@ -50,8 +50,9 @@
             @endif
             <div class="list-group">
                 @foreach ($beatmapSet->beatmaps as $beatmap)
-                    <div class="list-group-item d-flex justify-content-between align-items-center{{ $beatmap->blacklisted ? ' opacity-50' : '' }}">
-                        <div>
+                    <div class="list-group-item d-flex align-items-center{{ $beatmap->blacklisted ? ' opacity-50' : '' }}">
+                        {!! $beatmap->mode_icon !!}
+                        <div class="ms-3">
                             <div class="d-inline-flex gap-1 align-items-baseline">
                                 <div class="fw-bold">{{ $beatmap->difficulty_name }}</div>
                                 <small class="text-muted">
@@ -67,7 +68,7 @@
                                 @endif
                             </small>
                         </div>
-                        <div class="text-end d-flex flex-row">
+                        <div class="ms-auto text-end d-flex flex-row">
                             @if (!$beatmap->blacklisted)
                                 <span class="badge bg-main fs-5">{{ number_format($beatmap->weighted_avg, 2) }}</span>
                             @endif
