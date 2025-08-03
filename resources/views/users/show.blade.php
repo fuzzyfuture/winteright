@@ -53,7 +53,7 @@
         </div>
 
         <h4 class="mb-3">recently rated</h4>
-        <div class="list-group">
+        <div class="list-group mb-4">
             @forelse ($recentRatings as $rating)
                 <div class="list-group-item d-flex align-items-center p-3">
                     <img src="https://assets.ppy.sh/beatmaps/{{ $rating->beatmap->set->id }}/covers/cover.jpg" alt="beatmap bg" width="175" />
@@ -76,7 +76,18 @@
                     </div>
                 </div>
             @empty
-                <div class="text-muted">No ratings found.</div>
+                <div class="text-muted">no ratings found.</div>
+            @endforelse
+        </div>
+
+        <h4>lists</h4>
+        <div class="list-group">
+            @forelse ($lists as $list)
+                <div class="list-group-item">
+                    <a href="{{ url('/lists/'.$list->id) }}">{{ $list->name }}</a>
+                </div>
+            @empty
+                <div class="text-muted">no lists found.</div>
             @endforelse
         </div>
     </div>
