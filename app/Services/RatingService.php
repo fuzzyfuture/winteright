@@ -109,4 +109,35 @@ class RatingService
 
         return $query->paginate($perPage);
     }
+
+    /**
+     * Retrieves recent ratings for a specified user.
+     * @param int $userId The user's ID.
+     * @param int $limit The amount of recent ratings to retrieve.
+     * @return Collection The user's recent ratings.
+     */
+    public function getRecentForUser(int $userId, int $limit = 5): Collection
+    {
+        return Rating::where('user_id', $userId)
+            ->with('user')
+            ->with('beatmap.set')
+            ->orderBy('updated_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Retrieves the users rating spread as an array of the rating bin (e.g. 0.5, 1.0) and the amount of ratings
+     * in that bin.
+     * @param int $userId The user's ID.
+     * @return Collection The user's rating spread.
+     */
+    public function getSpreadForUser(int $userId): Collection
+    {
+        return Rating::where('user_id', $userId)
+            ->selectRaw('score as rating_bin, COUNT(*) as count')
+            ->groupBy('rating_bin')
+            ->orderBy('rating_bin')
+            ->pluck('count', 'rating_bin');
+    }
 }
