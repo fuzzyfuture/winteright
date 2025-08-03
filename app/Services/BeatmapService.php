@@ -299,7 +299,7 @@ class BeatmapService
      */
     public function markAsBlacklisted(array $beatmapIds): void
     {
-        Beatmap::whereIn('beatmap_id', $beatmapIds)
+        Beatmap::whereIn('id', $beatmapIds)
             ->update([
                 'blacklisted' => true,
                 'blacklist_reason' => 'Mapper requested blacklist.',
