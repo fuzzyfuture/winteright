@@ -12,6 +12,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('search.index') }}">search</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('lists.index') }}">lists</a>
+                </li>
             </ul>
 
             <ul class="navbar-nav ms-auto">
