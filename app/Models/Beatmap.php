@@ -124,4 +124,26 @@ class Beatmap extends Model
         $output .= implode(', ', $chunks);
         return new HtmlString($output);
     }
+
+    public function getUrlAttribute(): HtmlString
+    {
+        $localUrl = route('beatmaps.show', $this->set_id);
+        $text = $this->set->artist.' - '.$this->set->title.' ['.$this->difficulty_name.']';
+
+        $localLink = '<a href="'.$localUrl.'">'.e($text).'</a>';
+        $extLink = '<a href="https://osu.ppy.sh/beatmapsets/'.$this->set_id.'#osu/'.$this->id.'"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       title="view on osu!"
+                       class="opacity-50 small">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>';
+
+        return new HtmlString($localLink.$extLink);
+    }
+
+    public function getBgUrlAttribute(): string
+    {
+        return 'https://assets.ppy.sh/beatmaps/'.$this->set_id.'/covers/cover.jpg';
+    }
 }
