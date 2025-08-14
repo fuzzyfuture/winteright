@@ -8,13 +8,13 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label">artist/title contains</label>
-                        <input class="form-control" name="artist-title" value="{{ $artistTitle }}">
+                        <input class="form-control" name="artistTitle" value="{{ $artistTitle }}">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">mapper name is</label>
-                        <input class="form-control mb-3" name="mapper-name" value="{{ $mapperName }}">
+                        <input class="form-control mb-3" name="mapperName" value="{{ $mapperName }}">
                         <label class="form-label">mapper id is</label>
-                        <input class="form-control" name="mapper-id" value="{{ $mapperId }}">
+                        <input class="form-control" name="mapperId" value="{{ $mapperId }}">
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary float-end">search</button>
