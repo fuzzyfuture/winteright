@@ -62,7 +62,7 @@ class Beatmap extends Model
         };
     }
 
-    public function getModeIconAttribute(): string
+    public function getModeIconAttribute(): HtmlString
     {
         $fileName = match ($this->mode) {
             0 => 'mode-osu-small',
@@ -71,7 +71,7 @@ class Beatmap extends Model
             3 => 'mode-mania-small',
         };
 
-        return '<img src="'.asset('/img/modes/'.$fileName.'.png').'"/>';
+        return new HtmlString('<img src="'.asset('/img/modes/'.$fileName.'.png').'"/>');
     }
 
     public function setExternalCreatorLabels(array $labels): void
