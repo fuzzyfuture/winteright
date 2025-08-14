@@ -40,19 +40,7 @@
                         <div class="col-md-10 p-3 ps-1">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <div>
-                                    <h5 class="mb-1 d-flex align-items-center gap-2">
-                                        <a href="{{ url("/mapsets/{$beatmap->set->id}") }}">
-                                            {{ $beatmap->set->artist ?? '?' }} - {{ $beatmap->set->title . ' [' . $beatmap->difficulty_name . ']' ?? '?' }}
-                                        </a>
-                                        <a href="https://osu.ppy.sh/beatmapsets/{{ $beatmap->set->id }}#osu/{{ $beatmap->id }}"
-                                           target="_blank"
-                                           rel="noopener noreferrer"
-                                           title="view on osu!"
-                                           class="opacity-50 small">
-                                            <i class="bi bi-box-arrow-up-right"></i>
-                                        </a>
-                                    </h5>
-
+                                    <h5 class="mb-1">{{ $beatmap->url }}</h5>
                                     <div>
                                         mapped by: {{ $beatmap->creator_label }}
                                     </div>
