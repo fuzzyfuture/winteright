@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('user_lists', function (Blueprint $table) {
             $table->bigIncrements('id')->unsigned();
             $table->string('name');
-            $table->string('description');
+            $table->text('description');
             $table->bigInteger('user_id')->unsigned();
+            $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
