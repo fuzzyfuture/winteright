@@ -19,9 +19,9 @@ class SearchController extends Controller
 
     public function index(Request $request)
     {
-        $artistTitle = $request->query('artist-title');
-        $mapperName = $request->query('mapper-name');
-        $mapperId = $request->query('mapper-id');
+        $artistTitle = $request->query('artistTitle');
+        $mapperName = $request->query('mapperName');
+        $mapperId = $request->query('mapperId');
 
         $searchResults = $this->searchService->search($artistTitle, $mapperName, $mapperId);
         $searchResults->appends($request->query());
