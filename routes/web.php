@@ -24,17 +24,31 @@ Route::controller(OsuController::class)
 Route::controller(UserController::class)
     ->as('users.')
     ->group(function () {
-        Route::get('/users/{id}', [UserController::class, 'show'])->name('show');
-        Route::get('/users/{id}/ratings', [UserController::class, 'ratings'])->name('ratings');
+        Route::get('/users/{id}', 'show')->name('show');
+        Route::get('/users/{id}/ratings', 'ratings')->name('ratings');
+    });
+
+Route::controller(BeatmapSetController::class)
+    ->as('beatmaps.')
+    ->group(function () {
+        Route::get('/mapsets/{set}', 'show')->name('show');
+        Route::get('/mapsets/{set}/ratings', 'ratings')->name('ratings');
     });
 
 Route::get('/charts', [ChartsController::class, 'index'])->name('charts.index');
 Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 
-Route::get('/mapsets/{set}', [BeatmapSetController::class, 'show'])->name('beatmaps.show');
-Route::get('/mapsets/{set}/ratings', [BeatmapSetController::class, 'ratings'])->name('beatmaps.ratings');
+Route::middleware('auth')->group(function () {
+    Route::post('/beatmaps/{id}/rate', [RatingController::class, 'update'])->name('ratings.update');
 
-Route::get('/lists', [UserListController::class, 'index'])->name('lists.index');
-Route::get('/lists/{id}', [UserListController::class, 'show'])->name('lists.show');
+    Route::get('/lists/new', [UserListController::class, 'getNew'])->name('lists.new');
+    Route::post('/lists/new', [UserListController::class, 'postNew'])->name('lists.new.post');
+});
 
-Route::middleware('auth')->post('/beatmaps/{beatmap}/rate', [RatingController::class, 'update'])->name('ratings.update');
+Route::controller(UserListController::class)
+    ->as('lists.')
+    ->group(function () {
+        Route::get('/lists', 'index')->name('index');
+        Route::get('/lists/{id}', 'show')->name('show');
+    });
+
