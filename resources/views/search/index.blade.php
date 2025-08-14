@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="mb-4">search</h1>
-    <div class="card mb-4">
+    <h1 class="mb-3">search</h1>
+    <div class="card mb-3">
         <div class="card-body">
             <form href="{{ url('/charts') }}" method="GET">
                 <div class="row mb-3">
