@@ -9,14 +9,7 @@
             <div class="list-group-item d-flex align-items-center p-3">
                 <img src="https://assets.ppy.sh/beatmaps/{{ $rating->beatmap->set->id }}/covers/cover.jpg" alt="beatmap bg" width="175" />
                 <div class="ms-3">
-                    <a href="{{ url('/mapsets/'.$rating->beatmap->set->id) }}"><strong>{{ $rating->beatmap->set->artist }} - {{ $rating->beatmap->set->title }} [{{ $rating->beatmap->difficulty_name }}]</strong></a>
-                    <a href="https://osu.ppy.sh/beatmapsets/{{ $rating->beatmap->set->id }}#osu/{{ $rating->beatmap->id }}"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       title="view on osu!"
-                       class="opacity-50 small">
-                        <i class="bi bi-box-arrow-up-right"></i>
-                    </a>
+                    <strong>{{ $rating->beatmap->url }}</strong>
                     <small class="text-muted d-block">
                         by {{ $rating->beatmap->creator_label }}
                     </small>
