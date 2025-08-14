@@ -66,4 +66,21 @@ class UserService
 
         return -1;
     }
+
+    /**
+     * Retrieves a user's ID by name. Does not use the beatmap creator names table as a fallback - only retrieves the
+     * ID if the user is a winteright user.
+     * @param string $name The user's name.
+     * @return int The user's ID if they're a winteright user - otherwise -1.
+     */
+    public function getIdByNameUsersOnly(string $name): int
+    {
+        $user = User::whereName($name)->first();
+
+        if ($user) {
+            return $user->id;
+        }
+
+        return -1;
+    }
 }
