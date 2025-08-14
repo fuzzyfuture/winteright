@@ -77,7 +77,7 @@
         <div class="list-group">
             @forelse ($lists as $list)
                 <div class="list-group-item">
-                    <a href="{{ url('/lists/'.$list->id) }}">{{ $list->name }}</a>
+                    <a href="{{ url('/lists/'.$list->id) }}">{{ !blank($list->name) ? $list->name : $list->id }}</a>
                 </div>
             @empty
                 <div class="text-muted">no lists found.</div>
