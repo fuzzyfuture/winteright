@@ -18,7 +18,12 @@
         <div class="container" id="mainContainer">
             @include('partials.header')
             @if (session('success'))
-                <div class="alert alert-primary m-3" data-bs-theme="dark">{{ session('success') }}</div>
+                <div class="alert alert-primary m-3 mb-0" data-bs-theme="dark">{{ session('success') }}</div>
+            @endif
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <div class="alert alert-primary m-3 mb-0" data-bs-theme="dark">{{ strtolower($error) }}</div>
+                @endforeach
             @endif
             <main class="content p-4">
                 @yield('content')
