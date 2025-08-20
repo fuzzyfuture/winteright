@@ -22,6 +22,7 @@
     </h2>
     <div class="mb-3">
         <small class="text-muted">
+            {{ $list->is_public ? 'public' : 'private' }} list <br/>
             created: {{ $list->created_at->toFormattedDateString() }}<br/>
             last updated: {{ $list->updated_at ? $list->updated_at->toFormattedDateString() : 'never' }}
         </small>
