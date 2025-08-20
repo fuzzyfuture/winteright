@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::controller(OsuController::class)
-    ->as('auth.osu.')
+Route::controller(AuthController::class)
+    ->as('auth.')
     ->group(function () {
         Route::get('/login', 'loginRedirect')->name('login');
         Route::get('/auth/redirect', 'redirect')->name('redirect');
