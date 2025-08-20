@@ -58,6 +58,13 @@ class UserListService
         return $items;
     }
 
+    /**
+     * Retrieves lists with the specified search parameters.
+     * @param string|null $name The list name to search for.
+     * @param string|null $creatorName The creator name to search for.
+     * @param int $perPage The amount of results to display per page.
+     * @return LengthAwarePaginator The paginated results.
+     */
     public function search(?string $name, ?string $creatorName, int $perPage = 50): LengthAwarePaginator
     {
         $query = UserList::with('owner')
