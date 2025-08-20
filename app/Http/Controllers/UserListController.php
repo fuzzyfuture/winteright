@@ -21,7 +21,7 @@ class UserListController extends Controller
     public function index(Request $request)
     {
         $name = $request->query('name');
-        $creatorName = $request->query('creatorName');
+        $creatorName = $request->query('creator_name');
 
         $lists = $this->userListService->search($name, $creatorName);
         $lists->appends($request->query());
