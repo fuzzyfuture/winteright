@@ -7,20 +7,15 @@
             <h2>filters</h2>
             <div class="card">
                 <div class="card-body">
-                    <form href="{{ url('/charts') }}" method="GET">
-                        <label class="form-label">year</label>
-                        <select class="form-select mb-2" name="year">
-                            <option value="" {{ !$year ? 'selected' : '' }}>all-time</option>
-                            @foreach ($beatmapYears as $beatmapYear)
-                                <option value="{{ $beatmapYear }}" {{ $year == $beatmapYear ? 'selected' : '' }}>{{ $beatmapYear }}</option>
-                            @endforeach
-                        </select>
+                    {{ html()->form('GET', route('charts.index'))->open() }}
+                        {{ html()->label('year', 'year')->class('form-label') }}
+                        {{ html()->select('year', $yearOptions, $year)->class('form-select mb-2') }}
                         <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" name="excludeRated" {{ $excludeRated ? 'checked' : '' }}>
-                            <label class="form-check-label">exclude rated beatmaps</label>
+                            {{ html()->checkbox('exclude_rated', $excludeRated)->class('form-check-input') }}
+                            {{ html()->label('exclude rated beatmaps', 'exclude_rated')->class('form-check-label') }}
                         </div>
-                        <button type="submit" class="btn btn-primary float-end">filter</button>
-                    </form>
+                        {{ html()->submit('filter')->class('btn btn-primary float-end') }}
+                    {{ html()->form()->close() }}
                 </div>
             </div>
         </div>
