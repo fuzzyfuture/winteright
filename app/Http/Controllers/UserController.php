@@ -35,7 +35,7 @@ class UserController extends Controller
         $beatmapService->applyCreatorLabels($recentRatings->pluck('beatmap'));
 
         $ratingSpread = $this->ratingService->getSpreadForUser($id);
-        $lists = $this->userListService->getForUser($id);
+        $lists = $this->userListService->getPublicForUser($id);
 
         return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists'));
     }
