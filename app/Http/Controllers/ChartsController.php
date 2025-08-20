@@ -23,7 +23,7 @@ class ChartsController extends Controller
     {
         $page = $request->get('page', 1);
         $year = $request->query('year');
-        $excludeRated = $request->query('excludeRated');
+        $excludeRated = $request->query('exclude_rated');
 
         $perPage = 50;
         $maxPages = 200;
