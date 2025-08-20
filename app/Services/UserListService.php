@@ -16,7 +16,17 @@ class UserListService
      * @param int $id The ID of the list.
      * @return UserList The list.
      */
-    public function get(int $id): UserList
+    public function get(int $id): ?UserList
+    {
+        return UserList::find($id);
+    }
+
+    /**
+     * Retrieves a list by ID. Includes the owner relation.
+     * @param int $id The ID of the list.
+     * @return UserList The list, if it exists. Null if the list does not exist.
+     */
+    public function getWithOwner(int $id): UserList
     {
         return UserList::whereId($id)
             ->with('owner')
