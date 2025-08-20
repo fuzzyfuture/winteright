@@ -31,7 +31,12 @@ class UserListController extends Controller
 
     public function show($listId)
     {
-        $list = $this->userListService->get($listId);
+        $list = $this->userListService->getWithOwner($listId);
+
+        if (Auth::user()->cannot('view', $list)) {
+            return back()->withErrors('you do not have permission to view this list.');
+        }
+
         $items = $this->userListService->getItems($listId);
 
         $beatmapItems = $items->where('item_type', UserListItemType::BEATMAP);
