@@ -8,6 +8,8 @@ use App\Models\UserList;
 use App\Models\UserListItem;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class UserListService
 {
@@ -86,12 +88,72 @@ class UserListService
     }
 
     /**
-     * Retrieves a user's lists.
+     * Retrieves a user's public lists.
      * @param int $userId The user ID.
-     * @return Collection The user's lists.
+     * @return Collection The user's public lists.
      */
-    public function getForUser(int $userId): Collection
+    public function getPublicForUser(int $userId): Collection
     {
-        return UserList::where('user_id', $userId)->get();
+        return UserList::where('user_id', $userId)
+            ->where('is_public', true)
+            ->get();
+    }
+
+    /**
+     * Creates a new list.
+     * @param int $userId The user ID of the creator of the list.
+     * @param string $name The name of the list.
+     * @param string $description The list's description.
+     * @param bool $isPublic True if the list should be public.
+     * @return UserList The newly created list.
+     * @throws Throwable
+     */
+    public function create(int $userId, string $name, string $description, bool $isPublic): UserList
+    {
+        return DB::transaction(function () use ($userId, $name, $description, $isPublic) {
+            return UserList::create([
+                'user_id' => $userId,
+                'name' => $name,
+                'description' => $description,
+                'is_public' => $isPublic,
+            ]);
+        });
+    }
+
+    /**
+     * Updates a list.
+     * @param int $listId The ID of the list to update.
+     * @param string $name The name of the list.
+     * @param string $description The list's description.
+     * @param bool $isPublic True if the list should be public.
+     * @return UserList The updated list.
+     * @throws Throwable
+     */
+    public function update(int $listId, string $name, string $description, bool $isPublic): UserList
+    {
+        return DB::transaction(function () use ($listId, $name, $description, $isPublic) {
+            $list = UserList::findOrFail($listId);
+
+            $list->name = $name;
+            $list->description = $description;
+            $list->is_public = $isPublic;
+
+            $list->save();
+
+            return $list;
+        });
+    }
+
+    /**
+     * Deletes a list.
+     * @param int $listId The ID of the list to be deleted.
+     * @return void
+     * @throws Throwable
+     */
+    public function delete(int $listId): void
+    {
+        DB::transaction(function () use ($listId) {
+            UserList::destroy($listId);
+        });
     }
 }
