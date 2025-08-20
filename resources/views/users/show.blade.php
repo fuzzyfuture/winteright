@@ -73,7 +73,7 @@
             @endforelse
         </div>
 
-        <h4>lists</h4>
+        <h4 class="mb-3">lists</h4>
         <div class="list-group">
             @forelse ($lists as $list)
                 <div class="list-group-item">
