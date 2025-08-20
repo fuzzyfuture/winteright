@@ -30,7 +30,7 @@ class UserListService
     {
         return UserList::whereId($id)
             ->with('owner')
-            ->first();
+            ->firstOrFail();
     }
 
     /**
