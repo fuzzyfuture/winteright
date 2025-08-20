@@ -20,20 +20,19 @@
             <ul class="navbar-nav ms-auto">
                 @if (Auth::check())
                     <li class="nav-item">
-                        <a href="{{ url("/users/".Auth::user()->id) }}" class="nav-link">
-                            <img src="https://a.ppy.sh/{{ Auth::user()->id }}" class="me-1" width="16" height="16" alt="Avatar">
+                        <a href="{{ route('users.show', Auth::id()) }}" class="nav-link">
+                            <img src="https://a.ppy.sh/{{ Auth::id() }}" class="me-1" width="16" height="16" alt="Avatar">
                             <span class="text-body">{{ Auth::user()->name }}</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <form action="{{ route('auth.osu.logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="nav-link w-100 text-start">logout</button>
-                        </form>
+                        {{ html()->form('POST', route('auth.logout'))->open() }}
+                            {{ html()->submit('logout')->class('nav-link w-100 text-start') }}
+                        {{ html()->form()->close() }}
                     </li>
                 @else
                     <li class="nav-item">
-                        <a href="{{ route('auth.osu.login') }}" class="nav-link" >login with osu!</a>
+                        <a href="{{ route('auth.login') }}" class="nav-link" >login with osu!</a>
                     </li>
                 @endif
             </ul>
