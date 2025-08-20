@@ -77,7 +77,8 @@
         <div class="list-group">
             @forelse ($lists as $list)
                 <div class="list-group-item">
-                    <a href="{{ url('/lists/'.$list->id) }}">{{ !blank($list->name) ? $list->name : $list->id }}</a>
+                    <a href="{{ url('/lists/'.$list->id) }}">{{ !blank($list->name) ? $list->name : $list->id }}</a> <br/>
+                    <small class="text-muted">last updated: {{ $list->updated_at->toFormattedDateString() ?? 'never' }}</small>
                 </div>
             @empty
                 <div class="text-muted">no lists found.</div>
