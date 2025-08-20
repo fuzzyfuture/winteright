@@ -73,19 +73,9 @@
                                 <span class="badge bg-main fs-5">{{ number_format($beatmap->weighted_avg, 2) }}</span>
                             @endif
                             @auth
-                                <form method="POST" action="{{ route('ratings.update', $beatmap->id) }}"
-                                      class="d-flex align-items-center gap-2 ms-3">
-                                    @csrf
-                                    <select name="score" class="form-select form-select-sm w-auto"
-                                            onchange="this.form.submit()">
-                                        <option value="">unrated</option>
-                                        @foreach (range(0, 10) as $i)
-                                            <option value="{{ $i }}" @selected(optional($beatmap->userRating)->score === $i)>
-                                                {{ number_format($i / 2, 1) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </form>
+                                {{ html()->form('POST', route('ratings.update', $beatmap->id))->class('d-flex align-items-center gap-2 ms-3')->open() }}
+                                    {{ html()->select('score', $ratingOptions, $beatmap->userRating?->score ?? '')->class('form-select form-select-sm w-auto')->attribute('onchange', 'this.form.submit()') }}
+                                {{ html()->form()->close() }}
                             @endauth
                         </div>
                     </div>
