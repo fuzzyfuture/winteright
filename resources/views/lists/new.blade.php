@@ -2,16 +2,19 @@
 
 @section('content')
     <h1 class="mb-3">lists - new</h1>
-    <form href="{{ route('lists.new.post') }}" method="POST">
-        @csrf
+    {{ html()->form('POST', route('lists.new.post'))->open() }}
         <div class="mb-3">
-            <label class="form-label">name</label>
-            <input class="form-control" name="name">
+            {{ html()->label('name *', 'name')->class('form-label') }}
+            {{ html()->text('name')->class('form-control') }}
         </div>
         <div class="mb-3">
-            <label class="form-label">description</label>
-            <textarea class="form-control" name="description"></textarea>
+            {{ html()->label('description', 'description')->class('form-label') }}
+            {{ html()->textarea('description')->class('form-control') }}
         </div>
-        <button type="submit" class="btn btn-primary">submit</button>
-    </form>
+        <div class="mb-4">
+            {{ html()->label('visibility', 'is_public')->class('form-label') }}
+            {{ html()->select('is_public', [1 => 'public', 0 => 'private'])->class('form-select') }}
+        </div>
+        {{ html()->submit('submit')->class('btn btn-primary') }}
+    {{ html()->form()->close() }}
 @endsection
