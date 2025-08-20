@@ -4,19 +4,19 @@
     <h1 class="mb-3">lists</h1>
     <div class="card mb-4">
         <div class="card-body">
-            <form href="{{ route('lists.index') }}" method="GET">
+            {{ html()->form('GET', route('lists.index'))->open() }}
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label class="form-label">name contains</label>
-                        <input class="form-control" name="name" value="{{ $name }}">
+                        {{ html()->label('name contains', 'name')->class('form-label') }}
+                        {{ html()->text('name', $name)->class('form-control') }}
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">creator name is</label>
-                        <input class="form-control mb-3" name="creatorName" value="{{ $creatorName }}">
+                        {{ html()->label('creator name is', 'creator_name')->class('form-label') }}
+                        {{ html()->text('creator_name', $creatorName)->class('form-control mb-3') }}
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary float-end">search</button>
-            </form>
+                {{ html()->submit('search')->class('btn btn-primary float-end') }}
+            {{ html()->form()->close() }}
         </div>
     </div>
     <div class="mb-3">
