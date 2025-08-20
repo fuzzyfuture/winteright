@@ -1,7 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>lists</h1>
+    <div class="d-flex flex-row align-items-center">
+        <h1>lists</h1>
+        @can('update', $list)
+            <a href="{{ route('lists.edit', $list->id) }}" class="ms-auto btn btn-outline-primary">
+                <i class="bi bi-pencil"></i>
+                edit
+            </a>
+        @endcan
+    </div>
     <h2>
         {{ $list->name }} by <a href="{{ url('/users/'.$list->user_id) }}">{{ $list->owner->name }}</a>
         <a href="https://osu.ppy.sh/users/{{ $list->user_id }}"
