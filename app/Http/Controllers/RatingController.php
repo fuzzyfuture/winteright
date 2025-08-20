@@ -17,12 +17,13 @@ class RatingController extends Controller
         $this->ratingService = $ratingService;
     }
 
-    public function update(Request $request, int $beatmapId)
+    public function update(Request $request, RatingValidator $validator, int $beatmapId)
     {
         $userId = Auth::id();
-        $validated = $request->validate([
-            'score' => ['nullable', 'integer', 'between:0,10'],
-        ]);
+
+        if (!$validator->validate($request->all(['score']), 'update')) {
+            return back()->withErrors($validator);
+        }
 
         if ($request->score === null || $request->score === '') {
             try {
