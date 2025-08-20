@@ -4,21 +4,21 @@
     <h1 class="mb-3">search</h1>
     <div class="card mb-3">
         <div class="card-body">
-            <form href="{{ url('/charts') }}" method="GET">
+            {{ html()->form('GET', route('search.index'))->open() }}
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label class="form-label">artist/title contains</label>
-                        <input class="form-control" name="artistTitle" value="{{ $artistTitle }}">
+                        {{ html()->label('artist/title contains', 'artist_title')->class('form-label') }}
+                        {{ html()->text('artist_title', $artistTitle)->class('form-control') }}
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">mapper name is</label>
-                        <input class="form-control mb-3" name="mapperName" value="{{ $mapperName }}">
-                        <label class="form-label">mapper id is</label>
-                        <input class="form-control" name="mapperId" value="{{ $mapperId }}">
+                        {{ html()->label('mapper name is', 'mapper_name')->class('form-label') }}
+                        {{ html()->text('mapper_name', $mapperName)->class('form-control mb-3') }}
+                        {{ html()->label('mapper id is', 'mapperId')->class('form-label') }}
+                        {{ html()->text('mapper_id', $mapperId)->class('form-control') }}
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary float-end">search</button>
-            </form>
+                {{ html()->submit('search')->class('btn btn-primary float-end') }}
+            {{ html()->form()->close() }}
         </div>
     </div>
     <div>
