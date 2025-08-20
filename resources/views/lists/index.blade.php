@@ -42,6 +42,7 @@
                            class="opacity-50 small">
                             <i class="bi bi-box-arrow-up-right"></i>
                         </a>
+                        <span class="text-muted"> - last updated: {{ $list->updated_at?->toFormattedDateString() ?? 'never' }}</span>
                     </small>
                 </div>
             </div>
