@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Auth\OsuController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeatmapSetController;
 use App\Http\Controllers\ChartsController;
 use App\Http\Controllers\HomeController;
