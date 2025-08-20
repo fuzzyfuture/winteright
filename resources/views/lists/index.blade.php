@@ -20,7 +20,10 @@
         </div>
     </div>
     <div class="mb-3">
-        <a href="{{ route('lists.new') }}" class="btn btn-sm btn-outline-primary">new</a>
+        <a href="{{ route('lists.new') }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-plus"></i>
+            new
+        </a>
     </div>
     <div>
         {{ $lists->links() }}
