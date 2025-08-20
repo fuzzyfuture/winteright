@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Enums\UserListItemType;
 use App\Services\BeatmapService;
 use App\Services\UserListService;
+use App\Validators\UserListValidator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Throwable;
 
 class UserListController extends Controller
 {
@@ -53,8 +56,71 @@ class UserListController extends Controller
         return view('lists.new');
     }
 
-    public function postNew()
+    public function postNew(Request $request, UserListValidator $validator)
     {
+        if (!$validator->validate($request->input(), 'create')) {
+            return back()->withInput($request->input())->withErrors($validator);
+        }
 
+        $userId = Auth::id();
+
+        try {
+            $data = $validator->getData();
+            $list = $this->userListService->create($userId, $data['name'], $data['description'], $data['is_public']);
+        } catch (Throwable $e) {
+            return back()->withErrors('error creating list: '.$e->getMessage());
+        }
+
+        return redirect()->route('lists.show', ['id' => $list->id])->with('success', 'list created successfuly!');
+    }
+
+    public function getEdit($listId)
+    {
+        $list = $this->userListService->get($listId);
+
+        if (Auth::user()->cannot('update', $list)) {
+            return back()->withErrors('you do not have permission to edit this list.');
+        }
+
+        return view('lists.edit', compact('list'));
+    }
+
+    public function postEdit(Request $request, UserListValidator $validator, $listId)
+    {
+        if (!$validator->validate($request->input(), 'update')) {
+            return back()->withInput($request->input())->withErrors($validator);
+        }
+
+        $list = $this->userListService->get($listId);
+
+        if (Auth::user()->cannot('update', $list)) {
+            return back()->withErrors('you do not have permission to edit this list.');
+        }
+
+        try {
+            $data = $validator->getData();
+            $list = $this->userListService->update($listId, $data['name'], $data['description'], $data['is_public']);
+        } catch (Throwable $e) {
+            return back()->withErrors('error updating list: '.$e->getMessage());
+        }
+
+        return redirect()->route('lists.show', ['id' => $list->id])->with('success', 'list updated successfully!');
+    }
+
+    public function delete($listId)
+    {
+        $list = $this->userListService->get($listId);
+
+        if (Auth::user()->cannot('delete', $list)) {
+            return back()->withErrors('you do not have permission to delete this list.');
+        }
+
+        try {
+            $this->userListService->delete($listId);
+        } catch (Throwable $e) {
+            return back()->withErrors('error deleting list: '.$e->getMessage());
+        }
+
+        return redirect()->route('lists.index')->with('success', 'list deleted successfully!');
     }
 }
