@@ -40,14 +40,21 @@ Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 
 Route::middleware('auth')->group(function () {
     Route::post('/beatmaps/{id}/rate', [RatingController::class, 'update'])->name('ratings.update');
-
-    Route::get('/lists/new', [UserListController::class, 'getNew'])->name('lists.new');
-    Route::post('/lists/new', [UserListController::class, 'postNew'])->name('lists.new.post');
 });
 
 Route::controller(UserListController::class)
     ->as('lists.')
     ->group(function () {
+        Route::middleware('auth')->group(function () {
+            Route::get('/lists/new', 'getNew')->name('new');
+            Route::post('/lists/new', 'postNew')->name('new.post');
+
+            Route::get('/lists/{id}/edit', 'getEdit')->name('edit');
+            Route::post('/lists/{id}/edit', 'postEdit')->name('edit.post');
+
+            Route::delete('/lists/{id}/delete', 'delete')->name('delete');
+        });
+
         Route::get('/lists', 'index')->name('index');
         Route::get('/lists/{id}', 'show')->name('show');
     });
