@@ -68,7 +68,8 @@ class UserListService
     public function search(?string $name, ?string $creatorName, int $perPage = 50): LengthAwarePaginator
     {
         $query = UserList::with('owner')
-            ->orderBy('created_at', 'desc');
+            ->where('is_public', true)
+            ->orderByRaw('COALESCE(updated_at, created_at) DESC');
 
         if (!blank($name)) {
             $query->where('name', 'LIKE', '%'.$name.'%');
