@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UserList extends Model
 {
-    protected $fillable = ['name', 'description', 'created_at', 'updated_at'];
+    protected $fillable = ['name', 'description', 'user_id', 'is_public', 'created_at', 'updated_at'];
 
     public function owner(): BelongsTo
     {
