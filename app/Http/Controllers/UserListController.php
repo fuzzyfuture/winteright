@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserListItemType;
+use App\Http\Requests\UserLists\AddUserListItemRequest;
+use App\Http\Requests\UserLists\CreateUserListRequest;
+use App\Http\Requests\UserLists\UpdateUserListRequest;
 use App\Services\BeatmapService;
 use App\Services\UserListService;
 use App\Validators\UserListValidator;
@@ -121,5 +124,39 @@ class UserListController extends Controller
         }
 
         return redirect()->route('lists.index')->with('success', 'list deleted successfully!');
+    }
+
+    public function getAddItem(Request $request)
+    {
+        $listOptions = $this->userListService->getForUser(Auth::id(), true)
+            ->mapWithKeys(fn ($list) => [$list->id => $list->name])
+            ->toArray();
+
+        $itemTypeOptions = collect(UserListItemType::cases())
+            ->mapWithKeys(fn ($case) => [$case->value => $case->name])
+            ->toArray();
+
+        $listId = $request->query('list_id');
+        $itemType = $request->query('item_type');
+        $itemId = $request->query('item_id');
+
+        return view('lists.add_item', compact('listOptions', 'itemTypeOptions', 'listId',
+            'itemType', 'itemId'));
+    }
+
+    public function postAddItem(AddUserListItemRequest $request)
+    {
+        $validated = $request->validated();
+        $itemType = UserListItemType::tryFrom($validated['item_type']);
+
+        try {
+            $this->userListService->createItem($validated['list_id'], $itemType, $validated['item_id'],
+                $validated['description'], $validated['order']);
+        } catch (Throwable $e) {
+            return back()->withErrors('error adding item: '.$e->getMessage());
+        }
+
+        return redirect()->route('lists.show', ['id' => $validated['list_id']])
+            ->with('success', 'item added successfully!');
     }
 }
