@@ -77,8 +77,8 @@ class UserListController extends Controller
     {
         $list = $this->userListService->get($listId);
 
-        if (Auth::user()->cannot('update', $list)) {
-            return back()->withErrors('you do not have permission to edit this list.');
+        if (Gate::denies('update', $list)) {
+            abort(403);
         }
 
         return view('lists.edit', compact('list'));
