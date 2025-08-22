@@ -213,4 +213,41 @@ class UserListService
             return $listItem;
         });
     }
+
+    /**
+     * Updates a list item.
+     *
+     * @param int $id The list item's ID.
+     * @param string|null $description The list item's description.
+     * @param int $order The list item's order in its list.
+     * @return UserListItem The updated list item.
+     * @throws Throwable
+     */
+    public function updateItem(int $id, ?string $description, int $order): UserListItem
+    {
+        return DB::transaction(function () use ($id, $description, $order) {
+           $item = UserListItem::findOrFail($id);
+
+           $item->description = $description;
+           $item->order = $order;
+
+           $item->save();
+
+           return $item;
+        });
+    }
+
+    /**
+     * Deletes an item from a list.
+     *
+     * @param int $id The ID of the list item to be deleted.
+     * @return void
+     * @throws Throwable
+     */
+    public function deleteItem(int $id): void
+    {
+        DB::transaction(function () use ($id) {
+            UserListItem::destroy($id);
+        });
+    }
 }
