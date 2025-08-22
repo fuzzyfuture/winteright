@@ -45,9 +45,9 @@ class BeatmapService
      * @param int $setId The beatmap set ID to check.
      * @return bool True if a beatmap set with the specified ID exists, false if not.
      */
-    public function beatmapSetExists(int $setId): bool
+    public function setExists(int $setId): bool
     {
-        return BeatmapSet::where('id', $setId)->exists();
+        return BeatmapSet::whereId($setId)->exists();
     }
 
     /**
