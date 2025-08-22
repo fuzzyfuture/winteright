@@ -113,8 +113,8 @@ class UserListController extends Controller
     {
         $list = $this->userListService->get($listId);
 
-        if (Auth::user()->cannot('delete', $list)) {
-            return back()->withErrors('you do not have permission to delete this list.');
+        if (Gate::denies('delete', $list)) {
+            abort(403);
         }
 
         try {
