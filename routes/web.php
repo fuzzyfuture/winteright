@@ -26,6 +26,7 @@ Route::controller(UserController::class)
     ->group(function () {
         Route::get('/users/{id}', 'show')->name('show');
         Route::get('/users/{id}/ratings', 'ratings')->name('ratings');
+        Route::get('/users/{id}/lists', 'lists')->name('lists');
     });
 
 Route::controller(BeatmapSetController::class)
