@@ -6,7 +6,8 @@
             you don't have any lists yet! <a href="{{ route('lists.new') }}">click here</a> to create your first list.
         </div>
     @endif
-    <h1>lists - add item</h1>
+    <h1>lists</h1>
+    <h2>new item</h2>
     {{ html()->form('POST', route('lists.add'))->open() }}
         <div class="mb-3">
             {{ html()->label('list', 'list_id')->class('form-label') }}
