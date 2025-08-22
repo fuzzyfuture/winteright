@@ -19,12 +19,18 @@
             {{ html()->form()->close() }}
         </div>
     </div>
-    <div class="mb-3">
-        <a href="{{ route('lists.new') }}" class="btn btn-sm btn-outline-primary">
-            <i class="bi bi-plus"></i>
-            new
-        </a>
-    </div>
+    @auth
+        <div class="mb-3 d-flex flex-wrap gap-1">
+            <a href="{{ route('lists.new') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-plus"></i>
+                new
+            </a>
+            <a href="{{ route('users.lists', Auth::id()) }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-person"></i>
+                my lists
+            </a>
+        </div>
+    @endauth
     <div>
         {{ $lists->links() }}
     </div>
