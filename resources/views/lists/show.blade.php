@@ -6,7 +6,15 @@
         @can('update', $list)
             <a href="{{ route('lists.edit', $list->id) }}" class="ms-auto btn btn-outline-primary">
                 <i class="bi bi-pencil"></i>
-                edit
+                edit details
+            </a>
+            <a href="{{ route('lists.edit', $list->id) }}" class="ms-1 btn btn-outline-primary">
+                <i class="bi bi-pencil"></i>
+                edit items
+            </a>
+            <a href="{{ route('lists.add', ['list_id' => $list->id]) }}" class="ms-1 btn btn-outline-primary">
+                <i class="bi bi-plus"></i>
+                add item
             </a>
         @endcan
     </div>
