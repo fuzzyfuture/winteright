@@ -24,7 +24,16 @@
                  alt="{{ $beatmapSet->artist }} - {{ $beatmapSet->title }} banner">
         </div>
         <div class="col-md-6">
-            <h4>info</h4>
+            <div class="d-flex">
+                <h4>info</h4>
+                @auth
+                    <a href="{{ route('lists.add', ['item_type' => \App\Enums\UserListItemType::BEATMAP_SET, 'item_id' => $beatmapSet->id]) }}"
+                       class="ms-auto btn btn-outline-primary">
+                        <i class="bi bi-plus"></i><i class="bi bi-list"></i>
+                        add to list
+                    </a>
+                @endauth
+            </div>
             <ul class="list-unstyled">
                 <li><strong>date ranked:</strong> {{ $beatmapSet->date_ranked->toFormattedDateString() }}</li>
                 <li><strong>genre:</strong> {{ $beatmapSet->genre_label }}</li>
