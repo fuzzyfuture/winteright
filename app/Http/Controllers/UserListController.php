@@ -87,26 +87,18 @@ class UserListController extends Controller
         return view('lists.edit', compact('list'));
     }
 
-    public function postEdit(Request $request, UserListValidator $validator, $listId)
+    public function postEdit(UpdateUserListRequest $request, $listId)
     {
-        if (!$validator->validate($request->input(), 'update')) {
-            return back()->withInput($request->input())->withErrors($validator);
-        }
-
-        $list = $this->userListService->get($listId);
-
-        if (Auth::user()->cannot('update', $list)) {
-            return back()->withErrors('you do not have permission to edit this list.');
-        }
+        $validated = $request->validated();
 
         try {
-            $data = $validator->getData();
-            $list = $this->userListService->update($listId, $data['name'], $data['description'], $data['is_public']);
+            $this->userListService->update($listId, $validated['name'], $validated['description'],
+                $validated['is_public']);
         } catch (Throwable $e) {
             return back()->withErrors('error updating list: '.$e->getMessage());
         }
 
-        return redirect()->route('lists.show', ['id' => $list->id])->with('success', 'list updated successfully!');
+        return redirect()->route('lists.show', ['id' => $listId])->with('success', 'list updated successfully!');
     }
 
     public function delete($listId)
