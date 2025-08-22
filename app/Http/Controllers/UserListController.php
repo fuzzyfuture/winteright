@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\UserListItemType;
 use App\Http\Requests\UserLists\AddUserListItemRequest;
 use App\Http\Requests\UserLists\CreateUserListRequest;
+use App\Http\Requests\UserLists\UpdateUserListItemRequest;
 use App\Http\Requests\UserLists\UpdateUserListRequest;
 use App\Services\BeatmapService;
 use App\Services\UserListService;
@@ -150,5 +151,37 @@ class UserListController extends Controller
 
         return redirect()->route('lists.show', ['id' => $validated['list_id']])
             ->with('success', 'item added successfully!');
+    }
+
+    public function getEditItems($listId)
+    {
+        $list = $this->userListService->getWithOwner($listId);
+
+        if (Gate::denies('update', $list)) {
+            abort(403);
+        }
+
+        $items = $this->userListService->getItems($listId);
+
+        $beatmapItems = $items->where('item_type', UserListItemType::BEATMAP);
+        $beatmapSetItems = $items->where('item_type', UserListItemType::BEATMAP_SET);
+
+        $this->beatmapService->applyCreatorLabels($beatmapItems->map->item);
+        $this->beatmapService->applyCreatorLabelsToSets($beatmapSetItems->map->item);
+
+        return view('lists.edit_items', compact('list', 'items'));
+    }
+
+    public function postEditItem(UpdateUserListItemRequest $request, $listId)
+    {
+        $validated = $request->validated();
+
+        try {
+            $this->userListService->updateItem($validated['item_id'], $validated['description'], $validated['order']);
+        } catch (Throwable $e) {
+            return back()->withErrors('error updating item: '.$e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'item updated successfully!');
     }
 }
