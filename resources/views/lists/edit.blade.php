@@ -15,13 +15,13 @@
             {{ html()->label('name *', 'name')->class('form-label') }}
             {{ html()->text('name', $list->name)->class('form-control') }}
         </div>
-    <div class="mb-3">
-        {{ html()->label('description', 'description')->class('form-label') }}
-        {{ html()->textarea('description', $list->description)->class('form-control') }}
-    </div>
-    <div class="mb-4">
-        {{ html()->label('visibility', 'is_public')->class('form-label') }}
-        {{ html()->select('is_public', [1 => 'public', 0 => 'private'], $list->is_public)->class('form-select') }}
-    </div>
+        <div class="mb-3">
+            {{ html()->label('description', 'description')->class('form-label') }}
+            {{ html()->textarea('description', $list->description)->class('form-control') }}
+        </div>
+        <div class="mb-4">
+            {{ html()->label('visibility', 'is_public')->class('form-label') }}
+            {{ html()->select('is_public', [1 => 'public', 0 => 'private'], $list->is_public)->class('form-select') }}
+        </div>
     {{ html()->submit('submit')->class('btn btn-primary') }}
 @endsection
