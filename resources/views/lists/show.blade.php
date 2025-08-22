@@ -8,7 +8,7 @@
                 <i class="bi bi-pencil"></i>
                 edit details
             </a>
-            <a href="{{ route('lists.edit', $list->id) }}" class="ms-1 btn btn-outline-primary">
+            <a href="{{ route('lists.edit-items', $list->id) }}" class="ms-1 btn btn-outline-primary">
                 <i class="bi bi-pencil"></i>
                 edit items
             </a>
