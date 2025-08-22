@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Ratings\UpdateRatingRequest;
 use App\Models\Rating;
 use App\Services\RatingService;
 use App\Validators\RatingValidator;
@@ -19,13 +20,9 @@ class RatingController extends Controller
         $this->ratingService = $ratingService;
     }
 
-    public function update(Request $request, RatingValidator $validator, int $beatmapId)
+    public function update(UpdateRatingRequest $request, int $beatmapId)
     {
         $userId = Auth::id();
-
-        if (!$validator->validate($request->all(['score']), 'update')) {
-            return back()->withErrors($validator);
-        }
 
         if ($request->score === null || $request->score === '') {
             try {
