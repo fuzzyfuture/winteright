@@ -185,4 +185,32 @@ class UserListService
             UserList::destroy($listId);
         });
     }
+
+    /**
+     * Creates a new list item.
+     * @param int $listId The ID of the list that the item belongs to.
+     * @param UserListItemType $itemType The item's type.
+     * @param int $itemId The item's ID.
+     * @param ?string $description The item's description.
+     * @param int $order The item's order in the list.
+     * @return UserListItem The new list item.
+     * @throws Throwable
+     */
+    public function createItem(int $listId, UserListItemType $itemType, int $itemId, ?string $description,
+                               int $order): UserListItem
+    {
+        return DB::transaction(function () use ($listId, $itemType, $itemId, $description, $order) {
+            $listItem = UserListItem::create([
+                'list_id' => $listId,
+                'item_type' => $itemType,
+                'item_id' => $itemId,
+                'description' => $description,
+                'order' => $order,
+            ]);
+
+            $listItem->list->touch();
+
+            return $listItem;
+        });
+    }
 }
