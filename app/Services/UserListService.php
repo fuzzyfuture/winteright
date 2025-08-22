@@ -16,7 +16,7 @@ class UserListService
     /**
      * Retrieves a list by ID.
      * @param int $id The ID of the list.
-     * @return UserList The list.
+     * @return UserList|null The list.
      */
     public function get(int $id): ?UserList
     {
