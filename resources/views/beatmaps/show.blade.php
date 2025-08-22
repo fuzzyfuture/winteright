@@ -77,9 +77,15 @@
                                 @endif
                             </small>
                         </div>
-                        <div class="ms-auto text-end d-flex flex-row">
+                        <div class="ms-auto text-end d-flex flex-row align-items-center">
+                            @auth
+                                <a href="{{ route('lists.add', ['item_type' => \App\Enums\UserListItemType::BEATMAP, 'item_id' => $beatmap->id]) }}"
+                                   class="ms-2 btn btn-sm btn-outline-primary p-1 py-0 opacity-50">
+                                    <i class="bi bi-plus"></i><i class="bi bi-list"></i>
+                                </a>
+                            @endauth
                             @if (!$beatmap->blacklisted)
-                                <span class="badge bg-main fs-5">{{ number_format($beatmap->weighted_avg, 2) }}</span>
+                                <span class="badge bg-main fs-5 ms-3">{{ number_format($beatmap->weighted_avg, 2) }}</span>
                             @endif
                             @auth
                                 {{ html()->form('POST', route('ratings.update', $beatmap->id))->class('d-flex align-items-center gap-2 ms-3')->open() }}
