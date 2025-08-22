@@ -8,6 +8,7 @@ use App\Services\RatingService;
 use App\Services\UserListService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -57,5 +58,13 @@ class UserController extends Controller
         $this->beatmapService->applyCreatorLabels($ratings->getCollection()->pluck('beatmap'));
 
         return view('users.ratings', compact('user', 'ratings', 'score'));
+    }
+
+    public function lists(int $id)
+    {
+        $user = $this->userService->get($id);
+        $lists = $this->userListService->getForProfile($id, Auth::check() && Auth::id() == $id);
+
+        return view('users.lists', compact('user', 'lists'));
     }
 }
