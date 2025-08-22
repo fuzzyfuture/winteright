@@ -56,22 +56,20 @@ class UserListController extends Controller
         return view('lists.new');
     }
 
-    public function postNew(Request $request, UserListValidator $validator)
+    public function postNew(CreateUserListRequest $request)
     {
-        if (!$validator->validate($request->input(), 'create')) {
-            return back()->withInput($request->input())->withErrors($validator);
-        }
-
         $userId = Auth::id();
+        $validated = $request->validated();
 
         try {
-            $data = $validator->getData();
-            $list = $this->userListService->create($userId, $data['name'], $data['description'], $data['is_public']);
+            $list = $this->userListService->create($userId, $validated['name'], $validated['description'],
+                $validated['is_public']);
         } catch (Throwable $e) {
             return back()->withErrors('error creating list: '.$e->getMessage());
         }
 
-        return redirect()->route('lists.show', ['id' => $list->id])->with('success', 'list created successfuly!');
+        return redirect()->route('lists.show', ['id' => $list->id])
+            ->with('success', 'list created successfully!');
     }
 
     public function getEdit($listId)
