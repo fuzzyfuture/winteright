@@ -53,6 +53,9 @@ Route::controller(UserListController::class)
             Route::get('/lists/{id}/edit', 'getEdit')->name('edit');
             Route::post('/lists/{id}/edit', 'postEdit')->name('edit.post');
 
+            Route::get('/lists/{id}/edit-items', 'getEditItems')->name('edit-items');
+            Route::post('/lists/{id}/edit-item', 'postEditItem')->name('edit-item.post');
+
             Route::delete('/lists/{id}/delete', 'delete')->name('delete');
 
             Route::get('/lists/add', 'getAddItem')->name('add');
