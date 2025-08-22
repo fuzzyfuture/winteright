@@ -8,6 +8,7 @@ use App\Services\UserListService;
 use App\Validators\UserListValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Throwable;
 
 class UserListController extends Controller
@@ -36,8 +37,8 @@ class UserListController extends Controller
     {
         $list = $this->userListService->getWithOwner($listId);
 
-        if (Auth::user()->cannot('view', $list)) {
-            return back()->withErrors('you do not have permission to view this list.');
+        if (Gate::denies('view', $list)) {
+            abort(403);
         }
 
         $items = $this->userListService->getItems($listId);
