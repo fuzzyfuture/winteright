@@ -17,13 +17,13 @@ class UserListPolicy
 
     /**
      * Determines if the given list can be viewed by the given user.
-     * @param User $user The user.
+     * @param ?User $user The user.
      * @param UserList $list The list.
      * @return bool True if the list can be viewed by the user.
      */
-    public function view(User $user, UserList $list): bool
+    public function view(?User $user, UserList $list): bool
     {
-        return $list->is_public || $user->id === $list->user_id;
+        return $list->is_public || ($user && $user->id === $list->user_id);
     }
 
     /**
