@@ -153,12 +153,12 @@ class UserListService
      * Updates a list.
      * @param int $listId The ID of the list to update.
      * @param string $name The name of the list.
-     * @param string $description The list's description.
+     * @param ?string $description The list's description.
      * @param bool $isPublic True if the list should be public.
      * @return UserList The updated list.
      * @throws Throwable
      */
-    public function update(int $listId, string $name, string $description, bool $isPublic): UserList
+    public function update(int $listId, string $name, ?string $description, bool $isPublic): UserList
     {
         return DB::transaction(function () use ($listId, $name, $description, $isPublic) {
             $list = UserList::findOrFail($listId);
