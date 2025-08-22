@@ -92,15 +92,40 @@ class UserListService
     }
 
     /**
-     * Retrieves a user's public lists.
-     * @param int $userId The user ID.
-     * @return Collection The user's public lists.
+     * Retrieves a user's lists.
+     *
+     * @param int $userId The user's ID.
+     * @param bool $includePrivate Whether to include private lists in the results. Defaults to false.
      */
-    public function getPublicForUser(int $userId): Collection
+    public function getForUser(int $userId, bool $includePrivate = false): Collection
     {
-        return UserList::where('user_id', $userId)
-            ->where('is_public', true)
-            ->get();
+        $query = UserList::where('user_id', $userId);
+
+        if (!$includePrivate) {
+            $query->where('is_public', true);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Retrieves a user's lists for their profile.
+     *
+     * @param int $userId The user's ID.
+     * @param bool $includePrivate Whether to include private lists in the results. Defaults to false. Should only
+     * be true when a user is viewing their own profile.
+     */
+    public function getForProfile(int $userId, bool $includePrivate = false): LengthAwarePaginator
+    {
+        $query = UserList::where('user_id', $userId)
+            ->with('owner')
+            ->withCount('items');
+
+        if (!$includePrivate) {
+            $query->where('is_public', true);
+        }
+
+        return $query->paginate(50);
     }
 
     /**
