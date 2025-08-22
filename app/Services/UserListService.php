@@ -46,6 +46,8 @@ class UserListService
     {
         $items = UserListItem::where('list_id', $id)
             ->with('item')
+            ->orderByDesc('order')
+            ->orderBy('created_at')
             ->paginate($perPage);
 
         $beatmaps = $items->getCollection()
