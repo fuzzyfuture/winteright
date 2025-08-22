@@ -132,12 +132,12 @@ class UserListService
      * Creates a new list.
      * @param int $userId The user ID of the creator of the list.
      * @param string $name The name of the list.
-     * @param string $description The list's description.
+     * @param ?string $description The list's description.
      * @param bool $isPublic True if the list should be public.
      * @return UserList The newly created list.
      * @throws Throwable
      */
-    public function create(int $userId, string $name, string $description, bool $isPublic): UserList
+    public function create(int $userId, string $name, ?string $description, bool $isPublic): UserList
     {
         return DB::transaction(function () use ($userId, $name, $description, $isPublic) {
             return UserList::create([
