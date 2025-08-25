@@ -15,12 +15,12 @@ class UpdateUserListItemRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $listId = $this->route('id');
+        $itemId = $this->route('id');
         $userListService = app(UserListService::class);
 
         try {
-            $list = $userListService->get($listId);
-            return Gate::allows('update', $list);
+            $item = $userListService->getItem($itemId);
+            return Gate::allows('update', $item->list);
         } catch (Throwable) {
             return false;
         }
@@ -34,7 +34,6 @@ class UpdateUserListItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'item_id' => ['integer', 'required', 'exists:user_list_items,id'],
             'description' => ['string', 'nullable'],
             'order' => ['integer', 'required'],
         ];
