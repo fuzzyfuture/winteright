@@ -24,12 +24,12 @@
                         @else
                             <h5>{{ $item->item_id }}<a href="https://osu.ppy.sh/users/{{ $item->item_id }}"></a></h5>
                         @endif
-                        {{ html()->form('POST')->open() }}
-                            <div class="mb-3">
+                        {{ html()->form('POST', route('lists.edit-item.post', $item->id))->open() }}
+                            <div class="mb-2">
                                 {{ html()->label('description', 'description')->class('form-label') }}
                                 {{ html()->textarea('description', $item->description)->class('form-control') }}
                             </div>
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 {{ html()->label('order *', 'order')->class('form-label') }}
                                 {{ html()->text('order', $item->order)->class('form-control') }}
                             </div>
@@ -46,7 +46,17 @@
                         <div><small class="text-muted">beatmap</small></div>
                         <h5 class="mb-1">{{ $item->item->url }}</h5>
                         <div class="mb-2">mapped by: {{ $item->item->creator_label }}</div>
-                        <div>{{ $item->description }}</div>
+                        {{ html()->form('POST', route('lists.edit-item.post', $item->id))->name($item->id)->open() }}
+                            <div class="mb-2">
+                                {{ html()->label('description', 'description')->class('form-label') }}
+                                {{ html()->textarea('description', $item->description)->class('form-control') }}
+                            </div>
+                            <div class="mb-3">
+                                {{ html()->label('order *', 'order')->class('form-label') }}
+                                {{ html()->text('order', $item->order)->class('form-control') }}
+                            </div>
+                            {{ html()->submit('save')->class('btn btn-primary') }}
+                        {{ html()->form()->close() }}
                     </div>
                 @elseif($item->isBeatmapSet())
                     <div class="col-md-2 p-2">
@@ -58,8 +68,7 @@
                         <div><small class="text-muted">beatmap set</small></div>
                         <h5 class="mb-1">{{ $item->item->url }}</h5>
                         <div class="mb-3">mapped by: {{ $item->item->creator_label }}</div>
-                        {{ html()->form('POST', route('lists.edit-item.post', $list->id))->open() }}
-                            {{ html()->hidden('item_id', $item->id) }}
+                        {{ html()->form('POST', route('lists.edit-item.post', $item->id))->open() }}
                             <div class="mb-2">
                                 {{ html()->label('description', 'description')->class('form-label') }}
                                 {{ html()->textarea('description', $item->description)->class('form-control') }}
