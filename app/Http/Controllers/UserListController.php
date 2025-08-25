@@ -172,12 +172,12 @@ class UserListController extends Controller
         return view('lists.edit_items', compact('list', 'items'));
     }
 
-    public function postEditItem(UpdateUserListItemRequest $request, $listId)
+    public function postEditItem(UpdateUserListItemRequest $request, $itemId)
     {
         $validated = $request->validated();
 
         try {
-            $this->userListService->updateItem($validated['item_id'], $validated['description'], $validated['order']);
+            $this->userListService->updateItem($itemId, $validated['description'], $validated['order']);
         } catch (Throwable $e) {
             return back()->withErrors('error updating item: '.$e->getMessage());
         }
