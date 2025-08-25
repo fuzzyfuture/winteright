@@ -184,4 +184,15 @@ class UserListController extends Controller
 
         return redirect()->back()->with('success', 'item updated successfully!');
     }
+
+    public function deleteItem($listId)
+    {
+        $list = $this->userListService->get($listId);
+
+        if (Gate::denies('update', $list)) {
+            abort(403);
+        }
+
+
+    }
 }
