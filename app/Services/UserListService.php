@@ -37,6 +37,18 @@ class UserListService
     }
 
     /**
+     * Retrieves a list item by ID.
+     * @param int $id The ID of the list item.
+     * @return UserListItem|null The list item, if it exists.
+     */
+    public function getItem(int $id): ?UserListItem
+    {
+        return UserListItem::with('list')
+            ->whereId($id)
+            ->firstOrFail();
+    }
+
+    /**
      * Retrieves a list's items.
      * @param int $id The list's ID.
      * @param int $perPage The amount of items to display per-page.
