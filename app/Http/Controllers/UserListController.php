@@ -235,4 +235,11 @@ class UserListController extends Controller
 
         return redirect()->back()->with('success', 'list unfavorited successfully!');
     }
+
+    public function favorites()
+    {
+        $lists = $this->userListService->getFavorites(Auth::id());
+
+        return view('lists.favorites', compact('lists'));
+    }
 }
