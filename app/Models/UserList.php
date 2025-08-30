@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UserList extends Model
@@ -18,5 +19,10 @@ class UserList extends Model
     public function items(): HasMany
     {
         return $this->hasMany(UserListItem::class, 'list_id');
+    }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(UserListFavorite::class, 'list_id');
     }
 }
