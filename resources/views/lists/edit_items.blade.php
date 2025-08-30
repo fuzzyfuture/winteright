@@ -18,12 +18,19 @@
                         </div>
                     </div>
                     <div class="col-md-10 p-3 ps-1">
-                        <div><small class="text-muted">user</small></div>
-                        @if ($item->item)
-                            <h5><a href="{{ route('users.show', $item->item_id) }}">{{ $item->item->name }}</a></h5>
-                        @else
-                            <h5>{{ $item->item_id }}<a href="https://osu.ppy.sh/users/{{ $item->item_id }}"></a></h5>
-                        @endif
+                        <div class="d-flex">
+                            <div>
+                                <div><small class="text-muted">user</small></div>
+                                @if ($item->item)
+                                    <h5><a href="{{ route('users.show', $item->item_id) }}">{{ $item->item->name }}</a></h5>
+                                @else
+                                    <h5>{{ $item->item_id }}<a href="https://osu.ppy.sh/users/{{ $item->item_id }}"></a></h5>
+                                @endif
+                            </div>
+                            {{ html()->form('DELETE', route('lists.delete-item', $item->id))->class('ms-auto')->attribute('onsubmit', 'return confirm(\'are you sure you want to delete this item?\')')->open() }}
+                                {{ html()->submit('<i class="bi bi-trash"></i> delete')->class('btn btn-primary') }}
+                            {{ html()->form()->close() }}
+                        </div>
                         {{ html()->form('POST', route('lists.edit-item.post', $item->id))->open() }}
                             <div class="mb-2">
                                 {{ html()->label('description', 'description')->class('form-label') }}
