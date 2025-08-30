@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\HtmlString;
 
 class User extends Authenticatable
 {
@@ -37,5 +38,20 @@ class User extends Authenticatable
     public function hasFavorited($listId): bool
     {
         return $this->favoriteLists()->where('list_id', $listId)->exists();
+    }
+
+    public function getUrlAttribute(): HtmlString
+    {
+        $localUrl = route('users.show', $this->id);
+        $localLink = '<a href="'.$localUrl.'">'.$this->name.'</a>';
+        $extLink = '<a href="https://osu.ppy.sh/users/'.$this->id.'"
+               target="_blank"
+               rel="noopener noreferrer"
+               title="view on osu!"
+               class="opacity-50 small">
+                <i class="bi bi-box-arrow-up-right"></i>
+            </a>';
+
+        return new HtmlString($localLink.$extLink);
     }
 }
