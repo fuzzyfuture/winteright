@@ -50,9 +50,16 @@
                         </div>
                     </div>
                     <div class="col-md-10 p-3 ps-1">
-                        <div><small class="text-muted">beatmap</small></div>
-                        <h5 class="mb-1">{{ $item->item->url }}</h5>
-                        <div class="mb-2">mapped by: {{ $item->item->creator_label }}</div>
+                        <div class="d-flex">
+                            <div>
+                                <div><small class="text-muted">beatmap</small></div>
+                                <h5 class="mb-1">{{ $item->item->url }}</h5>
+                                <div class="mb-2">mapped by: {{ $item->item->creator_label }}</div>
+                            </div>
+                            {{ html()->form('DELETE', route('lists.delete-item', $item->id))->class('ms-auto')->attribute('onsubmit', 'return confirm(\'are you sure you want to delete this item?\')')->open() }}
+                                {{ html()->submit('<i class="bi bi-trash"></i> delete')->class('btn btn-primary') }}
+                            {{ html()->form()->close() }}
+                        </div>
                         {{ html()->form('POST', route('lists.edit-item.post', $item->id))->name($item->id)->open() }}
                             <div class="mb-2">
                                 {{ html()->label('description', 'description')->class('form-label') }}
@@ -72,9 +79,16 @@
                         </div>
                     </div>
                     <div class="col-md-10 p-3 ps-1">
-                        <div><small class="text-muted">beatmap set</small></div>
-                        <h5 class="mb-1">{{ $item->item->url }}</h5>
-                        <div class="mb-3">mapped by: {{ $item->item->creator_label }}</div>
+                        <div class="d-flex">
+                            <div>
+                                <div><small class="text-muted">beatmap set</small></div>
+                                <h5 class="mb-1">{{ $item->item->url }}</h5>
+                                <div class="mb-3">mapped by: {{ $item->item->creator_label }}</div>
+                            </div>
+                            {{ html()->form('DELETE', route('lists.delete-item', $item->id))->class('ms-auto')->attribute('onsubmit', 'return confirm(\'are you sure you want to delete this item?\')')->open() }}
+                                {{ html()->submit('<i class="bi bi-trash"></i> delete')->class('btn btn-primary') }}
+                            {{ html()->form()->close() }}
+                        </div>
                         {{ html()->form('POST', route('lists.edit-item.post', $item->id))->open() }}
                             <div class="mb-2">
                                 {{ html()->label('description', 'description')->class('form-label') }}
