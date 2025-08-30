@@ -2,7 +2,7 @@
 
 @section('content')
     <h1>ratings</h1>
-    <h3 class="mb-3">{{ $user->name }} - {{ $score ? number_format($score, 1) : 'all' }}</h3>
+    <h3 class="mb-3">{{ $user->url }} - {{ $score ? number_format($score, 1) : 'all' }}</h3>
     {{ $ratings->links() }}
     <div class="list-group mb-3">
         @forelse ($ratings as $rating)
