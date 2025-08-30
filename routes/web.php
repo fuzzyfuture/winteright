@@ -64,6 +64,8 @@ Route::controller(UserListController::class)
 
             Route::post('/lists/{id}/favorite', 'favorite')->name('favorite');
             Route::post('/lists/{id}/unfavorite', 'unfavorite')->name('unfavorite');
+
+            Route::get('/lists/favorites', 'favorites')->name('favorites');
         });
 
         Route::get('/lists', 'index')->name('index');
