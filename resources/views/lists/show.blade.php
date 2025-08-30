@@ -4,6 +4,17 @@
     <div class="d-flex flex-row align-items-center">
         <h1>lists</h1>
         <div class="ms-auto">
+            @auth
+                @if (Auth::user()->hasFavorited($list->id))
+                    {{ html()->form('POST', route('lists.unfavorite', $list->id))->class('d-inline')->open() }}
+                        {{ html()->submit('<i class="bi bi-heartbreak"></i> unfavorite')->class('ms-1 btn btn-primary') }}
+                    {{ html()->form()->close() }}
+                @else
+                    {{ html()->form('POST', route('lists.favorite', $list->id))->class('d-inline')->open() }}
+                        {{ html()->submit('<i class="bi bi-heart"></i> favorite')->class('ms-1 btn btn-primary') }}
+                    {{ html()->form()->close() }}
+                @endif
+            @endauth
             @can('update', $list)
                 <a href="{{ route('lists.edit', $list->id) }}" class="ms-1 btn btn-outline-primary">
                     <i class="bi bi-pencil"></i>
