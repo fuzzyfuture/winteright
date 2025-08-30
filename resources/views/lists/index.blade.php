@@ -29,6 +29,10 @@
                 <i class="bi bi-person"></i>
                 my lists
             </a>
+            <a href="{{ route('lists.favorites') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-heart"></i>
+                my favs
+            </a>
         </div>
     @endauth
     <div>
