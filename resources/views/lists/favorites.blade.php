@@ -17,7 +17,7 @@
                     </div>
                 </div>
                 {{ html()->form('POST', route('lists.unfavorite', $list->id))->class('ms-auto')->open() }}
-                    {{ html()->submit('<i class="bi bi-heartbreak"></i> unfavorite')->class('ms-1 btn btn-outline-primary') }}
+                    {{ html()->submit('<i class="bi bi-heartbreak"></i> unfavorite')->class('ms-1 btn btn-primary') }}
                 {{ html()->form()->close() }}
             </div>
         @empty
