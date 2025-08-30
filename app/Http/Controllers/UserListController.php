@@ -185,14 +185,20 @@ class UserListController extends Controller
         return redirect()->back()->with('success', 'item updated successfully!');
     }
 
-    public function deleteItem($listId)
+    public function deleteItem($itemId)
     {
-        $list = $this->userListService->get($listId);
+        $item = $this->userListService->getItem($itemId);
 
-        if (Gate::denies('update', $list)) {
+        if (Gate::denies('update', $item->list)) {
             abort(403);
         }
 
+        try {
+            $this->userListService->deleteItem($itemId);
+        } catch (Throwable $e) {
+            return back()->withErrors('error deleting item: '.$e->getMessage());
+        }
 
+        return redirect()->back()->with('success', 'item deleted successfully!');
     }
 }
