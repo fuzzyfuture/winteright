@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="mb-3">lists - new</h1>
+    <h1>lists</h1>
+    <h2 class="mb-3">new</h2>
     {{ html()->form('POST', route('lists.new.post'))->open() }}
         <div class="mb-3">
             {{ html()->label('name *', 'name')->class('form-label') }}
