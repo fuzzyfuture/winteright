@@ -42,18 +42,7 @@
         @forelse($lists as $list)
             <div class="p-3 rounded shadow-sm mb-2 chart-beatmap-card">
                 <h5 class="mb-1"><a href="{{ route('lists.show', $list->id) }}">{{ $list->name }}</a></h5>
-                <div>
-                    <small>
-                        by <a href="{{ route('users.show', $list->user_id) }}">{{ $list->owner->name }}</a>
-                        <a href="https://osu.ppy.sh/users/{{ $list->user_id }}"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           title="view on osu!"
-                           class="opacity-50 small">
-                            <i class="bi bi-box-arrow-up-right"></i>
-                        </a>
-                    </small>
-                </div>
+                <div><small>by {{ $list->owner->url }}</small></div>
                 <div>
                     <small class="text-muted">
                         {{ $list->items_count }} items | {{ $list->favorites_count }} favs | last updated: {{ $list->updated_at?->toFormattedDateString() ?? 'never' }}
