@@ -3,20 +3,33 @@
 @section('content')
     <div class="d-flex flex-row align-items-center">
         <h1>lists</h1>
-        @can('update', $list)
-            <a href="{{ route('lists.edit', $list->id) }}" class="ms-auto btn btn-outline-primary">
-                <i class="bi bi-pencil"></i>
-                edit details
-            </a>
-            <a href="{{ route('lists.edit-items', $list->id) }}" class="ms-1 btn btn-outline-primary">
-                <i class="bi bi-pencil"></i>
-                edit items
-            </a>
-            <a href="{{ route('lists.add', ['list_id' => $list->id]) }}" class="ms-1 btn btn-outline-primary">
-                <i class="bi bi-plus"></i>
-                add item
-            </a>
-        @endcan
+        <div class="ms-auto">
+            @can('update', $list)
+                <a href="{{ route('lists.edit', $list->id) }}" class="ms-1 btn btn-outline-primary">
+                    <i class="bi bi-pencil"></i>
+                    edit details
+                </a>
+                <a href="{{ route('lists.edit-items', $list->id) }}" class="ms-1 btn btn-outline-primary">
+                    <i class="bi bi-pencil"></i>
+                    edit items
+                </a>
+                <a href="{{ route('lists.add', ['list_id' => $list->id]) }}" class="ms-1 btn btn-outline-primary">
+                    <i class="bi bi-plus"></i>
+                    add item
+                </a>
+            @endcan
+            @auth
+                @if (Auth::user()->hasFavorited($list->id))
+                    {{ html()->form('POST', route('lists.unfavorite', $list->id))->class('d-inline')->open() }}
+                        {{ html()->submit('<i class="bi bi-heartbreak"></i> unfavorite')->class('ms-1 btn btn-outline-primary') }}
+                    {{ html()->form()->close() }}
+                @else
+                    {{ html()->form('POST', route('lists.favorite', $list->id))->class('d-inline')->open() }}
+                        {{ html()->submit('<i class="bi bi-heart"></i> favorite')->class('ms-1 btn btn-outline-primary') }}
+                    {{ html()->form()->close() }}
+                @endif
+            @endauth
+        </div>
     </div>
     <h2>
         {{ $list->name }} by <a href="{{ url('/users/'.$list->user_id) }}">{{ $list->owner->name }}</a>
