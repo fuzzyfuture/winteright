@@ -135,7 +135,8 @@ class UserListService
     {
         $query = UserList::where('user_id', $userId)
             ->with('owner')
-            ->withCount('items');
+            ->withCount('items')
+            ->withCount('favorites');
 
         if (!$includePrivate) {
             $query->where('is_public', true);
