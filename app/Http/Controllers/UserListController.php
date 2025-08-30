@@ -201,4 +201,38 @@ class UserListController extends Controller
 
         return redirect()->back()->with('success', 'item deleted successfully!');
     }
+
+    public function favorite($listId)
+    {
+        $list = $this->userListService->get($listId);
+
+        if (Gate::denies('view', $list)) {
+            abort(403);
+        }
+
+        try {
+            $this->userListService->favorite(Auth::id(), $listId);
+        } catch (Throwable $e) {
+            return back()->withErrors('error favoriting list: '.$e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'list favorited successfully!');
+    }
+
+    public function unfavorite($listId)
+    {
+        $list = $this->userListService->get($listId);
+
+        if (Gate::denies('view', $list)) {
+            abort(403);
+        }
+
+        try {
+            $this->userListService->unfavorite(Auth::id(), $listId);
+        } catch (Throwable $e) {
+            return back()->withErrors('error unfavoriting list: '.$e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'list unfavorited successfully!');
+    }
 }
