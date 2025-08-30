@@ -33,6 +33,7 @@ class UserListService
         return UserList::whereId($id)
             ->with('owner')
             ->withCount('items')
+            ->withCount('favorites')
             ->firstOrFail();
     }
 
