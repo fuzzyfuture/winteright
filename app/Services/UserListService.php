@@ -128,6 +128,7 @@ class UserListService
      * @param int $userId The user's ID.
      * @param bool $includePrivate Whether to include private lists in the results. Defaults to false. Should only
      * be true when a user is viewing their own profile.
+     * @return LengthAwarePaginator The user's lists, paginated.
      */
     public function getForProfile(int $userId, bool $includePrivate = false): LengthAwarePaginator
     {
