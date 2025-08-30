@@ -83,20 +83,8 @@ class Beatmap extends Model
     {
         $labels = $this->externalCreatorLabels;
 
-        if (empty($labels) && $this->set?->creator) {
-            $url = url('/users/' . $this->set->creator_id);
-            return new HtmlString('<a href="'.$url.'">'.e($this->set->creator->name).'</a>'.
-                '<a href="https://osu.ppy.sh/users/'.$this->set->creator_id.'"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   title="view on osu!"
-                   class="opacity-50 small">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                </a>');
-        }
-
         if (empty($labels)) {
-            return new HtmlString('unknown');
+            return $this->set?->creator?->url ?? new HtmlString('unknown');
         }
 
         $output = '';
@@ -104,21 +92,22 @@ class Beatmap extends Model
 
         foreach ($labels as $creator) {
             if ($creator['isWinteright']) {
-                $localLink = '<a href="' . url('/users/' . $creator['id']) . '">' . e($creator['name']) . '</a>';
+                $localLink = '<a href="'.route('users.show', $creator['id']).'">'.e($creator['name']).'</a>';
             } else if (!empty($creator['name'])) {
                 $localLink = e($creator['name']);
             } else {
                 $localLink = e($creator['id']);
             }
 
-            $chunks[] = $localLink.
-                '<a href="https://osu.ppy.sh/users/'.$creator['id'].'"
+            $extLink = '<a href="https://osu.ppy.sh/users/'.$creator['id'].'"
                    target="_blank"
                    rel="noopener noreferrer"
                    title="view on osu!"
                    class="opacity-50 small">
                     <i class="bi bi-box-arrow-up-right"></i>
                 </a>';
+
+            $chunks[] = $localLink.$extLink;
         }
 
         $output .= implode(', ', $chunks);
