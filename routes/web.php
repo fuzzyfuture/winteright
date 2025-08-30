@@ -61,6 +61,9 @@ Route::controller(UserListController::class)
 
             Route::get('/lists/add', 'getAddItem')->name('add');
             Route::post('/lists/add', 'postAddItem')->name('add.post');
+
+            Route::post('/lists/{id}/favorite', 'favorite')->name('favorite');
+            Route::post('/lists/{id}/unfavorite', 'unfavorite')->name('unfavorite');
         });
 
         Route::get('/lists', 'index')->name('index');
