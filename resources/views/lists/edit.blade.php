@@ -5,7 +5,7 @@
         <h1>lists</h1>
         @can('delete', $list)
             {{ html()->form('DELETE', route('lists.delete', $list->id))->class('ms-auto')->attribute('onsubmit', 'return confirm(\'are you sure you want to delete this list?\')')->open() }}
-                {{ html()->submit('<i class="bi bi-trash"></i> delete')->class('btn btn-outline-primary') }}
+                {{ html()->submit('<i class="bi bi-trash"></i> delete')->class('btn btn-primary') }}
             {{ html()->form()->close() }}
         @endcan
     </div>
