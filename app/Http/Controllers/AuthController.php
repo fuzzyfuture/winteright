@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -8,7 +8,7 @@ use App\Services\AuthService;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
-class OsuController extends Controller
+class AuthController extends Controller
 {
     protected AuthService $authService;
 
@@ -20,7 +20,7 @@ class OsuController extends Controller
     public function loginRedirect()
     {
         session(['url.intended' => url()->previous()]);
-        return redirect()->route('auth.osu.redirect');
+        return redirect()->route('auth.redirect');
     }
 
     public function redirect()

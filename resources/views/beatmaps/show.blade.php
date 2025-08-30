@@ -24,7 +24,16 @@
                  alt="{{ $beatmapSet->artist }} - {{ $beatmapSet->title }} banner">
         </div>
         <div class="col-md-6">
-            <h4>info</h4>
+            <div class="d-flex">
+                <h4>info</h4>
+                @auth
+                    <a href="{{ route('lists.add', ['item_type' => \App\Enums\UserListItemType::BEATMAP_SET, 'item_id' => $beatmapSet->id]) }}"
+                       class="ms-auto btn btn-outline-primary">
+                        <i class="bi bi-plus"></i><i class="bi bi-list"></i>
+                        add to list
+                    </a>
+                @endauth
+            </div>
             <ul class="list-unstyled">
                 <li><strong>date ranked:</strong> {{ $beatmapSet->date_ranked->toFormattedDateString() }}</li>
                 <li><strong>genre:</strong> {{ $beatmapSet->genre_label }}</li>
@@ -51,7 +60,7 @@
             <div class="list-group">
                 @foreach ($beatmapSet->beatmaps as $beatmap)
                     <div class="list-group-item d-flex align-items-center{{ $beatmap->blacklisted ? ' opacity-50' : '' }}">
-                        {!! $beatmap->mode_icon !!}
+                        {{ $beatmap->mode_icon }}
                         <div class="ms-3">
                             <div class="d-inline-flex gap-1 align-items-baseline">
                                 <div class="fw-bold">{{ $beatmap->difficulty_name }}</div>
@@ -68,24 +77,20 @@
                                 @endif
                             </small>
                         </div>
-                        <div class="ms-auto text-end d-flex flex-row">
+                        <div class="ms-auto text-end d-flex flex-row align-items-center">
+                            @auth
+                                <a href="{{ route('lists.add', ['item_type' => \App\Enums\UserListItemType::BEATMAP, 'item_id' => $beatmap->id]) }}"
+                                   class="ms-2 btn btn-sm btn-outline-primary p-1 py-0 opacity-50">
+                                    <i class="bi bi-plus"></i><i class="bi bi-list"></i>
+                                </a>
+                            @endauth
                             @if (!$beatmap->blacklisted)
-                                <span class="badge bg-main fs-5">{{ number_format($beatmap->weighted_avg, 2) }}</span>
+                                <span class="badge bg-main fs-5 ms-3">{{ number_format($beatmap->weighted_avg, 2) }}</span>
                             @endif
                             @auth
-                                <form method="POST" action="{{ route('ratings.update', $beatmap->id) }}"
-                                      class="d-flex align-items-center gap-2 ms-3">
-                                    @csrf
-                                    <select name="score" class="form-select form-select-sm w-auto"
-                                            onchange="this.form.submit()">
-                                        <option value="">unrated</option>
-                                        @foreach (range(0, 10) as $i)
-                                            <option value="{{ $i }}" @selected(optional($beatmap->userRating)->score === $i)>
-                                                {{ number_format($i / 2, 1) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </form>
+                                {{ html()->form('POST', route('ratings.update', $beatmap->id))->class('d-flex align-items-center gap-2 ms-3')->open() }}
+                                    {{ html()->select('score', $ratingOptions, $beatmap->userRating?->score ?? '')->class('form-select form-select-sm w-auto')->attribute('onchange', 'this.form.submit()') }}
+                                {{ html()->form()->close() }}
                             @endauth
                         </div>
                     </div>

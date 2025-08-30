@@ -62,7 +62,7 @@ class Beatmap extends Model
         };
     }
 
-    public function getModeIconAttribute(): string
+    public function getModeIconAttribute(): HtmlString
     {
         $fileName = match ($this->mode) {
             0 => 'mode-osu-small',
@@ -71,7 +71,7 @@ class Beatmap extends Model
             3 => 'mode-mania-small',
         };
 
-        return '<img src="'.asset('/img/modes/'.$fileName.'.png').'"/>';
+        return new HtmlString('<img src="'.asset('/img/modes/'.$fileName.'.png').'"/>');
     }
 
     public function setExternalCreatorLabels(array $labels): void
@@ -83,20 +83,8 @@ class Beatmap extends Model
     {
         $labels = $this->externalCreatorLabels;
 
-        if (empty($labels) && $this->set?->creator) {
-            $url = url('/users/' . $this->set->creator_id);
-            return new HtmlString('<a href="'.$url.'">'.e($this->set->creator->name).'</a>'.
-                '<a href="https://osu.ppy.sh/users/'.$this->set->creator_id.'"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   title="view on osu!"
-                   class="opacity-50 small">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                </a>');
-        }
-
         if (empty($labels)) {
-            return new HtmlString('unknown');
+            return $this->set?->creator?->url ?? new HtmlString('unknown');
         }
 
         $output = '';
@@ -104,24 +92,47 @@ class Beatmap extends Model
 
         foreach ($labels as $creator) {
             if ($creator['isWinteright']) {
-                $localLink = '<a href="' . url('/users/' . $creator['id']) . '">' . e($creator['name']) . '</a>';
+                $localLink = '<a href="'.route('users.show', $creator['id']).'">'.e($creator['name']).'</a>';
             } else if (!empty($creator['name'])) {
                 $localLink = e($creator['name']);
             } else {
                 $localLink = e($creator['id']);
             }
 
-            $chunks[] = $localLink.
-                '<a href="https://osu.ppy.sh/users/'.$creator['id'].'"
+            $extLink = '<a href="https://osu.ppy.sh/users/'.$creator['id'].'"
                    target="_blank"
                    rel="noopener noreferrer"
                    title="view on osu!"
                    class="opacity-50 small">
                     <i class="bi bi-box-arrow-up-right"></i>
                 </a>';
+
+            $chunks[] = $localLink.$extLink;
         }
 
         $output .= implode(', ', $chunks);
         return new HtmlString($output);
+    }
+
+    public function getUrlAttribute(): HtmlString
+    {
+        $localUrl = route('beatmaps.show', $this->set_id);
+        $text = $this->set->artist.' - '.$this->set->title.' ['.$this->difficulty_name.']';
+
+        $localLink = '<a href="'.$localUrl.'">'.e($text).'</a>';
+        $extLink = '<a href="https://osu.ppy.sh/beatmapsets/'.$this->set_id.'#osu/'.$this->id.'"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       title="view on osu!"
+                       class="opacity-50 small">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>';
+
+        return new HtmlString($localLink.$extLink);
+    }
+
+    public function getBgUrlAttribute(): string
+    {
+        return 'https://assets.ppy.sh/beatmaps/'.$this->set_id.'/covers/cover.jpg';
     }
 }

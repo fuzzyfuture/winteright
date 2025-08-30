@@ -5,27 +5,40 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Services\BeatmapService;
 use App\Services\RatingService;
+use App\Services\UserListService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     protected UserService $userService;
     protected RatingService $ratingService;
     protected BeatmapService $beatmapService;
+    protected UserListService $userListService;
 
-    public function __construct(UserService $userService, RatingService $ratingService, BeatmapService $beatmapService)
+    public function __construct(UserService $userService, RatingService $ratingService, BeatmapService $beatmapService,
+                                UserListService $userListService)
     {
         $this->userService = $userService;
         $this->ratingService = $ratingService;
         $this->beatmapService = $beatmapService;
+        $this->userListService = $userListService;
     }
 
     public function show(int $id)
     {
         $user = $this->userService->get($id);
 
-        return view('users.show', $this->userService->getProfileData($user));
+        $recentRatings = $this->ratingService->getRecentForUser($id);
+
+        $beatmapService = app(BeatmapService::class);
+        $beatmapService->applyCreatorLabels($recentRatings->pluck('beatmap'));
+
+        $ratingSpread = $this->ratingService->getSpreadForUser($id);
+        $lists = $this->userListService->getForUser($id);
+
+        return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists'));
     }
 
     public function ratings(Request $request, int $id)
@@ -45,5 +58,13 @@ class UserController extends Controller
         $this->beatmapService->applyCreatorLabels($ratings->getCollection()->pluck('beatmap'));
 
         return view('users.ratings', compact('user', 'ratings', 'score'));
+    }
+
+    public function lists(int $id)
+    {
+        $user = $this->userService->get($id);
+        $lists = $this->userListService->getForProfile($id, Auth::check() && Auth::id() == $id);
+
+        return view('users.lists', compact('user', 'lists'));
     }
 }

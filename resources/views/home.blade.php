@@ -35,14 +35,7 @@
                     <div class="list-group-item d-flex align-items-center">
                         <img src="https://assets.ppy.sh/beatmaps/{{ $set->id }}/covers/cover.jpg" alt="beatmap bg" width="175" />
                         <div class="ms-2">
-                            <a href="{{ url("/mapsets/$set->id") }}"><strong>{{ $set->artist }} - {{ $set->title }}</strong></a>
-                            <a href="https://osu.ppy.sh/beatmapsets/{{ $set->id }}#osu"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               title="view on osu!"
-                               class="opacity-50 small">
-                                <i class="bi bi-box-arrow-up-right"></i>
-                            </a>
+                            <strong>{{ $set->url }}</strong>
                             <small class="text-muted d-block">
                                 by {{ $set->creator_label }}
                             </small>

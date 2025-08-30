@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Ratings\UpdateRatingRequest;
 use App\Models\Rating;
 use App\Services\RatingService;
+use App\Validators\RatingValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\MessageBag;
 use Throwable;
 
 class RatingController extends Controller
@@ -17,29 +20,27 @@ class RatingController extends Controller
         $this->ratingService = $ratingService;
     }
 
-    public function update(Request $request, int $beatmapId)
+    public function update(UpdateRatingRequest $request, int $beatmapId)
     {
         $userId = Auth::id();
-        $validated = $request->validate([
-            'score' => ['nullable', 'integer', 'between:0,10'],
-        ]);
 
         if ($request->score === null || $request->score === '') {
             try {
                 $this->ratingService->clear($userId, $beatmapId);
             } catch (Throwable $e) {
-                return back()->withErrors('Error while clearing rating for beatmap '.$beatmapId.': '.$e->getMessage());
+                return back()->withErrors('error while clearing rating for beatmap '.$beatmapId.': '
+                    .$e->getMessage());
             }
 
-            return back()->with('success', 'Rating removed.');
+            return back()->with('success', 'rating removed.');
         }
 
         try {
-            $this->ratingService->set($userId, $beatmapId, $validated['score']);
+            $this->ratingService->set($userId, $beatmapId, $request->score);
         } catch (Throwable $e) {
-            return back()->withErrors('Error while rating '.$beatmapId.': '.$e->getMessage());
+            return back()->withErrors('error while rating '.$beatmapId.': '.$e->getMessage());
         }
 
-        return back()->with('success', 'Rating saved!');
+        return back()->with('success', 'rating saved!');
     }
 }

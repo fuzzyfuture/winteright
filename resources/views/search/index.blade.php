@@ -1,24 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="mb-4">search</h1>
-    <div class="card mb-4">
+    <h1 class="mb-3">search</h1>
+    <div class="card mb-3">
         <div class="card-body">
-            <form href="{{ url('/charts') }}" method="GET">
+            {{ html()->form('GET', route('search.index'))->open() }}
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label class="form-label">artist/title contains</label>
-                        <input class="form-control" name="artist-title" value="{{ $artistTitle }}">
+                        {{ html()->label('artist/title contains', 'artist_title')->class('form-label') }}
+                        {{ html()->text('artist_title', $artistTitle)->class('form-control') }}
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">mapper name is</label>
-                        <input class="form-control mb-3" name="mapper-name" value="{{ $mapperName }}">
-                        <label class="form-label">mapper id is</label>
-                        <input class="form-control" name="mapper-id" value="{{ $mapperId }}">
+                        {{ html()->label('mapper name is', 'mapper_name')->class('form-label') }}
+                        {{ html()->text('mapper_name', $mapperName)->class('form-control mb-3') }}
+                        {{ html()->label('mapper id is', 'mapperId')->class('form-label') }}
+                        {{ html()->text('mapper_id', $mapperId)->class('form-control') }}
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary float-end">search</button>
-            </form>
+                {{ html()->submit('search')->class('btn btn-primary float-end') }}
+            {{ html()->form()->close() }}
         </div>
     </div>
     <div>
@@ -35,19 +35,9 @@
                 <div class="col-md-10 p-3 ps-1">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <div>
-                            <h5 class="mb-1 d-flex align-items-center gap-2">
-                                <a href="{{ url("/mapsets/{$beatmapSet->id}") }}">
-                                    {{ $beatmapSet->artist }} - {{ $beatmapSet->title }}
-                                </a>
-                                <a href="https://osu.ppy.sh/beatmapsets/{{ $beatmapSet->id }}"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   title="view on osu!"
-                                   class="opacity-50 small">
-                                    <i class="bi bi-box-arrow-up-right"></i>
-                                </a>
+                            <h5 class="mb-1">
+                                {{ $beatmapSet->url }}
                             </h5>
-
                             <div>
                                 mapped by: {{ $beatmapSet->creator_label }}
                             </div>

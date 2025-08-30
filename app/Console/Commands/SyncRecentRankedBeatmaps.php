@@ -84,7 +84,7 @@ class SyncRecentRankedBeatmaps extends Command
                     break 2;
                 }
 
-                if ($skipUpdates && $this->beatmapService->beatmapSetExists($setData['id'])) {
+                if ($skipUpdates && $this->beatmapService->setExists($setData['id'])) {
                     $this->info('Skipped.');
                     continue;
                 }

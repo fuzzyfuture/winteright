@@ -23,7 +23,7 @@ class ChartsController extends Controller
     {
         $page = $request->get('page', 1);
         $year = $request->query('year');
-        $excludeRated = $request->query('excludeRated');
+        $excludeRated = $request->query('exclude_rated');
 
         $perPage = 50;
         $maxPages = 200;
@@ -47,9 +47,15 @@ class ChartsController extends Controller
         $topBeatmaps->appends($request->query());
 
         $this->beatmapService->applyCreatorLabels($topBeatmaps->getCollection());
+
+        $yearOptions = ['' => 'all'];
         $beatmapYears = $this->beatmapService->getBeatmapYears();
 
-        return view('charts.index', compact('topBeatmaps', 'beatmapYears', 'year',
+        foreach ($beatmapYears as $beatmapYear) {
+            $yearOptions[$beatmapYear] = $beatmapYear;
+        }
+
+        return view('charts.index', compact('topBeatmaps', 'yearOptions', 'year',
             'excludeRated'));
     }
 }
