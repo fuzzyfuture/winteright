@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\UserListItemType;
 use App\Models\Beatmap;
 use App\Models\UserList;
+use App\Models\UserListFavorite;
 use App\Models\UserListItem;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -263,6 +264,41 @@ class UserListService
     {
         DB::transaction(function () use ($id) {
             UserListItem::destroy($id);
+        });
+    }
+
+    /**
+     * Favorites a list for the given user.
+     *
+     * @param int $userId The user's ID.
+     * @param int $listId The ID of the list to favorite.
+     * @return void
+     * @throws Throwable
+     */
+    public function favorite(int $userId, int $listId): void
+    {
+        DB::transaction(function () use ($userId, $listId) {
+           UserListFavorite::create([
+              'user_id' => $userId,
+              'list_id' => $listId,
+           ]);
+        });
+    }
+
+    /**
+     * Unfavorites a list for the given user.
+     *
+     * @param int $userId The user's ID.
+     * @param int $listId The ID of the list to unfavorite.
+     * @return void
+     * @throws Throwable
+     */
+    public function unfavorite(int $userId, int $listId): void
+    {
+        DB::transaction(function () use ($userId, $listId) {
+            UserListFavorite::where('user_id', $userId)
+                ->where('list_id', $listId)
+                ->delete();
         });
     }
 }
