@@ -146,6 +146,23 @@ class UserListService
     }
 
     /**
+     * Retrieves a user's favorite lists.
+     *
+     * @param int $userId The user's ID.
+     * @return LengthAwarePaginator The user's favorite lists, paginated.
+     */
+    public function getFavorites(int $userId): LengthAwarePaginator
+    {
+        return UserList::whereHas('favorites', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->with('owner')
+            ->withCount('items')
+            ->withCount('favorites')
+            ->paginate(50);
+    }
+
+    /**
      * Creates a new list.
      * @param int $userId The user ID of the creator of the list.
      * @param string $name The name of the list.
