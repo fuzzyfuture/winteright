@@ -29,17 +29,6 @@
                     add item
                 </a>
             @endcan
-            @auth
-                @if (Auth::user()->hasFavorited($list->id))
-                    {{ html()->form('POST', route('lists.unfavorite', $list->id))->class('d-inline')->open() }}
-                        {{ html()->submit('<i class="bi bi-heartbreak"></i> unfavorite')->class('ms-1 btn btn-outline-primary') }}
-                    {{ html()->form()->close() }}
-                @else
-                    {{ html()->form('POST', route('lists.favorite', $list->id))->class('d-inline')->open() }}
-                        {{ html()->submit('<i class="bi bi-heart"></i> favorite')->class('ms-1 btn btn-outline-primary') }}
-                    {{ html()->form()->close() }}
-                @endif
-            @endauth
         </div>
     </div>
     <h2>
