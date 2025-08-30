@@ -87,6 +87,7 @@ class UserListService
     {
         $query = UserList::with('owner')
             ->withCount('items')
+            ->withCount('favorites')
             ->where('is_public', true)
             ->orderByRaw('COALESCE(updated_at, created_at) DESC');
 
