@@ -38,4 +38,13 @@ class UpdateUserListItemRequest extends FormRequest
             'order' => ['integer', 'required'],
         ];
     }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            redirect()->back()
+                ->withErrors($validator)
+                ->withInput([])
+        );
+    }
 }
