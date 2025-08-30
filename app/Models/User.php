@@ -27,4 +27,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Rating::class);
     }
+
+    public function favoriteLists(): BelongsToMany
+    {
+        return $this->belongsToMany(UserList::class, 'user_list_favorites', 'user_id', 'list_id');
+    }
+
+    public function hasFavorited($listId): bool
+    {
+        return $this->favoriteLists()->where('list_id', $listId)->exists();
+    }
 }
