@@ -157,12 +157,19 @@ class RatingService
     /**
      * Retrieves the users rating spread as an array of the rating bin (e.g. 0.5, 1.0) and the amount of ratings
      * in that bin.
+     *
+     * @param int $enabledModes Bitfield of enabled modes.
      * @param int $userId The user's ID.
      * @return Collection The user's rating spread.
      */
-    public function getSpreadForUser(int $userId): Collection
+    public function getSpreadForUser(int $enabledModes, int $userId): Collection
     {
+        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+
         return Rating::where('user_id', $userId)
+            ->whereHas('beatmap', function ($query) use ($modesArray) {
+                $query->whereIn('mode', $modesArray);
+            })
             ->selectRaw('score as rating_bin, COUNT(*) as count')
             ->groupBy('rating_bin')
             ->orderBy('rating_bin')
