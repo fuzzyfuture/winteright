@@ -21,8 +21,7 @@ class SearchService
         $query = BeatmapSet::with('creator');
 
         if (!blank($artistTitle)) {
-            $query->where('artist', 'like', '%'.$artistTitle.'%')
-                ->orWhere('title', 'like', '%'.$artistTitle.'%');
+            $query->whereRaw('CONCAT(artist, \' \', title) LIKE ?', ['%'.$artistTitle.'%']);
         }
 
         if (!blank($mapperName)) {
