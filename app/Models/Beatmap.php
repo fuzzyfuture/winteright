@@ -70,10 +70,10 @@ class Beatmap extends Model
     public function getModeIconAttribute(): HtmlString
     {
         $fileName = match ($this->mode) {
-            0 => 'mode-osu-small',
-            1 => 'mode-taiko-small',
-            2 => 'mode-fruits-small',
-            3 => 'mode-mania-small',
+            BeatmapMode::OSU => 'mode-osu-small',
+            BeatmapMode::TAIKO => 'mode-taiko-small',
+            BeatmapMode::FRUITS => 'mode-fruits-small',
+            BeatmapMode::MANIA => 'mode-mania-small',
         };
 
         return new HtmlString('<img src="'.asset('/img/modes/'.$fileName.'.png').'"/>');
