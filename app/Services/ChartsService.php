@@ -29,9 +29,19 @@ class ChartsService
             ->get();
     }
 
-    public function getTopBeatmapsCount($year = null, $excludeRated = false, $user = null): int
+    /**
+     * Retrieves the count of top beatmaps for the charts with filter parameters.
+     *
+     * @param int $enabledModes Bitfield of enabled modes.
+     * @param ?string $year The year to filter beatmaps to.
+     * @param bool $excludeRated True to exclude maps that the user has already rated.
+     * @param ?int $userId The user's ID.
+     * @return int The count of top beatmaps with the specified filter parameters.
+     */
+    public function getTopBeatmapsCount(int $enabledModes, ?string $year = null, ?bool $excludeRated = false,
+                                        ?int $userId = null): int
     {
-        return $this->topBeatmapsBaseQuery($year, $excludeRated, $user)->count();
+        return $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId)->count();
     }
 
     /**
