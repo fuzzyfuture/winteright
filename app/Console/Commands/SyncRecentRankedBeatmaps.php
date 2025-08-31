@@ -67,6 +67,7 @@ class SyncRecentRankedBeatmaps extends Command
                     'status' => 'ranked',
                     'cursor_string' => $cursor,
                     'sort' => 'ranked_desc',
+                    'nsfw' => 'true'
                 ]);
             } catch (Throwable $e) {
                 $this->error('Error while retrieving latest ranked beatmaps at position '.$cursor.': '.$e->getMessage());
