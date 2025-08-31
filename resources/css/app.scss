@@ -94,6 +94,10 @@ body {
     padding: 5px 0;
 }
 
+.nav-link.dropdown-toggle {
+    color: $body-color;
+}
+
 .nav-link:hover {
     color: $body-color;
     text-decoration: underline;
