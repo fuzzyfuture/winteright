@@ -24,6 +24,31 @@
                             <span class="text-body">{{ Auth::user()->name }}</span>
                         </a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           data-bs-auto-close="outside" aria-expanded="false">
+                            modes
+                        </a>
+                        {{ html()->form('POST', route('users.postModes'))->class('dropdown-menu p-2')->open() }}
+                            <div class="form-check">
+                                {{ html()->checkbox('osu', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::OSU))->class('form-check-input') }}
+                                {{ html()->label('osu', 'osu')->class('form-check-label') }}
+                            </div>
+                            <div class="form-check">
+                                {{ html()->checkbox('taiko', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::TAIKO))->class('form-check-input') }}
+                                {{ html()->label('taiko', 'taiko')->class('form-check-label') }}
+                            </div>
+                            <div class="form-check">
+                                {{ html()->checkbox('fruits', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::FRUITS))->class('form-check-input') }}
+                                {{ html()->label('fruits', 'fruits')->class('form-check-label') }}
+                            </div>
+                            <div class="form-check">
+                                {{ html()->checkbox('mania', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::MANIA))->class('form-check-input') }}
+                                {{ html()->label('mania', 'mania')->class('form-check-label') }}
+                            </div>
+                            {{ html()->submit('save')->class('btn btn-sm btn-primary mt-2') }}
+                        {{ html()->form()->close() }}
+                    </li>
                     <li class="nav-item">
                         {{ html()->form('POST', route('auth.logout'))->open() }}
                             {{ html()->submit('logout')->class('nav-link w-100 text-start') }}
