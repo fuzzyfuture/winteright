@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Http\Requests\Users\UpdateEnabledModesRequest;
 use App\Services\BeatmapService;
 use App\Services\RatingService;
 use App\Services\UserListService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Throwable;
 
 class UserController extends Controller
 {
@@ -66,5 +67,17 @@ class UserController extends Controller
         $lists = $this->userListService->getForProfile($id, Auth::check() && Auth::id() == $id);
 
         return view('users.lists', compact('user', 'lists'));
+    }
+
+    public function postModes(UpdateEnabledModesRequest $request)
+    {
+        try {
+            $this->userService->updateEnabledModes(Auth::id(), $request->boolean('osu'),
+                $request->boolean('taiko'), $request->boolean('fruits'), $request->boolean('mania'));
+        } catch (Throwable $e) {
+            return back()->withErrors('error updating modes: '.$e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'enabled modes updated successfully!');
     }
 }
