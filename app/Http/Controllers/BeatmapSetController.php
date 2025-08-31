@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\BeatmapService;
 use App\Services\RatingService;
+use Illuminate\Support\Facades\Auth;
 
 class BeatmapSetController extends Controller
 {
@@ -28,7 +29,7 @@ class BeatmapSetController extends Controller
 
         $beatmapIds = $beatmapSet->beatmaps->pluck('id');
 
-        $ratings = $this->ratingService->getForBeatmaps($beatmapIds, 10);
+        $ratings = $this->ratingService->getForBeatmaps($beatmapIds, Auth::user()->enabled_modes ?? 15, 10);
         $ratings->withPath('/mapsets/'.$setId.'/ratings');
 
         $this->beatmapService->applyCreatorLabels($beatmapSet->beatmaps);
