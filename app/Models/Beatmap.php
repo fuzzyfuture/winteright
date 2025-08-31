@@ -18,6 +18,10 @@ class Beatmap extends Model
         'blacklisted', 'blacklist_reason',
     ];
 
+    protected $casts = [
+        'mode' => BeatmapMode::class,
+    ];
+
     protected array $externalCreatorLabels = [];
 
     public function set(): BelongsTo
