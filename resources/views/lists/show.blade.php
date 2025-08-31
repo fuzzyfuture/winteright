@@ -45,7 +45,7 @@
         <small class="text-muted">
             {{ $list->is_public ? 'public' : 'private' }} list | {{ $list->items_count }} items | {{ $list->favorites_count }} favs <br/>
             created: {{ $list->created_at->toFormattedDateString() }}<br/>
-            last updated: {{ $list->updated_at ? $list->updated_at->toFormattedDateString() : 'never' }}
+            last updated: {{ $list->updated_at?->toFormattedDateString() ?? 'never' }}
         </small>
     </div>
     <div class="mb-4">
