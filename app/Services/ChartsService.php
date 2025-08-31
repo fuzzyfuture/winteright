@@ -2,31 +2,66 @@
 
 namespace App\Services;
 
+use App\Enums\BeatmapMode;
 use App\Models\Beatmap;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class ChartsService
 {
-    public function getTopBeatmaps($year = null, $excludeRated = false, $user = null, $offset = 0, $limit = 50): Collection
+    /**
+     * Retrieves top beatmaps for the charts with filter parameters.
+     *
+     * @param int $enabledModes Bitfield of enabled modes.
+     * @param ?string $year The year to filter beatmaps to.
+     * @param bool $excludeRated True to exclude maps that the user has already rated.
+     * @param ?int $userId The user's ID.
+     * @param int $offset The offset for results pagination.
+     * @param int $limit The amount to display per-page.
+     * @return Collection The top beatmaps with the specified filter parameters.
+     */
+    public function getTopBeatmaps(int $enabledModes, ?string $year = null, ?bool $excludeRated = false,
+                                   ?int $userId = null, int $offset = 0, int $limit = 50): Collection
     {
-        return $this->topBeatmapsBaseQuery($year, $excludeRated, $user)
+        return $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId)
             ->skip($offset)
             ->take($limit)
             ->get();
     }
 
-    public function getTopBeatmapsCount($year = null, $excludeRated = false, $user = null): int
+    /**
+     * Retrieves the count of top beatmaps for the charts with filter parameters.
+     *
+     * @param int $enabledModes Bitfield of enabled modes.
+     * @param ?string $year The year to filter beatmaps to.
+     * @param bool $excludeRated True to exclude maps that the user has already rated.
+     * @param ?int $userId The user's ID.
+     * @return int The count of top beatmaps with the specified filter parameters.
+     */
+    public function getTopBeatmapsCount(int $enabledModes, ?string $year = null, ?bool $excludeRated = false,
+                                        ?int $userId = null): int
     {
-        return $this->topBeatmapsBaseQuery($year, $excludeRated, $user)->count();
+        return $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId)->count();
     }
 
-    private function topBeatmapsBaseQuery($year = null, $excludeRated = false, $user = null)
+    /**
+     * Base database query builder for retrieving filtered top beatmap results.
+     *
+     * @param int $enabledModes Bitfield of enabled modes.
+     * @param ?string $year The year to filter beatmaps to.
+     * @param bool $excludeRated True to exclude maps that the user has already rated.
+     * @param ?int $userId The user's ID.
+     * @return Builder The query builder.
+     */
+    private function topBeatmapsBaseQuery(int $enabledModes, ?string $year = null, ?bool $excludeRated = false,
+                                          ?int $userId = null): Builder
     {
+        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
         $query = Beatmap::with(['set', 'userRating'])
             ->withCount('ratings')
             ->where('blacklisted', false)
             ->whereHas('ratings')
+            ->whereIn('mode', $modesArray)
             ->orderBy('bayesian_avg', 'desc');
 
         if ($year) {
@@ -35,9 +70,9 @@ class ChartsService
             });
         }
 
-        if ($excludeRated && $user) {
-            $query->whereDoesntHave('ratings', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
+        if ($excludeRated && $userId) {
+            $query->whereDoesntHave('ratings', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
             });
         }
 

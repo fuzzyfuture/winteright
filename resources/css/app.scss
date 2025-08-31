@@ -4,6 +4,7 @@ $body-bg: #201b32;
 $main-bg: #302749;
 $footer: #201A31;
 $body-color: #f0e6f6;
+$navbar-dark-active-color: #f0e6f6;
 
 $font-size-base: 0.9rem;
 $font-size-root: 0.9rem;
@@ -91,6 +92,10 @@ body {
 
 .nav-item {
     padding: 5px 0;
+}
+
+.nav-link.dropdown-toggle {
+    color: $body-color;
 }
 
 .nav-link:hover {

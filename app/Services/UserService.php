@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class UserService
 {
@@ -82,5 +83,30 @@ class UserService
         }
 
         return -1;
+    }
+
+    /**
+     * Updates a user's enabled beatmap modes.
+     *
+     * @param int $userId The user's ID.
+     * @param bool $osu True to enable osu.
+     * @param bool $taiko True to enable taiko.
+     * @param bool $fruits True to enable fruits.
+     * @param bool $mania True to enable mania.
+     * @return void
+     * @throws Throwable
+     */
+    public function updateEnabledModes(int $userId, bool $osu, bool $taiko, bool $fruits, bool $mania): void
+    {
+        $enabledModes = 0;
+
+        if ($osu) $enabledModes |= (1 << 0);     // 0001 or +1
+        if ($taiko) $enabledModes |= (1 << 1);   // 0010 or +2
+        if ($fruits) $enabledModes |= (1 << 2);  // 0100 or +4
+        if ($mania) $enabledModes |= (1 << 3);   // 1000 or +8
+
+        DB::transaction(function () use ($userId, $enabledModes) {
+            User::where('id', $userId)->update(['enabled_modes' => $enabledModes]);
+        });
     }
 }

@@ -31,10 +31,12 @@ class ChartsController extends Controller
 
         $offset = ($page - 1) * $perPage;
 
-        $actualCount = $this->chartsService->getTopBeatmapsCount($year, $excludeRated, Auth::user());
+        $enabledModes = Auth::user()->enabled_modes ?? 15;
+
+        $actualCount = $this->chartsService->getTopBeatmapsCount($enabledModes, $year, $excludeRated, Auth::id());
         $totalResults = min($actualCount, $maxResults);
 
-        $beatmapData = $this->chartsService->getTopBeatmaps($year, $excludeRated, Auth::user(), $offset, $perPage);
+        $beatmapData = $this->chartsService->getTopBeatmaps($enabledModes, $year, $excludeRated, Auth::id(), $offset, $perPage);
 
         $topBeatmaps = new LengthAwarePaginator(
             $beatmapData,

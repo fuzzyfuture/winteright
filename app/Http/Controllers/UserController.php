@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Http\Requests\Users\UpdateEnabledModesRequest;
 use App\Services\BeatmapService;
 use App\Services\RatingService;
 use App\Services\UserListService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Throwable;
 
 class UserController extends Controller
 {
@@ -30,12 +31,14 @@ class UserController extends Controller
     {
         $user = $this->userService->get($id);
 
-        $recentRatings = $this->ratingService->getRecentForUser($id);
+        $enabledModes = Auth::user()->enabled_modes ?? 15;
+
+        $recentRatings = $this->ratingService->getRecentForUser($enabledModes, $id);
 
         $beatmapService = app(BeatmapService::class);
         $beatmapService->applyCreatorLabels($recentRatings->pluck('beatmap'));
 
-        $ratingSpread = $this->ratingService->getSpreadForUser($id);
+        $ratingSpread = $this->ratingService->getSpreadForUser($enabledModes, $id);
         $lists = $this->userListService->getForUser($id);
 
         return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists'));
@@ -52,7 +55,9 @@ class UserController extends Controller
             $score = '0.0';
         }
 
-        $ratings = $this->ratingService->getForUser($id, $score ? floatval($score) : null);
+        $enabledModes = Auth::user()->enabled_modes ?? 15;
+
+        $ratings = $this->ratingService->getForUser($enabledModes, $id, $score ? floatval($score) : null);
         $ratings->appends($request->query());
 
         $this->beatmapService->applyCreatorLabels($ratings->getCollection()->pluck('beatmap'));
@@ -66,5 +71,17 @@ class UserController extends Controller
         $lists = $this->userListService->getForProfile($id, Auth::check() && Auth::id() == $id);
 
         return view('users.lists', compact('user', 'lists'));
+    }
+
+    public function postModes(UpdateEnabledModesRequest $request)
+    {
+        try {
+            $this->userService->updateEnabledModes(Auth::id(), $request->boolean('osu'),
+                $request->boolean('taiko'), $request->boolean('fruits'), $request->boolean('mania'));
+        } catch (Throwable $e) {
+            return back()->withErrors('error updating modes: '.$e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'enabled modes updated successfully!');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BeatmapMode;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -16,6 +17,10 @@ class Beatmap extends Model
         'id', 'set_id', 'difficulty_name', 'mode', 'status', 'sr',
         'weighted_avg', 'bayesian_avg',
         'blacklisted', 'blacklist_reason',
+    ];
+
+    protected $casts = [
+        'mode' => BeatmapMode::class,
     ];
 
     protected array $externalCreatorLabels = [];
@@ -65,10 +70,10 @@ class Beatmap extends Model
     public function getModeIconAttribute(): HtmlString
     {
         $fileName = match ($this->mode) {
-            0 => 'mode-osu-small',
-            1 => 'mode-taiko-small',
-            2 => 'mode-fruits-small',
-            3 => 'mode-mania-small',
+            BeatmapMode::OSU => 'mode-osu-small',
+            BeatmapMode::TAIKO => 'mode-taiko-small',
+            BeatmapMode::FRUITS => 'mode-fruits-small',
+            BeatmapMode::MANIA => 'mode-mania-small',
         };
 
         return new HtmlString('<img src="'.asset('/img/modes/'.$fileName.'.png').'"/>');

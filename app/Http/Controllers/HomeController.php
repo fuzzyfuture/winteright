@@ -27,9 +27,11 @@ class HomeController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $enabledModes = $user->enabled_modes ?? 15;
+
         $stats = $this->statsService->getHomePageStats();
-        $recentlyRanked = $this->beatmapService->getRecentBeatmapSets();
-        $recentRatings = $this->ratingService->getRecent();
+        $recentlyRanked = $this->beatmapService->getRecentBeatmapSets($enabledModes);
+        $recentRatings = $this->ratingService->getRecent($enabledModes);
         $lastSynced = $this->siteInfoService->getLastSyncedRankedBeatmaps();
 
         return view('home', compact('user', 'stats', 'recentlyRanked', 'recentRatings',

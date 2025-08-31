@@ -58,7 +58,12 @@
                 </div>
             @endif
             <div class="list-group">
+                @php($hiddenCount = 0)
                 @foreach ($beatmapSet->beatmaps as $beatmap)
+                    @if(Auth::check() && !Auth::user()->hasModeEnabled($beatmap->mode))
+                        @php($hiddenCount++)
+                        @continue
+                    @endif
                     <div class="list-group-item d-flex align-items-center{{ $beatmap->blacklisted ? ' opacity-50' : '' }}">
                         {{ $beatmap->mode_icon }}
                         <div class="ms-3">
@@ -96,6 +101,11 @@
                     </div>
                 @endforeach
             </div>
+            @if ($hiddenCount > 0)
+                <div class="mt-2">
+                    <small class="text-muted">{{ $hiddenCount }} difficulties from other modes hidden</small>
+                </div>
+            @endif
         </div>
         <div class="col-md-4">
             <h4 class="mb-3">ratings</h4>

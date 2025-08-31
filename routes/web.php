@@ -24,6 +24,10 @@ Route::controller(AuthController::class)
 Route::controller(UserController::class)
     ->as('users.')
     ->group(function () {
+        Route::middleware('auth')->group(function () {
+            Route::post('/modes', 'postModes')->name('postModes');
+        });
+
         Route::get('/users/{id}', 'show')->name('show');
         Route::get('/users/{id}/ratings', 'ratings')->name('ratings');
         Route::get('/users/{id}/lists', 'lists')->name('lists');
