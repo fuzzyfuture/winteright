@@ -38,6 +38,11 @@ class User extends Authenticatable
         return $this->favoriteLists()->where('list_id', $listId)->exists();
     }
 
+    public function hasModeEnabled($mode): bool
+    {
+        return (bool) ($this->enabled_modes & (1 << $mode->value));
+    }
+
     public function getUrlAttribute(): HtmlString
     {
         $localUrl = route('users.show', $this->id);
