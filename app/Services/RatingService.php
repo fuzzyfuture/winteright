@@ -107,16 +107,22 @@ class RatingService
 
     /**
      * Retrieves all ratings for a given user.
+     *
+     * @param int $enabledModes Bitfield of enabled modes.
      * @param int $userId The user's ID.
      * @param int $perPage The amount of ratings to display per page.
      * @return LengthAwarePaginator The paginated ratings.
      */
-    public function getForUser(int $userId, ?float $score, int $perPage = 50): LengthAwarePaginator
+    public function getForUser(int $enabledModes, int $userId, ?float $score, int $perPage = 50): LengthAwarePaginator
     {
+        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
         $query = Rating::orderByDesc('updated_at')
             ->with('beatmap.set')
             ->where('user_id', $userId)
-            ->whereRelation('beatmap', 'blacklisted', false);
+            ->whereHas('beatmap', function ($query) use ($modesArray) {
+                $query->whereIn('mode', $modesArray)
+                    ->where('blacklisted', false);
+            });
 
         if (!is_null($score)) {
             $query->whereRaw('score / 2 = '.$score);
