@@ -9,9 +9,21 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ChartsService
 {
-    public function getTopBeatmaps($year = null, $excludeRated = false, $user = null, $offset = 0, $limit = 50): Collection
+    /**
+     * Retrieves top beatmaps for the charts with filter parameters.
+     *
+     * @param int $enabledModes Bitfield of enabled modes.
+     * @param ?string $year The year to filter beatmaps to.
+     * @param bool $excludeRated True to exclude maps that the user has already rated.
+     * @param ?int $userId The user's ID.
+     * @param int $offset The offset for results pagination.
+     * @param int $limit The amount to display per-page.
+     * @return Collection The top beatmaps with the specified filter parameters.
+     */
+    public function getTopBeatmaps(int $enabledModes, ?string $year = null, ?bool $excludeRated = false,
+                                   ?int $userId = null, int $offset = 0, int $limit = 50): Collection
     {
-        return $this->topBeatmapsBaseQuery($year, $excludeRated, $user)
+        return $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId)
             ->skip($offset)
             ->take($limit)
             ->get();
