@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\BeatmapMode;
 use App\Models\Beatmap;
 use App\Models\BeatmapSet;
 use App\Models\Rating;
@@ -147,14 +148,21 @@ class BeatmapService
 
     /**
      * Retrieves recently ranked beatmap sets.
+     *
+     * @param int $enabledModes Bitfield of enabled modes.
      * @param int $limit The amount of recently ranked beatmap sets to retrieve. Defaults to 10.
      * @return Collection The recently ranked beatmap sets.
      */
-    public function getRecentBeatmapSets(int $limit = 10): Collection
+    public function getRecentBeatmapSets(int $enabledModes, int $limit = 10): Collection
     {
-        return Cache::tags(['recent_beatmap_sets'])->remember('recent_'.$limit.'_beatmap_sets', 43200, function () use ($limit) {
+        return Cache::remember('recent_'.$limit.'_beatmap_sets_'.$enabledModes, 43200, function () use ($limit, $enabledModes) {
+            $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+
             return BeatmapSet::withCount('beatmaps')
                 ->with('creator')
+                ->whereHas('beatmaps', function($query) use ($modesArray) {
+                    $query->whereIn('mode', $modesArray);
+                })
                 ->orderByDesc('date_ranked')
                 ->limit($limit)
                 ->get();
