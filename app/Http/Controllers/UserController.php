@@ -55,7 +55,9 @@ class UserController extends Controller
             $score = '0.0';
         }
 
-        $ratings = $this->ratingService->getForUser($id, $score ? floatval($score) : null);
+        $enabledModes = Auth::user()->enabled_modes ?? 15;
+
+        $ratings = $this->ratingService->getForUser($enabledModes, $id, $score ? floatval($score) : null);
         $ratings->appends($request->query());
 
         $this->beatmapService->applyCreatorLabels($ratings->getCollection()->pluck('beatmap'));
