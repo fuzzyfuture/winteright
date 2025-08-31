@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\BeatmapMode;
 use App\Models\Rating;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
@@ -59,16 +60,23 @@ class RatingService
 
     /**
      * Retrieves recent ratings.
+     *
+     * @param int $enabledModes Bitfield of enabled modes.
      * @param int $limit The amount of recent ratings to retrieve. Defaults to 20.
      * @return Collection The recent ratings.
      */
-    public function getRecent(int $limit = 15): Collection
+    public function getRecent(int $enabledModes, int $limit = 15): Collection
     {
-        return Cache::remember('recent_'.$limit.'_ratings', 30, function () use ($limit) {
+        return Cache::remember('recent_'.$limit.'_ratings_'.$enabledModes, 30, function () use ($enabledModes, $limit) {
+            $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+
             return Rating::orderByDesc('updated_at')
                 ->with('user')
                 ->with('beatmap.set')
-                ->whereRelation('beatmap', 'blacklisted', false)
+                ->whereHas('beatmap', function ($query) use ($modesArray) {
+                    $query->whereIn('mode', $modesArray)
+                        ->where('blacklisted', false);
+                })
                 ->limit($limit)
                 ->get();
         });
