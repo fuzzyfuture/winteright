@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Services\BeatmapService;
 use App\Services\RatingService;
-use Illuminate\Http\Request;
 
 class BeatmapSetController extends Controller
 {
