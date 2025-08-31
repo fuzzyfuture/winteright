@@ -1,5 +1,7 @@
 # Winteright
 
+[![Laravel Forge Site Deployment Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fforge.laravel.com%2Fsite-badges%2Fa6d93b53-1ce4-4026-8fbf-a004bbe5c6d9%3Fdate%3D1%26commit%3D1&style=plastic)](https://forge.laravel.com/servers/938171/sites/2780293)
+
 Winteright is an osu! beatmap rating platform inspired by [OMDB](https://github.com/apollo-dw/omdb). All data from OMDB will be imported as features are implemented.
 
 ## Blacklist
