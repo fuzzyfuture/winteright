@@ -31,12 +31,14 @@ class UserController extends Controller
     {
         $user = $this->userService->get($id);
 
-        $recentRatings = $this->ratingService->getRecentForUser($id);
+        $enabledModes = Auth::user()->enabled_modes ?? 15;
+
+        $recentRatings = $this->ratingService->getRecentForUser($enabledModes, $id);
 
         $beatmapService = app(BeatmapService::class);
         $beatmapService->applyCreatorLabels($recentRatings->pluck('beatmap'));
 
-        $ratingSpread = $this->ratingService->getSpreadForUser($id);
+        $ratingSpread = $this->ratingService->getSpreadForUser($enabledModes, $id);
         $lists = $this->userListService->getForUser($id);
 
         return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists'));
