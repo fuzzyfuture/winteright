@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BeatmapMode;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
