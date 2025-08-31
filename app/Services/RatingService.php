@@ -133,15 +133,22 @@ class RatingService
 
     /**
      * Retrieves recent ratings for a specified user.
+     *
+     * @param int $enabledModes Bitfield of enabled modes.
      * @param int $userId The user's ID.
      * @param int $limit The amount of recent ratings to retrieve.
      * @return Collection The user's recent ratings.
      */
-    public function getRecentForUser(int $userId, int $limit = 5): Collection
+    public function getRecentForUser(int $enabledModes, int $userId, int $limit = 5): Collection
     {
+        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+
         return Rating::where('user_id', $userId)
             ->with('user')
             ->with('beatmap.set')
+            ->whereHas('beatmap', function ($query) use ($modesArray) {
+                $query->whereIn('mode', $modesArray);
+            })
             ->orderBy('updated_at', 'desc')
             ->limit($limit)
             ->get();
