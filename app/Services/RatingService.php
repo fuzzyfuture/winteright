@@ -84,17 +84,24 @@ class RatingService
 
     /**
      * Retrieves all ratings for a given list of beatmap IDs.
+     *
      * @param Collection $ids The list of beatmap IDs.
+     * @param int $enabledModes Bitfield of enabled modes.
      * @param int $perPage The amount of ratings to display per page.
      * @return Paginator The paginated ratings.
      */
-    public function getForBeatmaps(Collection $ids, int $perPage = 15): Paginator
+    public function getForBeatmaps(Collection $ids, int $enabledModes, int $perPage = 15): Paginator
     {
+        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+
         return Rating::orderByDesc('updated_at')
             ->with('user')
             ->with('beatmap.set')
             ->whereIn('beatmap_id', $ids)
-            ->whereRelation('beatmap', 'blacklisted', false)
+            ->whereHas('beatmap', function ($query) use ($modesArray) {
+                $query->whereIn('mode', $modesArray)
+                    ->where('blacklisted', false);
+            })
             ->simplePaginate($perPage);
     }
 
