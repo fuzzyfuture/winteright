@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>winteright</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="{{ asset('/favicon.ico') }}">
 
     <meta property="og:title" content="winteright">
     <meta property="og:description" content="a beatmap rating platform for osu!">
