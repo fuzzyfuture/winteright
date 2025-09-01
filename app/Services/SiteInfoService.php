@@ -2,17 +2,19 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class SiteInfoService
 {
     /**
      * Retrieves the timestamp for the latest time new ranked beatmaps were synced with the osu! API.
-     * @return string The timestamp.
+     *
+     * @return ?Carbon The timestamp.
      */
-    public function getLastSyncedRankedBeatmaps(): string
+    public function getLastSyncedRankedBeatmaps(): ?Carbon
     {
-        return DB::table('site_info')->value('last_synced_ranked_beatmaps');
+        return Carbon::parse(DB::table('site_info')->value('last_synced_ranked_beatmaps'));
     }
 
     /**
