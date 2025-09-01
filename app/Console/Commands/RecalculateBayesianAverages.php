@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Beatmap;
 use App\Models\Rating;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class RecalculateBayesianAverages extends Command
 {
@@ -52,6 +53,8 @@ class RecalculateBayesianAverages extends Command
                     ]);
                 }
             });
+
+        Cache::tags(['charts'])->flush();
 
         $this->info('Bayesian averages updated successfully.');
     }
