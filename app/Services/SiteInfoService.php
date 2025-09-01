@@ -30,4 +30,28 @@ class SiteInfoService
             ['last_synced_ranked_beatmaps' => $lastSynced]
         );
     }
+
+    /**
+     * Retrieves the timestamp for the latest time the charts were updated (bayesian averages were recalculated).
+     *
+     * @return ?Carbon The timestamp.
+     */
+    public function getLastUpdatedCharts(): ?Carbon
+    {
+        return Carbon::parse(DB::table('site_info')->value('last_updated_charts'));
+    }
+
+    /**
+     * Stores the timestamp for the latest time the charts were updated (bayesian averages were recalculated).
+     *
+     * @param string $lastUpdated The new timestamp.
+     * @return void
+     */
+    public function storeLastUpdatedCharts(string $lastUpdated): void
+    {
+        DB::table('site_info')->updateOrInsert(
+            [],
+            ['last_updated_charts' => $lastUpdated]
+        );
+    }
 }
