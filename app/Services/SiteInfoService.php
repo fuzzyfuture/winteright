@@ -19,6 +19,7 @@ class SiteInfoService
 
     /**
      * Stores the timestamp for the latest time new ranked beatmaps were synced with the osu! API.
+     *
      * @param string $lastSynced The new timestamp.
      * @return void
      */
