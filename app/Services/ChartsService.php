@@ -6,6 +6,7 @@ use App\Enums\BeatmapMode;
 use App\Models\Beatmap;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class ChartsService
 {
@@ -23,10 +24,17 @@ class ChartsService
     public function getTopBeatmaps(int $enabledModes, ?string $year = null, ?bool $excludeRated = false,
                                    ?int $userId = null, int $offset = 0, int $limit = 50): Collection
     {
-        return $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId)
+        $query = $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId)
             ->skip($offset)
-            ->take($limit)
-            ->get();
+            ->take($limit);
+
+        if ($excludeRated && $userId) {
+            return $query->get();
+        }
+
+        return Cache::tags('charts')->remember('top_beatmaps_'.$enabledModes.'_'.$year.'_'.$offset.'_'.$limit, 43200, function () use ($query) {
+           return $query->get();
+        });
     }
 
     /**
@@ -41,7 +49,16 @@ class ChartsService
     public function getTopBeatmapsCount(int $enabledModes, ?string $year = null, ?bool $excludeRated = false,
                                         ?int $userId = null): int
     {
-        return $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId)->count();
+        $query = $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId);
+
+        if ($excludeRated && $userId)
+        {
+            return $query->count();
+        }
+
+        return Cache::tags('charts')->remember('top_beatmaps_count'.$enabledModes.'_'.$year, 43200, function () use ($query) {
+            return $query->count();
+        });
     }
 
     /**

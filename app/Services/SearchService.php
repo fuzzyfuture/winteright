@@ -6,6 +6,7 @@ use App\Enums\BeatmapMode;
 use App\Models\BeatmapSet;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class SearchService
 {
@@ -25,6 +26,13 @@ class SearchService
             ->whereHas('beatmaps', function ($query) use ($modesArray) {
                 $query->whereIn('mode', $modesArray);
             });
+
+        if (blank($artistTitle) && blank($mapperName) && blank($mapperId)) {
+            return Cache::tags('search')->remember('search_'.$enabledModes, 600, function () use ($query) {
+                return $query->orderBy('date_ranked', 'desc')
+                    ->paginate(50);
+            });
+        }
 
         if (!blank($artistTitle)) {
             $query->whereRaw('CONCAT(artist, \' \', title) LIKE ?', ['%'.$artistTitle.'%']);

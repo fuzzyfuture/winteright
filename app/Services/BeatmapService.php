@@ -331,10 +331,12 @@ class BeatmapService
      */
     public function getBeatmapYears(): Collection
     {
-        return BeatmapSet::selectRaw('DATE_FORMAT(date_ranked, "%Y") as year')
-            ->groupBy('year')
-            ->orderByDesc('year')
-            ->pluck('year');
+        return Cache::remember('beatmap_years', 43200, function () {
+            return BeatmapSet::selectRaw('DATE_FORMAT(date_ranked, "%Y") as year')
+                ->groupBy('year')
+                ->orderByDesc('year')
+                ->pluck('year');
+        });
     }
 
     /**
