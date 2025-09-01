@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use App\Models\Beatmap;
 use App\Models\Rating;
+use App\Services\SiteInfoService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class RecalculateBayesianAverages extends Command
@@ -22,6 +24,15 @@ class RecalculateBayesianAverages extends Command
      * @var string
      */
     protected $description = 'Recalculate and update Bayesian averages for all beatmaps.';
+
+    protected SiteInfoService $siteInfoService;
+
+    public function __construct(SiteInfoService $siteInfoService)
+    {
+        $this->siteInfoService = $siteInfoService;
+
+        parent::__construct();
+    }
 
     /**
      * Execute the console command.
@@ -53,6 +64,8 @@ class RecalculateBayesianAverages extends Command
                     ]);
                 }
             });
+
+        $this->siteInfoService->storeLastUpdatedCharts(Carbon::now()->toDateTimeString());
 
         Cache::tags(['charts'])->flush();
 
