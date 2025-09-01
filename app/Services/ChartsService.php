@@ -49,7 +49,16 @@ class ChartsService
     public function getTopBeatmapsCount(int $enabledModes, ?string $year = null, ?bool $excludeRated = false,
                                         ?int $userId = null): int
     {
-        return $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId)->count();
+        $query = $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId);
+
+        if ($excludeRated && $userId)
+        {
+            return $query->count();
+        }
+
+        return Cache::tags('charts')->remember('top_beatmaps_count'.$enabledModes.'_'.$year, 43200, function () use ($query) {
+            return $query->count();
+        });
     }
 
     /**
