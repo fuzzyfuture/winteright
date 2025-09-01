@@ -118,7 +118,7 @@ class SyncRecentRankedBeatmaps extends Command
 
         $this->siteInfoService->storeLastSyncedRankedBeatmaps(Carbon::now()->toDateTimeString());
 
-        Cache::tags(['recent_beatmap_sets'])->flush();
+        Cache::tags(['recent_beatmap_sets', 'search'])->flush();
 
         $this->info('Import complete! Imported '.$imported.' beatmap sets.');
     }
