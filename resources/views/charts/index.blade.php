@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="mb-4">charts</h1>
+    <h1 class="mb-3">charts</h1>
     <div class="row">
         <div class="col-md-3">
-            <h2>filters</h2>
+            <h2 class="mb-3">filters</h2>
             <div class="card">
                 <div class="card-body">
                     {{ html()->form('GET', route('charts.index'))->open() }}
@@ -20,7 +20,12 @@
             </div>
         </div>
         <div class="col-md-9">
-            <h2>top {{ $excludeRated ? 'unrated ' : '' }}beatmaps of {{ $year ?? 'all-time' }}</h2>
+            <div class="d-flex align-items-end mb-3">
+                <h2 class="mb-0">top {{ $excludeRated ? 'unrated ' : '' }}beatmaps of {{ $year ?? 'all-time' }}</h2>
+                @if ($lastUpdated)
+                    <small class="text-muted d-block ms-3 mb-1">last updated: {{ $lastUpdated->diffForHumans() }}</small>
+                @endif
+            </div>
             <div>
                 {{ $topBeatmaps->links() }}
             </div>
