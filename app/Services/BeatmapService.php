@@ -293,6 +293,7 @@ class BeatmapService
             'creator_id' => $creatorId
         ], array_unique($creatorIds));
 
+        DB::table('beatmap_creators')->where('beatmap_id', $beatmapId)->delete();
         DB::table('beatmap_creators')->upsert($rows, ['beatmap_id', 'creator_id']);
     }
 
