@@ -358,4 +358,17 @@ class BeatmapService
                 ->update(['weighted_avg' => $newAverage]);
         });
     }
+
+    /**
+     * Retrieves all beatmap sets that contain beatmaps which are missing entries in the beatmap_creators table.
+     *
+     * @return Collection The beatmap sets.
+     */
+    public function getBeatmapSetsWithoutCreators(): Collection
+    {
+        return BeatmapSet::whereHas('beatmaps', function ($query) {
+            $query->leftJoin('beatmap_creators', 'beatmaps.id', '=', 'beatmap_creators.beatmap_id')
+                ->where('beatmap_creators.creator_id', '=', null);
+        })->get();
+    }
 }
