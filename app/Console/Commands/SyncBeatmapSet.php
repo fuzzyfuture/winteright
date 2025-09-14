@@ -6,6 +6,7 @@ use App\Services\BeatmapService;
 use App\Services\OsuApiService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Throwable;
 
 class SyncBeatmapSet extends Command
 {
@@ -37,22 +38,27 @@ class SyncBeatmapSet extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $setId = $this->argument('setId');
 
         $this->info('Fetching beatmap set '.$setId.'...');
 
         $token = $this->osuApiService->getAccessToken();
-        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/'.$setId);
 
-        if ($response->failed()) {
-            $this->error('Failed to fetch beatmap set with ID '.$setId.'.');
+        try {
+            $fullDetails = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/'.$setId)->json();
+        } catch (Throwable $e) {
+            $this->error('Error while attempting to fetch beatmap set with ID '.$setId.': '.$e->getMessage());
             return;
         }
 
-        $fullDetails = $response->json();
-        $this->beatmapService->storeBeatmapSetAndBeatmaps($fullDetails, $fullDetails);
+        try {
+            $this->beatmapService->storeBeatmapSetAndBeatmaps($fullDetails, $fullDetails);
+        } catch (Throwable $e) {
+            $this->error('Error while storing beatmap set with ID '.$setId.': '.$e->getMessage());
+            return;
+        }
 
         $this->info('Successfully synced beatmap set '.$fullDetails['artist'].' - '.$fullDetails['title'].'.');
     }

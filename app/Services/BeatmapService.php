@@ -293,6 +293,7 @@ class BeatmapService
             'creator_id' => $creatorId
         ], array_unique($creatorIds));
 
+        DB::table('beatmap_creators')->where('beatmap_id', $beatmapId)->delete();
         DB::table('beatmap_creators')->upsert($rows, ['beatmap_id', 'creator_id']);
     }
 
@@ -340,12 +341,13 @@ class BeatmapService
     }
 
     /**
+     * Updates the weighted average for the specified beatmap.
      *
-     * @param $id
+     * @param int $id The beatmap's ID.
      * @return void
      * @throws Throwable
      */
-    public function updateWeightedAverage($id): void
+    public function updateWeightedAverage(int $id): void
     {
         $newAverage = Rating::selectRaw('AVG(score / 2) as average')
             ->where('beatmap_id', $id)
@@ -355,5 +357,18 @@ class BeatmapService
             Beatmap::where('id', $id)
                 ->update(['weighted_avg' => $newAverage]);
         });
+    }
+
+    /**
+     * Retrieves all beatmap sets that contain beatmaps which are missing entries in the beatmap_creators table.
+     *
+     * @return Collection The beatmap sets.
+     */
+    public function getBeatmapSetsWithoutCreators(): Collection
+    {
+        return BeatmapSet::whereHas('beatmaps', function ($query) {
+            $query->leftJoin('beatmap_creators', 'beatmaps.id', '=', 'beatmap_creators.beatmap_id')
+                ->where('beatmap_creators.creator_id', '=', null);
+        })->get();
     }
 }

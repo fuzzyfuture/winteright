@@ -30,11 +30,6 @@ class Beatmap extends Model
         return $this->belongsTo(BeatmapSet::class, 'set_id', 'id');
     }
 
-    public function creators(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'beatmap_creators', 'beatmap_id', 'creator_id', 'id', 'id');
-    }
-
     public function ratings(): HasMany|Beatmap
     {
         return $this->hasMany(Rating::class);

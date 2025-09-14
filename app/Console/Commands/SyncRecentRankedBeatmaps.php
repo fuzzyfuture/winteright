@@ -93,8 +93,6 @@ class SyncRecentRankedBeatmaps extends Command
                 // 1.1-second delay between requests (~55 req/min), per osu! api guidelines. you're welcome peppy
                 usleep(1100000);
 
-                $fullDetails = null;
-
                 try {
                     $fullDetails = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/'.$setData['id'])->json();
                 } catch (Throwable $e) {
