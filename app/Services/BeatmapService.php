@@ -341,12 +341,13 @@ class BeatmapService
     }
 
     /**
+     * Updates the weighted average for the specified beatmap.
      *
-     * @param $id
+     * @param int $id The beatmap's ID.
      * @return void
      * @throws Throwable
      */
-    public function updateWeightedAverage($id): void
+    public function updateWeightedAverage(int $id): void
     {
         $newAverage = Rating::selectRaw('AVG(score / 2) as average')
             ->where('beatmap_id', $id)
