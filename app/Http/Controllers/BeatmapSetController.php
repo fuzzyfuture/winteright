@@ -46,7 +46,7 @@ class BeatmapSetController extends Controller
 
         $beatmapIds = $beatmapSet->beatmaps->pluck('id');
 
-        $ratings = $this->ratingService->getForBeatmaps($beatmapIds, 10);
+        $ratings = $this->ratingService->getForBeatmaps($beatmapIds, Auth::user()->enabled_modes ?? 15, 10);
         $ratings->withPath('/mapsets/'.$setId.'/ratings');
 
         return view('partials.beatmapset.ratings', compact('ratings'));
