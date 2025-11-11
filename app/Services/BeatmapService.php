@@ -81,6 +81,77 @@ class BeatmapService
     }
 
     /**
+     * Stores a beatmap (difficulty) in the database. Intended for use while syncing with the osu! API; assumes the
+     * parameters are structured as received from the osu! API. Should not be called directly - use
+     * `storeBeatmapSetAndBeatmaps()` instead.
+     * @param $map
+     * @param $setId
+     * @param $shouldBlacklist
+     * @return void
+     * @throws Throwable
+     */
+    private function storeBeatmap($map, $setId, $shouldBlacklist): void
+    {
+        DB::transaction(function () use ($map, $setId, $shouldBlacklist) {
+            Beatmap::updateOrCreate(
+                ['id' => $map['id']],
+                [
+                    'set_id' => $setId,
+                    'difficulty_name' => $map['version'],
+                    'mode' => $map['mode_int'],
+                    'status' => $map['ranked'],
+                    'sr' => $map['difficulty_rating'],
+                    'blacklisted' => $shouldBlacklist,
+                    'blacklist_reason' => $shouldBlacklist ? 'Mapper requested blacklist.' : null,
+                ]
+            );
+        });
+    }
+
+    /**
+     * Stores the beatmaps (difficulties) for a particular set in the database. Intended for use while syncing
+     * with the osu! API; assumes the parameters are structured as received from the osu! API. Should not be called
+     * directly - use `storeBeatmapSetAndBeatmaps()` instead.
+     * @param $fullDetails
+     * @param $setData
+     * @return void
+     * @throws Throwable
+     */
+    private function storeBeatmapsForSet($fullDetails, $setData): void
+    {
+        $blacklistService = app(BlacklistService::class);
+        $userService = app(UserService::class);
+
+        $blacklist = $blacklistService->getBlacklist();
+        $existingBeatmapIds = [];
+
+        foreach ($fullDetails['beatmaps'] as $map) {
+            $shouldBlacklist = false;
+            $creatorIds = [];
+            $existingBeatmapIds[] = $map['id'];
+
+            foreach ($map['owners'] as $owner) {
+                $creatorIds[] = $owner['id'];
+
+                if (in_array($owner['id'], $blacklist)) {
+                    $shouldBlacklist = true;
+                }
+
+                if (!$userService->exists($owner['id'])) {
+                    $this->addCreatorName($owner['id'], $owner['username']);
+                }
+            }
+
+            $this->setCreators($map['id'], $creatorIds);
+            $this->storeBeatmap($map, $setData['id'], $shouldBlacklist);
+        }
+
+        Beatmap::where('set_id', $setData['id'])
+            ->whereNotIn('id', $existingBeatmapIds)
+            ->delete();
+    }
+
+    /**
      * Stores a beatmap set in the database, along with its difficulties (beatmaps). Intended for use while syncing
      * with the osu! API; assumes the parameters are structured as received from the osu! API.
      * @param $setData
@@ -90,9 +161,6 @@ class BeatmapService
      */
     public function storeBeatmapSetAndBeatmaps($setData, $fullDetails): void
     {
-        $blacklistService = app(BlacklistService::class);
-        $blacklist = $blacklistService->getBlacklist();
-
         DB::transaction(function () use ($setData, $fullDetails) {
             return BeatmapSet::updateOrCreate(
                 ['id' => $setData['id']],
@@ -109,41 +177,7 @@ class BeatmapService
             );
         });
 
-        $userService = app(UserService::class);
-
-        foreach ($fullDetails['beatmaps'] as $map) {
-            $shouldBlacklist = false;
-            $creatorIds = [];
-
-            foreach ($map['owners'] as $owner) {
-                $creatorIds[] = $owner['id'];
-
-                if (in_array($owner['id'], $blacklist)) {
-                    $shouldBlacklist = true;
-                }
-
-                if (!$userService->exists($owner['id'])) {
-                    $this->addCreatorName($owner['id'], $owner['username']);
-                }
-            }
-
-            DB::transaction(function () use ($map, $setData, $shouldBlacklist) {
-                Beatmap::updateOrCreate(
-                    ['id' => $map['id']],
-                    [
-                        'set_id' => $setData['id'],
-                        'difficulty_name' => $map['version'],
-                        'mode' => $map['mode_int'],
-                        'status' => $map['ranked'],
-                        'sr' => $map['difficulty_rating'],
-                        'blacklisted' => $shouldBlacklist,
-                        'blacklist_reason' => $shouldBlacklist ? 'Mapper requested blacklist.' : null,
-                    ]
-                );
-            });
-
-            $this->addCreators($map['id'], $creatorIds);
-        }
+        $this->storeBeatmapsForSet($fullDetails, $setData);
     }
 
     /**
@@ -241,7 +275,7 @@ class BeatmapService
      * @param Collection $names The prefetched collection of names.
      * @return array The label.
      */
-    protected function resolveLabel(int $creatorId, Collection $users, Collection $names): array
+    private function resolveLabel(int $creatorId, Collection $users, Collection $names): array
     {
         $winterightName = $users[$creatorId]?->name ?? '';
         $creatorName = $names[$creatorId]?->name ?? '';
@@ -284,7 +318,7 @@ class BeatmapService
      * @param array $creatorIds The IDs of the creators.
      * @return void
      */
-    public function addCreators(int $beatmapId, array $creatorIds): void
+    public function setCreators(int $beatmapId, array $creatorIds): void
     {
         if (empty($creatorIds)) return;
 
