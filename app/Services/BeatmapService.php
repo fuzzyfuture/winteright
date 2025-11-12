@@ -144,8 +144,8 @@ class BeatmapService
                 }
             }
 
-            $this->setCreators($map['id'], $creatorIds);
             $this->storeBeatmap($map, $setData['id'], $shouldBlacklist);
+            $this->setCreators($map['id'], $creatorIds);
         }
 
         Beatmap::where('set_id', $setData['id'])
