@@ -191,18 +191,19 @@ class BeatmapService
      */
     public function getRecentBeatmapSets(int $enabledModes, int $limit = 10): Collection
     {
-        return Cache::remember('recent_'.$limit.'_beatmap_sets_'.$enabledModes, 43200, function () use ($limit, $enabledModes) {
-            $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+        return Cache::tags('recent_beatmap_sets')
+            ->remember('recent_'.$limit.'_beatmap_sets_'.$enabledModes, 600, function () use ($limit, $enabledModes) {
+                $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
-            return BeatmapSet::withCount('beatmaps')
-                ->with('creator')
-                ->whereHas('beatmaps', function($query) use ($modesArray) {
-                    $query->whereIn('mode', $modesArray);
-                })
-                ->orderByDesc('date_ranked')
-                ->limit($limit)
-                ->get();
-        });
+                return BeatmapSet::withCount('beatmaps')
+                    ->with('creator')
+                    ->whereHas('beatmaps', function($query) use ($modesArray) {
+                        $query->whereIn('mode', $modesArray);
+                    })
+                    ->orderByDesc('date_ranked')
+                    ->limit($limit)
+                    ->get();
+            });
     }
 
     /**
