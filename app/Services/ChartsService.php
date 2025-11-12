@@ -74,7 +74,7 @@ class ChartsService
                                           ?int $userId = null): Builder
     {
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
-        $query = Beatmap::with(['set', 'userRating'])
+        $query = Beatmap::with(['set', 'userRating', 'creators.user', 'creators.creatorName'])
             ->withCount('ratings')
             ->where('blacklisted', false)
             ->whereHas('ratings')

@@ -117,7 +117,7 @@ class RatingService
     {
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
         $query = Rating::orderByDesc('updated_at')
-            ->with('beatmap.set')
+            ->with(['beatmap.set', 'beatmap.creators.user', 'beatmap.creators.creatorName'])
             ->where('user_id', $userId)
             ->whereHas('beatmap', function ($query) use ($modesArray) {
                 $query->whereIn('mode', $modesArray)
@@ -144,8 +144,7 @@ class RatingService
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
         return Rating::where('user_id', $userId)
-            ->with('user')
-            ->with('beatmap.set')
+            ->with(['user', 'beatmap.set', 'beatmap.creators.user', 'beatmap.creators.creatorName'])
             ->whereHas('beatmap', function ($query) use ($modesArray) {
                 $query->whereIn('mode', $modesArray);
             })
