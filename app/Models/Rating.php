@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Rating extends Model
 {
-    protected $fillable = ['user_id', 'beatmap_id', 'score', 'rated_at'];
+    protected $fillable = ['user_id', 'beatmap_id', 'score'];
 
     public function user(): BelongsTo
     {
