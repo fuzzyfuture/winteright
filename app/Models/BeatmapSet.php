@@ -21,7 +21,7 @@ class BeatmapSet extends Model
 
     protected array $externalCreatorLabel = [];
 
-    public function beatmaps(): BeatmapSet|HasMany
+    public function beatmaps(): HasMany
     {
         return $this->hasMany(Beatmap::class, 'set_id', 'id');
     }
@@ -29,6 +29,11 @@ class BeatmapSet extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'creator_id', 'id');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class, 'beatmap_set_id', 'id');
     }
 
     public function getStatusLabelAttribute(): string
