@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use App\Enums\BeatmapMode;
+use App\Models\BeatmapCreator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\HtmlString;
 
 class Beatmap extends Model
@@ -23,14 +23,12 @@ class Beatmap extends Model
         'mode' => BeatmapMode::class,
     ];
 
-    protected array $externalCreatorLabels = [];
-
     public function set(): BelongsTo
     {
         return $this->belongsTo(BeatmapSet::class, 'set_id', 'id');
     }
 
-    public function ratings(): HasMany|Beatmap
+    public function ratings(): HasMany
     {
         return $this->hasMany(Rating::class);
     }
@@ -38,6 +36,11 @@ class Beatmap extends Model
     public function userRating()
     {
         return $this->hasOne(Rating::class)->where('user_id', Auth::id());
+    }
+
+    public function creators(): HasMany
+    {
+        return $this->hasMany(BeatmapCreator::class, 'beatmap_id');
     }
 
     public function getStatusLabelAttribute(): string
@@ -74,44 +77,17 @@ class Beatmap extends Model
         return new HtmlString('<img src="'.asset('/img/modes/'.$fileName.'.png').'"/>');
     }
 
-    public function setExternalCreatorLabels(array $labels): void
-    {
-        $this->externalCreatorLabels = $labels;
-    }
-
     public function getCreatorLabelAttribute(): HtmlString
     {
-        $labels = $this->externalCreatorLabels;
-
-        if (empty($labels)) {
-            return $this->set?->creator?->url ?? new HtmlString('unknown');
+        if ($this->creators->isEmpty()) {
+            return $this->set->creator_label;
         }
 
-        $output = '';
-        $chunks = [];
+        $urls = $this->creators->map(function ($creator) {
+            return $creator->url->toHtml();
+        });
 
-        foreach ($labels as $creator) {
-            if ($creator['isWinteright']) {
-                $localLink = '<a href="'.route('users.show', $creator['id']).'">'.e($creator['name']).'</a>';
-            } else if (!empty($creator['name'])) {
-                $localLink = e($creator['name']);
-            } else {
-                $localLink = e($creator['id']);
-            }
-
-            $extLink = '<a href="https://osu.ppy.sh/users/'.$creator['id'].'"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   title="view on osu!"
-                   class="opacity-50 small">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                </a>';
-
-            $chunks[] = $localLink.$extLink;
-        }
-
-        $output .= implode(', ', $chunks);
-        return new HtmlString($output);
+        return new HtmlString($urls->implode(', '));
     }
 
     public function getUrlAttribute(): HtmlString

@@ -10,12 +10,10 @@ use Illuminate\Support\Facades\Auth;
 class SearchController extends Controller
 {
     protected SearchService $searchService;
-    protected BeatmapService $beatmapService;
 
-    public function __construct(SearchService $searchService, BeatmapService $beatmapService)
+    public function __construct(SearchService $searchService)
     {
         $this->searchService = $searchService;
-        $this->beatmapService = $beatmapService;
     }
 
     public function index(Request $request)
@@ -28,8 +26,6 @@ class SearchController extends Controller
         $searchResults = $this->searchService->search(Auth::user()->enabled_modes ?? 15, $artistTitle,
             $mapperName, $mapperId, $page);
         $searchResults->appends($request->query());
-
-        $this->beatmapService->applyCreatorLabelsToSets($searchResults->getCollection());
 
         return view('search.index', compact('searchResults', 'artistTitle', 'mapperName',
             'mapperId'));

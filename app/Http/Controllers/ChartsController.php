@@ -51,8 +51,6 @@ class ChartsController extends Controller
 
         $topBeatmaps->appends($request->query());
 
-        $this->beatmapService->applyCreatorLabels($topBeatmaps->getCollection());
-
         $yearOptions = ['' => 'all'];
         $beatmapYears = $this->beatmapService->getBeatmapYears();
 

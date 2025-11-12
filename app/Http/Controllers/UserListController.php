@@ -47,12 +47,6 @@ class UserListController extends Controller
 
         $items = $this->userListService->getItems($listId);
 
-        $beatmapItems = $items->where('item_type', UserListItemType::BEATMAP);
-        $beatmapSetItems = $items->where('item_type', UserListItemType::BEATMAP_SET);
-
-        $this->beatmapService->applyCreatorLabels($beatmapItems->map->item);
-        $this->beatmapService->applyCreatorLabelsToSets($beatmapSetItems->map->item);
-
         return view('lists.show', compact('list', 'items'));
     }
 
@@ -162,12 +156,6 @@ class UserListController extends Controller
         }
 
         $items = $this->userListService->getItems($listId);
-
-        $beatmapItems = $items->where('item_type', UserListItemType::BEATMAP);
-        $beatmapSetItems = $items->where('item_type', UserListItemType::BEATMAP_SET);
-
-        $this->beatmapService->applyCreatorLabels($beatmapItems->map->item);
-        $this->beatmapService->applyCreatorLabelsToSets($beatmapSetItems->map->item);
 
         return view('lists.edit_items', compact('list', 'items'));
     }

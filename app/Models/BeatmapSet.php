@@ -19,8 +19,6 @@ class BeatmapSet extends Model
         'date_ranked' => 'datetime',
     ];
 
-    protected array $externalCreatorLabel = [];
-
     public function beatmaps(): BeatmapSet|HasMany
     {
         return $this->hasMany(Beatmap::class, 'set_id', 'id');
@@ -28,7 +26,12 @@ class BeatmapSet extends Model
 
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'creator_id', 'id');
+        return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    public function creatorName(): BelongsTo
+    {
+        return $this->belongsTo(BeatmapCreatorName::class, 'creator_id');
     }
 
     public function getStatusLabelAttribute(): string
@@ -81,51 +84,23 @@ class BeatmapSet extends Model
         };
     }
 
-    public function setExternalCreatorLabel(array $label): void
-    {
-        $this->externalCreatorLabel = $label;
-    }
-
     public function getCreatorLabelAttribute(): HtmlString
     {
-        $label = $this->externalCreatorLabel;
-
-        if (empty($label)) {
-            $id = $this->creator_id;
-
-            if ($this->creator) {
-                $name = e($this->creator->name);
-                $isWinteright = true;
-            } else {
-                $beatmapService = app(BeatmapService::class);
-                $name = $beatmapService->getCreatorName($this->creator_id);
-                $isWinteright = false;
-            }
-
-            $label = [
-              'id' => $id,
-              'name' => $name,
-              'isWinteright' => $isWinteright,
-            ];
-        }
-
-        if ($label['isWinteright']) {
-            $url = url('/users/'.$label['id']);
-            $name = e($label['name']);
-            $localLink = '<a href="'.$url.'">'.$name.'</a>';
-        } else if (!blank($label['name'])) {
-            $localLink = e($label['name']);
+        if ($this->creator) {
+            $localLink = '<a href="'.route('users.show', $this->creator_id).'">'.e($this->creator->name).'</a>';
+        } else if ($this->creatorName) {
+            $localLink = e($this->creatorName->name);
         } else {
-            $localLink = e($label['id']);
+            $localLink = $this->creator_id;
         }
 
-        $extLink = '<a href="https://osu.ppy.sh/users/'.$label['id'].'"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       title="view on osu!"
-                       class="opacity-50 small">
+        $extLink = '<a href="https://osu.ppy.sh/users/'.$this->creator_id.'"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="view on osu!"
+                    class="opacity-50 small">
                         <i class="bi bi-box-arrow-up-right"></i>
-                    </a>';
+                </a>';
 
         return new HtmlString($localLink.$extLink);
     }

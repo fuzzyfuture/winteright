@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\UserListItemType;
 use App\Models\Beatmap;
+use App\Models\BeatmapSet;
 use App\Models\UserList;
 use App\Models\UserListFavorite;
 use App\Models\UserListItem;
@@ -58,23 +59,18 @@ class UserListService
      */
     public function getItems(int $id, int $perPage = 50): LengthAwarePaginator
     {
-        $items = UserListItem::where('list_id', $id)
-            ->with('item')
+        return UserListItem::where('list_id', $id)
+            ->with([
+                'item' => function ($morphTo) {
+                    $morphTo->morphWith([
+                        Beatmap::class => ['set', 'creators.user', 'creators.creatorName'],
+                        BeatmapSet::class => ['creator', 'creatorName'],
+                    ]);
+                }
+            ])
             ->orderByDesc('order')
             ->orderBy('created_at')
             ->paginate($perPage);
-
-        $beatmaps = $items->getCollection()
-            ->filter(function ($item) {
-               return $item->item_type == UserListItemType::BEATMAP && $item->item instanceof Beatmap;
-            })
-            ->map(function ($item) {
-                return $item->item;
-            });
-
-        $beatmaps->load('set');
-
-        return $items;
     }
 
     /**

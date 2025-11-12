@@ -34,10 +34,6 @@ class UserController extends Controller
         $enabledModes = Auth::user()->enabled_modes ?? 15;
 
         $recentRatings = $this->ratingService->getRecentForUser($enabledModes, $id);
-
-        $beatmapService = app(BeatmapService::class);
-        $beatmapService->applyCreatorLabels($recentRatings->pluck('beatmap'));
-
         $ratingSpread = $this->ratingService->getSpreadForUser($enabledModes, $id);
         $lists = $this->userListService->getForUser($id);
 
@@ -59,8 +55,6 @@ class UserController extends Controller
 
         $ratings = $this->ratingService->getForUser($enabledModes, $id, $score ? floatval($score) : null);
         $ratings->appends($request->query());
-
-        $this->beatmapService->applyCreatorLabels($ratings->getCollection()->pluck('beatmap'));
 
         return view('users.ratings', compact('user', 'ratings', 'score'));
     }

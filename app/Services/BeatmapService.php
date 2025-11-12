@@ -27,6 +27,8 @@ class BeatmapService
             'creator',
             'beatmaps.ratings',
             'beatmaps.userRating',
+            'beatmaps.creators.user',
+            'beatmaps.creators.creatorName'
         ])->where('id', $setId)->firstOrFail();
     }
 
@@ -189,113 +191,19 @@ class BeatmapService
      */
     public function getRecentBeatmapSets(int $enabledModes, int $limit = 10): Collection
     {
-        return Cache::remember('recent_'.$limit.'_beatmap_sets_'.$enabledModes, 43200, function () use ($limit, $enabledModes) {
-            $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+        return Cache::tags('recent_beatmap_sets')
+            ->remember('recent_'.$limit.'_beatmap_sets_'.$enabledModes, 600, function () use ($limit, $enabledModes) {
+                $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
-            return BeatmapSet::withCount('beatmaps')
-                ->with('creator')
-                ->whereHas('beatmaps', function($query) use ($modesArray) {
-                    $query->whereIn('mode', $modesArray);
-                })
-                ->orderByDesc('date_ranked')
-                ->limit($limit)
-                ->get();
-        });
-    }
-
-    /**
-     * Returns the raw creator data (beatmap ID, user ID) for a list of beatmap IDs.
-     * @param array $beatmapIds The list of beatmap IDs.
-     * @return Collection The raw creator data (beatmap ID, user ID)
-     */
-    public function getRawCreators(array $beatmapIds): Collection
-    {
-        return DB::table('beatmap_creators')
-            ->whereIn('beatmap_id', $beatmapIds)
-            ->get()
-            ->unique();
-    }
-
-    /**
-     * Applies creator labels to each beatmap in a collection. If the mapper has used OMDB or winteright, their
-     * username will be linked and displayed. If they are present in the beatmap creators table, their unlinked
-     * username will be displayed. Otherwise, their ID is displayed. See `applyCreatorLabelsToSets()` for a similar
-     * method for beatmap sets.
-     * @param Collection $beatmaps The list of beatmaps to lookup mappers for.
-     * @return void
-     */
-    public function applyCreatorLabels(Collection $beatmaps): void
-    {
-        $beatmapIds = $beatmaps->pluck('id')->all();
-
-        $rawCreators = $this->getRawCreators($beatmapIds);
-        $grouped = $rawCreators->groupBy('beatmap_id');
-
-        $ids = $rawCreators->pluck('creator_id')->unique()->all();
-        $users = User::whereIn('id', $ids)->get()->keyBy('id');
-        $names = DB::table('beatmap_creator_names')->whereIn('id', $ids)->get()->keyBy('id');
-
-        foreach ($grouped as $beatmapId => $creators) {
-            $labels = $creators->map(function ($creator) use ($users, $names) {
-                return $this->resolveLabel($creator->creator_id, $users, $names);
-            })->toArray();
-
-            $beatmap = $beatmaps->firstWhere('id', $beatmapId);
-            $beatmap->setExternalCreatorLabels($labels);
-        }
-    }
-
-    /**
-     * Applies creator labels to each beatmap set in a collection. If the mapper has used OMDB or winteright, their
-     * username will be linked and displayed. If they are present in the beatmap creators table, their unlinked
-     * username will be displayed. Otherwise, their ID is displayed. See `applyCreatorLabels()` for a similar method
-     * for beatmaps.
-     * @param Collection $beatmapSets The list of beatmap sets to lookup mappers for.
-     * @return void
-     */
-    public function applyCreatorLabelsToSets(Collection $beatmapSets): void
-    {
-        $ids = $beatmapSets->pluck('creator_id')->all();
-
-        $users = User::whereIn('id', $ids)->get()->keyBy('id');
-        $names = DB::table('beatmap_creator_names')->whereIn('id', $ids)->get()->keyBy('id');
-
-        foreach ($beatmapSets as $beatmapSet) {
-            $label = $this->resolveLabel($beatmapSet->creator_id, $users, $names);
-            $beatmapSet->setExternalCreatorLabel($label);
-        }
-    }
-
-    /**
-     * Creates a label array for a beatmap or beatmap set's creator, given the creator's ID and the prefetched
-     * collections of users and creator names. Used when mass-applying creator labels to collections of beatmaps and
-     * beatmap sets.
-     * @param int $creatorId The creator's ID.
-     * @param Collection $users The prefetched collection of users.
-     * @param Collection $names The prefetched collection of names.
-     * @return array The label.
-     */
-    private function resolveLabel(int $creatorId, Collection $users, Collection $names): array
-    {
-        $winterightName = $users[$creatorId]?->name ?? '';
-        $creatorName = $names[$creatorId]?->name ?? '';
-
-        if (!blank($winterightName)) {
-            $name = $winterightName;
-            $isWinteright = true;
-        } else if (!blank($creatorName)) {
-            $name = $creatorName;
-            $isWinteright = false;
-        } else {
-            $name = '';
-            $isWinteright = false;
-        }
-
-        return [
-            'id' => $creatorId,
-            'name' => $name,
-            'isWinteright' => $isWinteright,
-        ];
+                return BeatmapSet::withCount('beatmaps')
+                    ->with('creator')
+                    ->whereHas('beatmaps', function($query) use ($modesArray) {
+                        $query->whereIn('mode', $modesArray);
+                    })
+                    ->orderByDesc('date_ranked')
+                    ->limit($limit)
+                    ->get();
+            });
     }
 
     /**
