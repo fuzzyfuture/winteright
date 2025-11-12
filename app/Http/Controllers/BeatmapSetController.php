@@ -32,8 +32,6 @@ class BeatmapSetController extends Controller
         $ratings = $this->ratingService->getForBeatmaps($beatmapIds, Auth::user()->enabled_modes ?? 15, 10);
         $ratings->withPath('/mapsets/'.$setId.'/ratings');
 
-        $this->beatmapService->applyCreatorLabels($beatmapSet->beatmaps);
-
         $ratingOptions = ['' => 'unrated', 0 => '0.0', 1 => '0.5', 2 => '1.0', 3 => '1.5', 4 => '2.0', 5 => '2.5',
             6 => '3.0', 7 => '3.5', 8 => '4.0', 9 => '4.5', 10 => '5.0'];
 
@@ -43,7 +41,6 @@ class BeatmapSetController extends Controller
     public function ratings($setId)
     {
         $beatmapSet = $this->beatmapService->getBeatmapSet($setId);
-
         $beatmapIds = $beatmapSet->beatmaps->pluck('id');
 
         $ratings = $this->ratingService->getForBeatmaps($beatmapIds, Auth::user()->enabled_modes ?? 15, 10);
