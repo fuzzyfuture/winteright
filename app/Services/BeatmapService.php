@@ -27,6 +27,8 @@ class BeatmapService
             'creator',
             'beatmaps.ratings',
             'beatmaps.userRating',
+            'beatmaps.creators.user',
+            'beatmaps.creators.creatorName'
         ])->where('id', $setId)->firstOrFail();
     }
 
