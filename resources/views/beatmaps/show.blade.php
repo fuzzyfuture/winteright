@@ -76,7 +76,7 @@
                             <br/>
                             <small class="text-muted">
                                 sr: {{ number_format($beatmap->sr, 2) }} |
-                                status: {{ $beatmap->status_label ?? 'Unknown' }}
+                                {{ $beatmap->status_label }}
                                 @if (!$beatmap->blacklisted)
                                     | ratings: {{ $beatmap->ratings->count()}}
                                 @endif
