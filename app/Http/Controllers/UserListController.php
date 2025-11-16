@@ -115,7 +115,7 @@ class UserListController extends Controller
 
     public function getAddItem(Request $request)
     {
-        $listOptions = $this->userListService->getForUser(Auth::id(), true)
+        $listOptions = $this->userListService->getForUser(Auth::id(), true, null)
             ->mapWithKeys(fn ($list) => [$list->id => $list->name])
             ->toArray();
 
