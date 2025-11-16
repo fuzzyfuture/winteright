@@ -31,6 +31,8 @@ Route::controller(UserController::class)
         Route::get('/users/{id}', 'show')->name('show');
         Route::get('/users/{id}/ratings', 'ratings')->name('ratings');
         Route::get('/users/{id}/lists', 'lists')->name('lists');
+        Route::get('/users/{id}/mapsets', 'mapsets')->name('mapsets');
+        Route::get('/users/{id}/gds', 'gds')->name('gds');
     });
 
 Route::controller(BeatmapSetController::class)
