@@ -30,14 +30,16 @@ class UserController extends Controller
     public function show(int $id)
     {
         $user = $this->userService->get($id);
-
         $enabledModes = Auth::user()->enabled_modes ?? 15;
 
-        $recentRatings = $this->ratingService->getRecentForUser($enabledModes, $id);
-        $ratingSpread = $this->ratingService->getSpreadForUser($enabledModes, $id);
+        $recentRatings = $this->ratingService->getForUser($id, $enabledModes);
+        $ratingSpread = $this->ratingService->getSpreadForUser($id, $enabledModes);
         $lists = $this->userListService->getForUser($id);
+        $beatmapSets = $this->beatmapService->getBeatmapSetsForUser($id, $enabledModes);
+        $guestDifficulties = $this->beatmapService->getGuestDifficultiesForUser($id, $enabledModes);
 
-        return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists'));
+        return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists',
+            'beatmapSets', 'guestDifficulties'));
     }
 
     public function ratings(Request $request, int $id)
