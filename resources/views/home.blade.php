@@ -25,7 +25,7 @@
     <div class="row g-4 mb-4">
         <div class="col-lg-7">
             <div class="d-flex align-items-end mb-3">
-                <h3 class="mb-0">recently ranked</h3>
+                <h3 class="mb-0">recently added</h3>
                 @if ($lastSynced)
                     <small class="text-muted d-block ms-3">last updated: {{ \Carbon\Carbon::parse($lastSynced)->diffForHumans() }}</small>
                 @endif
