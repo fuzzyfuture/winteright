@@ -39,7 +39,7 @@ class BeatmapSet extends Model
         $statuses = $this->beatmaps->pluck('status')->unique();
 
         if ($statuses->count() === 1) {
-            return Beatmap::statusLabel($statuses->first());
+            return Beatmap::getStatusLabel($statuses->first());
         }
 
         return 'mixed';
