@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BeatmapMode;
 use App\Services\BeatmapService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -125,5 +126,24 @@ class BeatmapSet extends Model
     public function getBgUrlAttribute(): string
     {
         return 'https://assets.ppy.sh/beatmaps/'.$this->id.'/covers/cover.jpg';
+    }
+
+    public function getDifficultySpreadAttribute(): HtmlString
+    {
+        $modeCounts = $this->beatmaps->groupBy('mode')->map->count();
+        $output = $modeCounts->map(function ($count, $mode) {
+            $icon = Beatmap::getModeIcon(BeatmapMode::from($mode));
+
+            return '<span class="mode-badge d-flex align-items-center">'.$icon.'<span class="count">'.$count.'</span></span>';
+        })->implode(' ');
+
+        return new HtmlString('<div class="d-flex align-items-center gap-2">'.$output.'</div>');
+    }
+
+    public function getStatusBadgeAttribute(): HtmlString
+    {
+        $output = '<span class="badge text-bg-primary">'.$this->status_label.'</span>';
+
+        return new HtmlString($output);
     }
 }
