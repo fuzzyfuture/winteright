@@ -55,7 +55,7 @@ class UserController extends Controller
 
         $enabledModes = Auth::user()->enabled_modes ?? 15;
 
-        $ratings = $this->ratingService->getForUser($enabledModes, $id, $score ? floatval($score) : null);
+        $ratings = $this->ratingService->getForUserPaginated($enabledModes, $id, $score ? floatval($score) : null);
         $ratings->appends($request->query());
 
         return view('users.ratings', compact('user', 'ratings', 'score'));
@@ -64,7 +64,7 @@ class UserController extends Controller
     public function lists(int $id)
     {
         $user = $this->userService->get($id);
-        $lists = $this->userListService->getForProfile($id, Auth::check() && Auth::id() == $id);
+        $lists = $this->userListService->getForUserPaginated($id, Auth::check() && Auth::id() == $id);
 
         return view('users.lists', compact('user', 'lists'));
     }
