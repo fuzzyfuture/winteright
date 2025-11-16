@@ -32,19 +32,7 @@
             </div>
             <ul class="list-group">
                 @foreach ($recentlyRanked as $set)
-                    <div class="list-group-item d-flex align-items-center">
-                        <img src="https://assets.ppy.sh/beatmaps/{{ $set->id }}/covers/cover.jpg" alt="beatmap bg" width="175" />
-                        <div class="ms-2">
-                            <strong>{{ $set->url }}</strong>
-                            <small class="text-muted d-block">
-                                by {{ $set->creator_label }}
-                            </small>
-                            <small class="text-muted d-block">
-                                {{ $set->beatmaps_count }} difficult{{ $set->beatmaps_count !== 1 ? 'ies' : 'y' }}
-                            </small>
-                        </div>
-                        <span class="text-muted ms-auto">{{ $set->date_ranked?->format('Y-m-d') }}</span>
-                    </div>
+                    <x-beatmaps.beatmap_set_list_group :set="$set" />
                 @endforeach
             </ul>
         </div>
