@@ -8,7 +8,7 @@
         @forelse ($ratings as $rating)
             <x-ratings.rating_list_group :rating="$rating" />
         @empty
-            <div class="text-muted">No ratings found.</div>
+            <div class="text-muted">no ratings found.</div>
         @endforelse
     </div>
     {{ $ratings->links() }}
