@@ -69,6 +69,26 @@ class UserController extends Controller
         return view('users.lists', compact('user', 'lists'));
     }
 
+    public function mapsets(int $id)
+    {
+        $user = $this->userService->get($id);
+        $enabledModes = Auth::user()->enabled_modes ?? 15;
+
+        $mapsets = $this->beatmapService->getBeatmapSetsForUserPaginated($id, $enabledModes);
+
+        return view('users.mapsets', compact('user', 'mapsets'));
+    }
+
+    public function gds(int $id)
+    {
+        $user = $this->userService->get($id);
+        $enabledModes = Auth::user()->enabled_modes ?? 15;
+
+        $gds = $this->beatmapService->getGuestDifficultiesForUserPaginated($id, $enabledModes);
+
+        return view('users.gds', compact('user', 'gds'));
+    }
+
     public function postModes(UpdateEnabledModesRequest $request)
     {
         try {
