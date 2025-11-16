@@ -30,67 +30,89 @@
     @if ($user->bio)
         <p class="mb-4">{{ $user->bio }}</p>
     @endif
+    <div class="row g-4 mb-4">
+        <div class="col-lg-5">
+            <h4 class="mb-3">ratings</h4>
+            <div>
+                @for ($i = 10; $i >= 0; $i--)
+                    @php
+                        $rating = $i / 2;
+                        $count = $ratingSpread[$i] ?? 0;
+                        $max = $max = $ratingSpread->isEmpty() ? 1 : $ratingSpread->max();
+                        $width = ($count / $max) * 100;
+                    @endphp
 
-    <div class="mb-3">
-        <h4 class="d-inline mb-0 me-2">ratings</h4>
-        <a href="{{ route('users.ratings', $user->id) }}">view all</a>
-    </div>
-    <div class="mb-4">
-        @for ($i = 10; $i >= 0; $i--)
-            @php
-                $rating = $i / 2;
-                $count = $ratingSpread[$i] ?? 0;
-                $max = $max = $ratingSpread->isEmpty() ? 1 : $ratingSpread->max();
-                $width = ($count / $max) * 100;
-            @endphp
-
-            <div class="d-flex align-items-center mb-1">
-                <div class="me-2" style="width: 3em;">
-                    <a href="{{ url('/users/'.$user->id.'/ratings?score='.number_format($rating, 1)) }}">
-                        {{ number_format($rating, 1) }}
+                    <a href="{{ url('/users/'.$user->id.'/ratings?score='.number_format($rating, 1)) }}" class="rating-bar d-flex align-items-center">
+                        <div class="me-2" style="width: 3em;">
+                            {{ number_format($rating, 1) }}
+                        </div>
+                        <div class="progress flex-grow-1 bg-main d-flex align-items-center" style="height: 24px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ $width }}%; height: 100%;"></div>
+                            <small class="ms-2">{{ $count }}</small>
+                        </div>
                     </a>
-                </div>
-                <div class="progress flex-grow-1 bg-main" style="height: 1.25rem;">
-                    <div class="progress-bar" role="progressbar" style="width: {{ $width }}%"></div>
-                    <small class="ms-2">{{ $count }}</small>
-                </div>
+                @endfor
             </div>
-        @endfor
+        </div>
+        <div class="col-lg-7">
+            <h4 class="mb-3">recently rated</h4>
+            <div class="list-group">
+                @forelse ($recentRatings as $rating)
+                    <x-ratings.rating_list_group :rating="$rating" />
+                @empty
+                    <div class="text-muted">no ratings found.</div>
+                @endforelse
+                @if ($recentRatings->isNotEmpty())
+                    <div class="list-group-item text-end">
+                        <a href="{{ route('users.ratings', $user->id) }}">view all</a>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
-
-    <h4 class="mb-3">recently rated</h4>
+    <h4 class="mb-3">lists</h4>
     <div class="list-group mb-4">
-        @forelse ($recentRatings as $rating)
-            <div class="list-group-item d-flex align-items-center p-3">
-                <img src="https://assets.ppy.sh/beatmaps/{{ $rating->beatmap->set->id }}/covers/cover.jpg" alt="beatmap bg" width="175" />
-                <div class="ms-3">
-                    <strong>{{ $rating->beatmap->url }}</strong>
-                    <small class="text-muted d-block">
-                        by {{ $rating->beatmap->creator_label }}
-                    </small>
-                </div>
-                <div class="ms-auto text-muted text-center">
-                    <span class="badge bg-main fs-6">{{ number_format($rating->score / 2, 1) }}</span><br/>
-                    <small>{{ $rating->updated_at->format('Y-m-d') }}</small>
-                </div>
-            </div>
-        @empty
-            <div class="text-muted">no ratings found.</div>
-        @endforelse
-    </div>
-
-    <div class="mb-3">
-        <h4 class="d-inline mb-0 me-2">lists</h4>
-        <a href="{{ route('users.lists', $user->id) }}">view all</a>
-    </div>
-    <div class="list-group">
         @forelse ($lists as $list)
-            <div class="list-group-item">
-                <a href="{{ url('/lists/'.$list->id) }}">{{ !blank($list->name) ? $list->name : $list->id }}</a> <br/>
-                <small class="text-muted">last updated: {{ $list->updated_at?->toFormattedDateString() ?? 'never' }}</small>
-            </div>
+            <x-lists.list_list_group :list="$list" />
         @empty
             <div class="text-muted">no lists found.</div>
         @endforelse
+        @if ($lists->isNotEmpty())
+            <div class="list-group-item text-end">
+                <a href="{{ route('users.lists', $user->id) }}">view all</a>
+            </div>
+        @endif
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <h4 class="mb-3">mapped beatmap sets</h4>
+            <div class="list-group">
+                @forelse ($beatmapSets as $set)
+                    <x-beatmaps.beatmap_set_list_group :set="$set" />
+                @empty
+                    <div class="text-muted">no mapsets found.</div>
+                @endforelse
+                @if ($beatmapSets->isNotEmpty())
+                    <div class="list-group-item text-end">
+                        <a href="{{ route('users.mapsets', $user->id) }}">view all</a>
+                    </div>
+                @endif
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <h4 class="mb-3">mapped guest difficulties</h4>
+            <div class="list-group">
+                @forelse ($guestDifficulties as $map)
+                    <x-beatmaps.beatmap_list_group :map="$map" />
+                @empty
+                    <div class="text-muted">no guest difficulties found.</div>
+                @endforelse
+                @if ($guestDifficulties->isNotEmpty())
+                    <div class="list-group-item text-end">
+                        <a href="{{ route('users.gds', $user->id) }}">view all</a>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 @endsection
