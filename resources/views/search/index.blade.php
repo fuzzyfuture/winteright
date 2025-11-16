@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <div class="col-md-10 p-3 ps-1">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h5 class="mb-1">
                                 {{ $beatmapSet->url }}
@@ -41,9 +41,11 @@
                             <div>
                                 mapped by: {{ $beatmapSet->creator_label }}
                             </div>
-                            @if ($beatmapSet->date_ranked)
-                                <div>ranked: {{ $beatmapSet->date_ranked->format('Y-m-d') }}</div>
-                            @endif
+                            <div class="mt-1 d-flex align-items-center gap-2">
+                                {{ $beatmapSet->status_badge }}
+                                <span class="text-muted">{{ $beatmapSet->date_ranked?->format('Y-m-d') }}</span>
+                                {{ $beatmapSet->difficulty_spread }}
+                            </div>
                         </div>
                     </div>
                 </div>

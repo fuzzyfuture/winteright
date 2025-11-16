@@ -43,9 +43,9 @@ class Beatmap extends Model
         return $this->hasMany(BeatmapCreator::class, 'beatmap_id');
     }
 
-    public function getStatusLabelAttribute(): string
+    public static function getStatusLabel(int $status): string
     {
-        return match ($this->status) {
+        return match ($status) {
             -2 => 'graveyard',
             1 => 'ranked',
             2 => 'approved',
@@ -53,6 +53,11 @@ class Beatmap extends Model
             4 => 'loved',
             default => 'unknown',
         };
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return self::getStatusLabel($this->status);
     }
 
     public function getDateLabelAttribute(): string
@@ -65,9 +70,9 @@ class Beatmap extends Model
         };
     }
 
-    public function getModeIconAttribute(): HtmlString
+    public static function getModeIcon(BeatmapMode $mode): HtmlString
     {
-        $fileName = match ($this->mode) {
+        $fileName = match ($mode) {
             BeatmapMode::OSU => 'mode-osu-small',
             BeatmapMode::TAIKO => 'mode-taiko-small',
             BeatmapMode::FRUITS => 'mode-fruits-small',
@@ -75,6 +80,11 @@ class Beatmap extends Model
         };
 
         return new HtmlString('<img src="'.asset('/img/modes/'.$fileName.'.png').'"/>');
+    }
+
+    public function getModeIconAttribute(): HtmlString
+    {
+        return self::getModeIcon($this->mode);
     }
 
     public function getCreatorLabelAttribute(): HtmlString
@@ -110,5 +120,12 @@ class Beatmap extends Model
     public function getBgUrlAttribute(): string
     {
         return 'https://assets.ppy.sh/beatmaps/'.$this->set_id.'/covers/cover.jpg';
+    }
+
+    public function getStatusBadgeAttribute(): HtmlString
+    {
+        $output = '<span class="badge text-bg-primary">'.$this->status_label.'</span>';
+
+        return new HtmlString($output);
     }
 }

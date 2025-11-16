@@ -20,6 +20,7 @@ class UserService
 
     /**
      * Retrieves the user with the given ID.
+     *
      * @param int $id The user's ID.
      * @return User The user.
      */

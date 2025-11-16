@@ -33,6 +33,19 @@ class User extends Authenticatable
         return $this->belongsToMany(UserList::class, 'user_list_favorites', 'user_id', 'list_id');
     }
 
+    public function beatmapSets(): HasMany
+    {
+        return $this->hasMany(BeatmapSet::class, 'creator_id');
+    }
+
+    public function guestDifficulties(): BelongsToMany
+    {
+        return $this->belongsToMany(Beatmap::class, 'beatmap_creators', 'creator_id', 'beatmap_id')
+            ->whereHas('set', function ($query) {
+                $query->where('creator_id', '!=', $this->id);
+            });
+    }
+
     public function hasFavorited($listId): bool
     {
         return $this->favoriteLists()->where('list_id', $listId)->exists();

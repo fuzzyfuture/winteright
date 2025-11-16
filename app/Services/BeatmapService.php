@@ -7,6 +7,7 @@ use App\Models\Beatmap;
 use App\Models\BeatmapSet;
 use App\Models\Rating;
 use App\Models\User;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -312,5 +313,106 @@ class BeatmapService
             $query->leftJoin('beatmap_creators', 'beatmaps.id', '=', 'beatmap_creators.beatmap_id')
                 ->where('beatmap_creators.creator_id', '=', null);
         })->get();
+    }
+
+    /**
+     * Retrieves the beatmap sets created by a specified user.
+     *
+     * @param int $userId The user's ID.
+     * @param int $enabledModes Bitfield of enabled modes.
+     * @param int $limit The maximum number of results to return.
+     * @return Collection The user's beatmap sets.
+     */
+    public function getBeatmapSetsForUser(int $userId, int $enabledModes = 15, int $limit = 5): Collection
+    {
+        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+
+        return BeatmapSet::where('creator_id', $userId)
+            ->whereHas('beatmaps', function ($query) use ($modesArray) {
+                $query->whereIn('mode', $modesArray);
+            })
+            ->with('creator')
+            ->withCount('beatmaps')
+            ->orderByDesc('date_ranked')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Retrieves and paginates all beatmap sets created by a specified user.
+     *
+     * @param int $userId The user's ID.
+     * @param int $enabledModes Bitfield of enabled modes.
+     * @param int $perPage The amount of beatmap sets to display per-page.
+     * @return LengthAwarePaginator The user's paginated beatmap sets.
+     */
+    public function getBeatmapSetsForUserPaginated(int $userId, int $enabledModes = 15,
+                                                   int $perPage = 50): LengthAwarePaginator
+    {
+        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+
+        return BeatmapSet::where('creator_id', $userId)
+            ->whereHas('beatmaps', function ($query) use ($modesArray) {
+                $query->whereIn('mode', $modesArray);
+            })
+            ->with('creator')
+            ->withCount('beatmaps')
+            ->orderByDesc('date_ranked')
+            ->paginate($perPage);
+    }
+
+    /**
+     * Retrieves guest difficulties (beatmaps created on another user's set) created by a specified user.
+     *
+     * @param int $userId The user's ID.
+     * @param int $enabledModes Bitfield of enabled modes.
+     * @param int $limit The maximum number of results to return.
+     * @return Collection The user's recent guest difficulties.
+     */
+    public function getGuestDifficultiesForUser(int $userId, int $enabledModes = 15, int $limit = 5): Collection
+    {
+        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+
+        return Beatmap::whereHas('creators', function ($query) use ($userId) {
+                $query->where('creator_id', $userId);
+            })
+            ->whereHas('set', function ($query) use ($userId) {
+                $query->where('creator_id', '!=', $userId);
+            })
+            ->whereIn('mode', $modesArray)
+            ->with(['set', 'creators.user', 'creators.creatorName'])
+            ->join('beatmap_sets', 'beatmaps.set_id', '=', 'beatmap_sets.id')
+            ->orderByDesc('beatmap_sets.date_ranked')
+            ->select('beatmaps.*')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Retrieves and paginates all guest difficulties (beatmaps created on another user's set) created by a specified
+     * user.
+     *
+     * @param int $userId The user's ID.
+     * @param int $enabledModes Bitfield of enabled modes.
+     * @param int $perPage The amount of guest difficulties to display per page.
+     * @return LengthAwarePaginator The paginated guest difficulties.
+     */
+    public function getGuestDifficultiesForUserPaginated(int $userId, int $enabledModes = 15,
+                                                         int $perPage = 50): LengthAwarePaginator
+    {
+        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+
+        return Beatmap::whereHas('creators', function ($query) use ($userId) {
+                $query->where('creator_id', $userId);
+            })
+            ->whereHas('set', function ($query) use ($userId) {
+                $query->where('creator_id', '!=', $userId);
+            })
+            ->whereIn('mode', $modesArray)
+            ->with(['set', 'creators.user', 'creators.creatorName'])
+            ->join('beatmap_sets', 'beatmaps.set_id', '=', 'beatmap_sets.id')
+            ->orderByDesc('beatmap_sets.date_ranked')
+            ->select('beatmaps.*')
+            ->paginate($perPage);
     }
 }

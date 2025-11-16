@@ -9,7 +9,6 @@ use App\Http\Requests\UserLists\UpdateUserListItemRequest;
 use App\Http\Requests\UserLists\UpdateUserListRequest;
 use App\Services\BeatmapService;
 use App\Services\UserListService;
-use App\Validators\UserListValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -115,7 +114,7 @@ class UserListController extends Controller
 
     public function getAddItem(Request $request)
     {
-        $listOptions = $this->userListService->getForUser(Auth::id(), true)
+        $listOptions = $this->userListService->getForUser(Auth::id(), true, null)
             ->mapWithKeys(fn ($list) => [$list->id => $list->name])
             ->toArray();
 

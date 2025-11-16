@@ -44,10 +44,10 @@
                                     <div>
                                         mapped by: {{ $beatmap->creator_label }}
                                     </div>
-                                    <div>status: {{ $beatmap->status_label }}</div>
-                                    @if ($beatmap->set->date_ranked)
-                                        <div>{{ $beatmap->date_label }}: {{ $beatmap->set->date_ranked->format('Y-m-d') }}</div>
-                                    @endif
+                                    <div class="mt-1 d-flex align-items-center gap-2">
+                                        {{ $beatmap->status_badge }}
+                                        <small class="text-muted">{{ $beatmap->set->date_ranked->format('Y-m-d') }}</small>
+                                    </div>
                                 </div>
 
                                 <div class="text-end">

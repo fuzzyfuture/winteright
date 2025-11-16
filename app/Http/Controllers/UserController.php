@@ -30,14 +30,16 @@ class UserController extends Controller
     public function show(int $id)
     {
         $user = $this->userService->get($id);
-
         $enabledModes = Auth::user()->enabled_modes ?? 15;
 
-        $recentRatings = $this->ratingService->getRecentForUser($enabledModes, $id);
-        $ratingSpread = $this->ratingService->getSpreadForUser($enabledModes, $id);
+        $recentRatings = $this->ratingService->getForUser($id, $enabledModes);
+        $ratingSpread = $this->ratingService->getSpreadForUser($id, $enabledModes);
         $lists = $this->userListService->getForUser($id);
+        $beatmapSets = $this->beatmapService->getBeatmapSetsForUser($id, $enabledModes);
+        $guestDifficulties = $this->beatmapService->getGuestDifficultiesForUser($id, $enabledModes);
 
-        return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists'));
+        return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists',
+            'beatmapSets', 'guestDifficulties'));
     }
 
     public function ratings(Request $request, int $id)
@@ -53,7 +55,7 @@ class UserController extends Controller
 
         $enabledModes = Auth::user()->enabled_modes ?? 15;
 
-        $ratings = $this->ratingService->getForUser($enabledModes, $id, $score ? floatval($score) : null);
+        $ratings = $this->ratingService->getForUserPaginated($enabledModes, $id, $score ? floatval($score) : null);
         $ratings->appends($request->query());
 
         return view('users.ratings', compact('user', 'ratings', 'score'));
@@ -62,9 +64,29 @@ class UserController extends Controller
     public function lists(int $id)
     {
         $user = $this->userService->get($id);
-        $lists = $this->userListService->getForProfile($id, Auth::check() && Auth::id() == $id);
+        $lists = $this->userListService->getForUserPaginated($id, Auth::check() && Auth::id() == $id);
 
         return view('users.lists', compact('user', 'lists'));
+    }
+
+    public function mapsets(int $id)
+    {
+        $user = $this->userService->get($id);
+        $enabledModes = Auth::user()->enabled_modes ?? 15;
+
+        $mapsets = $this->beatmapService->getBeatmapSetsForUserPaginated($id, $enabledModes);
+
+        return view('users.mapsets', compact('user', 'mapsets'));
+    }
+
+    public function gds(int $id)
+    {
+        $user = $this->userService->get($id);
+        $enabledModes = Auth::user()->enabled_modes ?? 15;
+
+        $gds = $this->beatmapService->getGuestDifficultiesForUserPaginated($id, $enabledModes);
+
+        return view('users.gds', compact('user', 'gds'));
     }
 
     public function postModes(UpdateEnabledModesRequest $request)
