@@ -36,7 +36,7 @@ class BeatmapSet extends Model
 
     public function getStatusLabelAttribute(): string
     {
-        $statuses = $this->beatmaps->pluck('status')->unique()->sort();
+        $statuses = $this->beatmaps->pluck('status')->unique();
 
         if ($statuses->count() === 1) {
             return Beatmap::statusLabel($statuses->first());
