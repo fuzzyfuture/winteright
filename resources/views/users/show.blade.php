@@ -30,46 +30,53 @@
     @if ($user->bio)
         <p class="mb-4">{{ $user->bio }}</p>
     @endif
-    <div class="row g-4 mb-4">
-        <div class="col-lg-5">
-            <h4 class="mb-3">ratings</h4>
-            <div>
-                @for ($i = 10; $i >= 0; $i--)
-                    @php
-                        $rating = $i / 2;
-                        $count = $ratingSpread[$i] ?? 0;
-                        $max = $max = $ratingSpread->isEmpty() ? 1 : $ratingSpread->max();
-                        $width = ($count / $max) * 100;
-                    @endphp
+    @if ($user->hide_ratings != \App\Enums\HideRatingsOption::ALL->value || Auth::id() == $user->id)
+        <div class="row g-4 mb-4">
+            <div class="col-lg-5">
+                <h4 class="mb-3">ratings</h4>
+                <div>
+                    @for ($i = 10; $i >= 0; $i--)
+                        @php
+                            $rating = $i / 2;
+                            $count = $ratingSpread[$i] ?? 0;
+                            $max = $max = $ratingSpread->isEmpty() ? 1 : $ratingSpread->max();
+                            $width = ($count / $max) * 100;
+                        @endphp
 
-                    <a href="{{ url('/users/'.$user->id.'/ratings?score='.number_format($rating, 1)) }}" class="rating-bar d-flex align-items-center">
-                        <div class="me-2" style="width: 3em;">
-                            {{ number_format($rating, 1) }}
+                        <a href="{{ url('/users/'.$user->id.'/ratings?score='.number_format($rating, 1)) }}" class="rating-bar d-flex align-items-center">
+                            <div class="me-2" style="width: 3em;">
+                                {{ number_format($rating, 1) }}
+                            </div>
+                            <div class="progress flex-grow-1 bg-main d-flex align-items-center" style="height: 24px;">
+                                <div class="progress-bar" role="progressbar" style="width: {{ $width }}%; height: 100%;"></div>
+                                <small class="ms-2">{{ $count }}</small>
+                            </div>
+                        </a>
+                    @endfor
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <h4 class="mb-3">recently rated</h4>
+                <div class="list-group">
+                    @forelse ($recentRatings as $rating)
+                        <x-ratings.rating_list_group :rating="$rating" />
+                    @empty
+                        <div class="text-muted">no ratings found.</div>
+                    @endforelse
+                    @if ($recentRatings->isNotEmpty())
+                        <div class="list-group-item text-end">
+                            <a href="{{ route('users.ratings', $user->id) }}">view all</a>
                         </div>
-                        <div class="progress flex-grow-1 bg-main d-flex align-items-center" style="height: 24px;">
-                            <div class="progress-bar" role="progressbar" style="width: {{ $width }}%; height: 100%;"></div>
-                            <small class="ms-2">{{ $count }}</small>
-                        </div>
-                    </a>
-                @endfor
+                    @endif
+                </div>
             </div>
         </div>
-        <div class="col-lg-7">
-            <h4 class="mb-3">recently rated</h4>
-            <div class="list-group">
-                @forelse ($recentRatings as $rating)
-                    <x-ratings.rating_list_group :rating="$rating" />
-                @empty
-                    <div class="text-muted">no ratings found.</div>
-                @endforelse
-                @if ($recentRatings->isNotEmpty())
-                    <div class="list-group-item text-end">
-                        <a href="{{ route('users.ratings', $user->id) }}">view all</a>
-                    </div>
-                @endif
-            </div>
+    @else
+        <h4 class="mb-3">ratings</h4>
+        <div class="alert alert-sm alert-primary" data-bs-theme="dark">
+            this user's ratings are private.
         </div>
-    </div>
+    @endif
     <h4 class="mb-3">lists</h4>
     <div class="list-group mb-4">
         @forelse ($lists as $list)

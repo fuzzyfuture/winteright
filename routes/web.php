@@ -6,6 +6,7 @@ use App\Http\Controllers\ChartsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserListController;
 use Illuminate\Support\Facades\Route;
@@ -24,15 +25,21 @@ Route::controller(AuthController::class)
 Route::controller(UserController::class)
     ->as('users.')
     ->group(function () {
-        Route::middleware('auth')->group(function () {
-            Route::post('/modes', 'postModes')->name('postModes');
-        });
-
         Route::get('/users/{id}', 'show')->name('show');
         Route::get('/users/{id}/ratings', 'ratings')->name('ratings');
         Route::get('/users/{id}/lists', 'lists')->name('lists');
         Route::get('/users/{id}/mapsets', 'mapsets')->name('mapsets');
         Route::get('/users/{id}/gds', 'gds')->name('gds');
+    });
+
+Route::controller(SettingsController::class)
+    ->as('settings.')
+    ->middleware('auth')
+    ->group(function () {
+       Route::get('/settings', 'show')->name('show');
+
+       Route::post('/settings/general/enabled-modes', 'enabledModes')->name('enabled_modes');
+       Route::post('/settings/general/hide-ratings', 'hideRatings')->name('hide_ratings');
     });
 
 Route::controller(BeatmapSetController::class)
