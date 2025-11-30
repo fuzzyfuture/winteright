@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\HideRatingsOption;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -108,6 +109,20 @@ class UserService
 
         DB::transaction(function () use ($userId, $enabledModes) {
             User::where('id', $userId)->update(['enabled_modes' => $enabledModes]);
+        });
+    }
+
+    /**
+     * Update's a user's hide ratings setting.
+     *
+     * @param int $userId The user's ID.
+     * @param HideRatingsOption $option The selected option.
+     * @throws Throwable
+     */
+    public function updateHideRatings(int $userId, HideRatingsOption $option): void
+    {
+        DB::transaction(function () use ($userId, $option) {
+           User::where('id', $userId)->update(['hide_ratings' => $option->value]);
         });
     }
 }
