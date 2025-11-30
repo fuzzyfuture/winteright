@@ -18,41 +18,44 @@
             </ul>
             <ul class="navbar-nav ms-auto">
                 @if (Auth::check())
-                    <li class="nav-item">
-                        <a href="{{ route('users.show', Auth::id()) }}" class="nav-link">
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                             <img src="https://a.ppy.sh/{{ Auth::id() }}" class="me-1" width="16" height="16" alt="Avatar">
                             <span class="text-body">{{ Auth::user()->name }}</span>
                         </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                           data-bs-auto-close="outside" aria-expanded="false">
-                            modes
-                        </a>
-                        {{ html()->form('POST', route('users.postModes'))->class('dropdown-menu p-2')->open() }}
-                            <div class="form-check">
-                                {{ html()->checkbox('osu', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::OSU))->class('form-check-input') }}
-                                {{ html()->label('osu', 'osu')->class('form-check-label') }}
-                            </div>
-                            <div class="form-check">
-                                {{ html()->checkbox('taiko', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::TAIKO))->class('form-check-input') }}
-                                {{ html()->label('taiko', 'taiko')->class('form-check-label') }}
-                            </div>
-                            <div class="form-check">
-                                {{ html()->checkbox('fruits', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::FRUITS))->class('form-check-input') }}
-                                {{ html()->label('fruits', 'fruits')->class('form-check-label') }}
-                            </div>
-                            <div class="form-check">
-                                {{ html()->checkbox('mania', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::MANIA))->class('form-check-input') }}
-                                {{ html()->label('mania', 'mania')->class('form-check-label') }}
-                            </div>
-                            {{ html()->submit('save')->class('btn btn-sm btn-primary mt-2') }}
-                        {{ html()->form()->close() }}
-                    </li>
-                    <li class="nav-item">
-                        {{ html()->form('POST', route('auth.logout'))->open() }}
-                            {{ html()->submit('logout')->class('nav-link w-100 text-start') }}
-                        {{ html()->form()->close() }}
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ route('users.show', Auth::id()) }}" class="dropdown-item">profile</a></li>
+                            <li><a href="{{ route('settings.show') }}" class="dropdown-item">settings</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li class="dropdown-item-text">enabled modes</li>
+                            <li class="dropdown-item-text" onclick="event.stopPropagation()">
+                                {{ html()->form('POST', route('settings.enabled_modes'))->class('')->open() }}
+                                    <div class="form-check">
+                                        {{ html()->checkbox('osu', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::OSU))->class('form-check-input')->id('navbar-osu') }}
+                                        {{ html()->label('osu', 'navbar-osu')->class('form-check-label') }}
+                                    </div>
+                                    <div class="form-check">
+                                        {{ html()->checkbox('taiko', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::TAIKO))->class('form-check-input')->id('navbar-taiko') }}
+                                        {{ html()->label('taiko', 'navbar-taiko')->class('form-check-label') }}
+                                    </div>
+                                    <div class="form-check">
+                                        {{ html()->checkbox('fruits', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::FRUITS))->class('form-check-input')->id('navbar-fruits') }}
+                                        {{ html()->label('fruits', 'navbar-fruits')->class('form-check-label') }}
+                                    </div>
+                                    <div class="form-check">
+                                        {{ html()->checkbox('mania', Auth::user()->hasModeEnabled(\App\Enums\BeatmapMode::MANIA))->class('form-check-input')->id('navbar-mania') }}
+                                        {{ html()->label('mania', 'navbar-mania')->class('form-check-label') }}
+                                    </div>
+                                    {{ html()->submit('save')->class('btn btn-sm btn-primary mt-2') }}
+                                {{ html()->form()->close() }}
+                            </li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                {{ html()->form('POST', route('auth.logout'))->open() }}
+                                {{ html()->submit('logout')->class('dropdown-item') }}
+                                {{ html()->form()->close() }}
+                            </li>
+                        </ul>
                     </li>
                 @else
                     <li class="nav-item">
@@ -63,3 +66,15 @@
         </div>
     </div>
 </nav>
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.dropdown-item-text form').forEach(function(form) {
+            form.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    });
+</script>
+@endsection
