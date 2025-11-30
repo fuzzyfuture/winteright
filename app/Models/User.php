@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\HideRatingsOption;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,7 +21,11 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = ['id', 'name'];
+    protected $fillable = ['id', 'name', 'banned', 'bio', 'title', 'enabled_modes', 'hide_ratings'];
+    protected $casts = [
+        'hide_ratings' => HideRatingsOption::class,
+    ];
+
     public $incrementing = false;
 
     public function ratings(): HasMany
