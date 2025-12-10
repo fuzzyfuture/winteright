@@ -57,24 +57,18 @@ class SyncRecentRankedBeatmaps extends Command
         $this->info('Last synced: '.$lastSynced);
 
         $newestRanked = Carbon::parse($lastSynced);
-        $token = $this->osuApiService->getAccessToken();
+        $token = $this->osuApiService->getPublicAccessToken();
+        $data = [];
         $cursor = null;
         $imported = 0;
 
         do {
             try {
-                $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/search', [
-                    'status' => 'ranked',
-                    'cursor_string' => $cursor,
-                    'sort' => 'ranked_desc',
-                    'nsfw' => 'true'
-                ]);
+                $data = $this->osuApiService->searchBeatmapSets($token, 'ranked', 'ranked_desc', true, $cursor);
             } catch (Throwable $e) {
                 $this->error('Error while retrieving latest ranked beatmaps at position '.$cursor.': '.$e->getMessage());
                 continue;
             }
-
-            $data = $response->json();
 
             foreach ($data['beatmapsets'] ?? [] as $setData) {
                 $rankedDate = $setData['ranked_date'];
@@ -94,7 +88,7 @@ class SyncRecentRankedBeatmaps extends Command
                 usleep(1100000);
 
                 try {
-                    $fullDetails = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/'.$setData['id'])->json();
+                    $fullDetails = $this->osuApiService->getBeatmapSetFullDetails($token, $setData['id']);
                 } catch (Throwable $e) {
                     $this->error('Error while retrieving details for beatmap set '.$setData['id'].': '.$e->getMessage());
                     continue;
