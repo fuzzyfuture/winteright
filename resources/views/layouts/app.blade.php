@@ -11,8 +11,6 @@
     <meta property="og:url" content="https://winteright.net/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="winteright">
-
-    @vite(['resources/js/app.js'])
 </head>
 <body class="d-flex flex-column min-vh-100">
     <div class="flex-grow-1 py-4">
@@ -29,9 +27,10 @@
             <main class="content p-4">
                 @yield('content')
             </main>
-            @yield('scripts')
             @include('partials.footer')
         </div>
     </div>
+    @yield('scripts')
+    @vite(['resources/js/app.js', 'resources/js/audio-preview.js'])
 </body>
 </html>
