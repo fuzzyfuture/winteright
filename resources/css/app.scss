@@ -144,3 +144,75 @@ a:has(i) {
 .progress {
     border-radius: 0;
 }
+
+.audio-preview {
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+@media (max-width: 767px) {
+    .audio-preview {
+        height: 75px;
+    }
+}
+
+
+.audio-preview .mode-icon-overlay {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    top: 0;
+    height: 100%;
+    width: 100px;
+    background: linear-gradient(to right, $body-bg, transparent);
+    z-index: 2;
+}
+
+.audio-preview .mode-icon-overlay img {
+    opacity: 0.8;
+    width: 25px;
+}
+
+.audio-preview .button-overlay {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    z-index: 3;
+    background-color: $body-bg;
+}
+
+.audio-preview .button-overlay {
+    opacity: 0;
+    transition: all 200ms ease-in-out;
+}
+
+.audio-preview:hover .button-overlay, .audio-preview[data-playing='true'] .button-overlay {
+    opacity: 1;
+    background-color: rgba($body-bg, 0.5);
+    transition: all 200ms ease-in-out;
+}
+
+.audio-preview img {
+    transition: opacity 200ms ease-in-out;
+}
+
+.audio-preview:hover > img, .audio-preview[data-playing='true'] > img {
+    opacity: 0.5;
+    transition: opacity 200ms ease-in-out;
+}
+
+.audio-preview:hover .mode-icon-overlay img, .audio-preview[data-playing='true'] .mode-icon-overlay img {
+    opacity: 0.4;
+    transition: opacity 200ms ease-in-out;
+}
+
+.audio-preview:hover {
+    cursor: pointer;
+}
