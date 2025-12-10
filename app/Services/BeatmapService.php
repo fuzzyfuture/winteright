@@ -432,10 +432,11 @@ class BeatmapService
         $recentScores = app(OsuApiService::class)->getUserScores($token, $userId, 'recent');
         $recentBeatmapIds = array_map(fn ($item) => $item['beatmap']['id'], $recentScores);
 
-        $recentBeatmaps = Beatmap::whereIn('id', $recentBeatmapIds)
+        $beatmapsById = Beatmap::whereIn('id', $recentBeatmapIds)
             ->with('set')
-            ->get();
+            ->get()
+            ->sortBy(fn ($beatmap) => array_search($beatmap->id, $recentBeatmapIds));
 
-        return $recentBeatmaps;
+        return $beatmapsById;
     }
 }
