@@ -7,6 +7,7 @@ use App\Models\Beatmap;
 use App\Models\BeatmapSet;
 use App\Models\Rating;
 use App\Models\User;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -414,5 +415,27 @@ class BeatmapService
             ->orderByDesc('beatmap_sets.date_ranked')
             ->select('beatmaps.*')
             ->paginate($perPage);
+    }
+
+    /**
+     * Retrieves the most recently played beatmaps (last 24 hours) for the specified user.
+     *
+     * @param int $userId The ID of the user.
+     * @return Collection The user's most recently played beatmaps.
+     * @throws ConnectionException
+     */
+    public function getRecentlyPlayedForUser(int $userId): Collection
+    {
+        $osuApiService = app(OsuApiService::class);
+
+        $token = $osuApiService->getPublicAccessToken();
+        $recentScores = app(OsuApiService::class)->getUserScores($token, $userId, 'recent');
+        $recentBeatmapIds = array_map(fn ($item) => $item['beatmap']['id'], $recentScores);
+
+        $recentBeatmaps = Beatmap::whereIn('id', $recentBeatmapIds)
+            ->with('set')
+            ->get();
+
+        return $recentBeatmaps;
     }
 }
