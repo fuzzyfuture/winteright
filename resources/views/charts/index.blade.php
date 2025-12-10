@@ -32,12 +32,18 @@
             <div class="container">
                 @forelse ($topBeatmaps as $beatmap)
                     <div class="row p-0 rounded overflow-hidden shadow-sm mb-2 chart-beatmap-card">
-                        <div class="col-md-2 p-2">
-                            <div class="chart-beatmap-img w-100 h-100"
-                                 style="background-image: url('https://assets.ppy.sh/beatmaps/{{ $beatmap->set->id }}/covers/cover.jpg');">
+                        <div class="col-md-3 py-2">
+                            <div class="ms-md-1 audio-preview" style="background-image: url(https://assets.ppy.sh/beatmaps/{{ $beatmap->set->id }}/covers/cover.jpg)" data-playing="false">
+                                <audio src="https://b.ppy.sh/preview/{{ $beatmap->set->id }}.mp3"></audio>
+                                <div class="button-overlay">
+                                    <i class="bi bi-play-fill h1 mb-0"></i>
+                                </div>
+                                <div class="mode-icon-overlay">
+                                    {{ $beatmap->mode_icon }}
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-10 p-3 ps-1">
+                        <div class="col-md-9 pt-1 pb-3 p-md-3 ps-md-1">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <div>
                                     <h5 class="mb-1">{{ $beatmap->url }}</h5>

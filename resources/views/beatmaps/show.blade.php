@@ -16,12 +16,14 @@
             <h3>{{ $beatmapSet->artist }}</h3>
             <p class="text-muted">
                 mapset by
-                <strong>{!! $beatmapSet->creatorLabel !!}</strong>
+                <strong>{!! $beatmapSet->creator_label !!}</strong>
             </p>
-            <img src="https://assets.ppy.sh/beatmaps/{{ $beatmapSet->id }}/covers/cover.jpg"
-                 class="img-fluid rounded shadow-sm mb-4"
-                 style="max-height: 300px; object-fit: cover;"
-                 alt="{{ $beatmapSet->artist }} - {{ $beatmapSet->title }} banner">
+            <div class="audio-preview rounded shadow-sm mb-4" style="height: 175px; background-image: url({{ $beatmapSet->bg_url }})">
+                <audio src="{{ $beatmapSet->preview_url }}"></audio>
+                <div class="button-overlay">
+                    <i class="bi bi-play-fill h1 mb-0"></i>
+                </div>
+            </div>
         </div>
         <div class="col-md-6">
             <div class="d-flex">
