@@ -92,12 +92,15 @@ class OsuApiService
      * @param string $token An access token with public scope.
      * @param int $id The user's ID.
      * @param string $type The type of score to retrieve. Must be 'best', 'firsts', or 'recent'.
+     * @param int $limit The maximum number of scores to retrieve.
      * @return array The user's scores as a JSON array.
      * @throws ConnectionException
      */
-    public function getUserScores(string $token, int $id, string $type): array
+    public function getUserScores(string $token, int $id, string $type, int $limit = 50): array
     {
-        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/users/'.$id.'/scores/'.$type);
+        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/users/'.$id.'/scores/'.$type, [
+            'limit' => $limit
+        ]);
 
         return $response->json();
     }
