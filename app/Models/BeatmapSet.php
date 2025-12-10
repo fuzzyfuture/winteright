@@ -128,6 +128,11 @@ class BeatmapSet extends Model
         return 'https://assets.ppy.sh/beatmaps/'.$this->id.'/covers/cover.jpg';
     }
 
+    public function getPreviewUrlAttribute(): string
+    {
+        return 'https://b.ppy.sh/preview/'.$this->id.'.mp3';
+    }
+
     public function getDifficultySpreadAttribute(): HtmlString
     {
         $modeCounts = $this->beatmaps->groupBy('mode')->map->count();

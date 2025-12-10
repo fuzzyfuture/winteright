@@ -122,6 +122,11 @@ class Beatmap extends Model
         return 'https://assets.ppy.sh/beatmaps/'.$this->set_id.'/covers/cover.jpg';
     }
 
+    public function getPreviewUrlAttribute(): string
+    {
+        return 'https://b.ppy.sh/preview/'.$this->set_id.'.mp3';
+    }
+
     public function getStatusBadgeAttribute(): HtmlString
     {
         $output = '<span class="badge text-bg-primary">'.$this->status_label.'</span>';

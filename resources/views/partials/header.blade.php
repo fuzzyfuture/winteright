@@ -26,6 +26,7 @@
                         <ul class="dropdown-menu">
                             <li><a href="{{ route('users.show', Auth::id()) }}" class="dropdown-item">profile</a></li>
                             <li><a href="{{ route('settings.show') }}" class="dropdown-item">settings</a></li>
+                            <li><a href="{{ route('played.recent') }}" class="dropdown-item">recently played</a></li>
                             <li><hr class="dropdown-divider" /></li>
                             <li class="dropdown-item-text">enabled modes</li>
                             <li class="dropdown-item-text" onclick="event.stopPropagation()">

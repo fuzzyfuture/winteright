@@ -74,11 +74,14 @@
                     </div>
                 @elseif($item->isBeatmap())
                     <div class="col-md-2 p-2">
-                        <div class="chart-beatmap-img w-100 h-100"
-                             style="background-image: url('{{ $item->item->bg_url }}');">
+                        <div class="ms-md-1 audio-preview" style="background-image: url({{ $item->item->bg_url }})" data-playing="false">
+                            <audio src="{{ $item->item->preview_url }}"></audio>
+                            <div class="button-overlay">
+                                <i class="bi bi-play-fill h1 mb-0"></i>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-10 p-3 ps-1">
+                    <div class="col-md-10 pb-2 p-md-3 ps-md-1">
                         <div><small class="text-muted">beatmap</small></div>
                         <h5 class="mb-1">{{ $item->item->url }}</h5>
                         <div class="mb-2">mapped by: {{ $item->item->creator_label }}</div>
@@ -86,11 +89,14 @@
                     </div>
                 @elseif($item->isBeatmapSet())
                     <div class="col-md-2 p-2">
-                        <div class="chart-beatmap-img w-100 h-100"
-                             style="background-image: url('{{ $item->item->bg_url }}');">
+                        <div class="ms-md-1 audio-preview" style="background-image: url({{ $item->item->bg_url }})" data-playing="false">
+                            <audio src="{{ $item->item->preview_url }}"></audio>
+                            <div class="button-overlay">
+                                <i class="bi bi-play-fill h1 mb-0"></i>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-10 p-3 ps-1">
+                    <div class="col-md-10 pb-2 p-md-3 ps-md-1">
                         <div><small class="text-muted">beatmap set</small></div>
                         <h5 class="mb-1">{{ $item->item->url }}</h5>
                         <div class="mb-2">mapped by: {{ $item->item->creator_label }}</div>

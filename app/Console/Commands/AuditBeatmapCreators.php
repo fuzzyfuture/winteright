@@ -56,7 +56,7 @@ class AuditBeatmapCreators extends Command
 
         $this->newLine();
         if ($this->confirm('Do you want to fix these beatmaps by retrieving their creators?')) {
-            $token = $this->osuApiService->getAccessToken();
+            $token = $this->osuApiService->getPublicAccessToken();
 
             foreach ($beatmapSets as $set) {
                 $id = $set->id;
