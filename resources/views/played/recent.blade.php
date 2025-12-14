@@ -37,7 +37,7 @@
                                     <i class="bi bi-plus"></i><i class="bi bi-list"></i>
                                 </a>
                                 {{ html()->form('POST', route('ratings.update', $map->id))->class('d-flex align-items-center gap-2 ms-3')->open() }}
-                                {{ html()->select('score', $ratingOptions, $map->userRating?->score ?? '')->class('form-select form-select-sm w-auto')->attribute('onchange', 'this.form.submit()') }}
+                                {{ html()->select('score', $ratingOptions, $map->userRating?->score ?? '')->class('form-select form-select-sm w-auto')->attribute('onchange', 'this.form.submit()')->attribute('autocomplete', 'off') }}
                                 {{ html()->form()->close() }}
                             </div>
                         </div>
