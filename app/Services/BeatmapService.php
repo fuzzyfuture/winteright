@@ -6,13 +6,12 @@ use App\Enums\BeatmapMode;
 use App\Models\Beatmap;
 use App\Models\BeatmapSet;
 use App\Models\Rating;
-use App\Models\User;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\HtmlString;
 use Throwable;
 
 class BeatmapService
@@ -421,20 +420,69 @@ class BeatmapService
      * @param int $userId The ID of the user.
      * @return Collection The user's most recently played beatmaps.
      * @throws ConnectionException
+     * @throws AuthenticationException
+     * @throws Throwable
      */
     public function getRecentlyPlayedForUser(int $userId): Collection
     {
         $osuApiService = app(OsuApiService::class);
 
-        $token = $osuApiService->getPublicAccessToken();
-        $recentScores = app(OsuApiService::class)->getUserScores($token, $userId, 'recent');
+        $recentScores = $osuApiService->getUserScores($userId, 'recent');
         $recentBeatmapIds = array_map(fn ($item) => $item['beatmap']['id'], $recentScores);
 
-        $beatmapsById = Beatmap::whereIn('id', $recentBeatmapIds)
-            ->with('set')
+        return Beatmap::whereIn('id', $recentBeatmapIds)
+            ->with(['set', 'creators.user', 'creators.creatorName', 'userRating'])
             ->get()
             ->sortBy(fn ($beatmap) => array_search($beatmap->id, $recentBeatmapIds));
+    }
 
-        return $beatmapsById;
+    /**
+     * Retrieves the beatmap sets that the user has favorited on the osu! website.
+     *
+     * @param int $userId The user's ID.
+     * @param int $page The current page.
+     * @param int $perPage The amount of results to include per-page.
+     * @return LengthAwarePaginator The paginated beatmap sets.
+     * @throws AuthenticationException
+     * @throws ConnectionException
+     * @throws Throwable
+     */
+    public function getFavoritesForUserPaginated(int $userId, int $page = 1, int $perPage = 50): LengthAwarePaginator
+    {
+        $osuApiService = app(OsuApiService::class);
+
+        $offset = ($page - 1) * $perPage;
+
+        $ids = Cache::tags('api_'.$userId)->remember(
+            'api_favorites_'.$userId.'_'.$page,
+            86400,
+            function () use ($userId, $osuApiService, $perPage, $offset) {
+                $favorites = $osuApiService->getUserBeatmaps($userId, 'favourite', $perPage, $offset);
+                return array_map(fn ($item) => $item['id'], $favorites);
+            }
+        );
+
+        $apiUser = Cache::tags('api_'.$userId)->remember(
+            'api_users_'.$userId,
+            86400,
+            function () use ($userId, $osuApiService) {
+                return $osuApiService->getUser($userId);
+            }
+        );
+
+        $favoriteCount = $apiUser['favourite_beatmapset_count'];
+
+        $beatmaps = BeatmapSet::whereIn('id', $ids)
+            ->with(['creator', 'creatorName', 'beatmaps'])
+            ->get()
+            ->sortBy(fn ($beatmap) => array_search($beatmap->id, $ids));
+
+        return new LengthAwarePaginator(
+            $beatmaps,
+            $favoriteCount,
+            $perPage,
+            $page,
+            ['path' => request()->url()]
+        );
     }
 }
