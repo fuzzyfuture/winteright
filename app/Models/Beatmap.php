@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 
@@ -33,7 +34,7 @@ class Beatmap extends Model
         return $this->hasMany(Rating::class);
     }
 
-    public function userRating()
+    public function userRating(): HasOne
     {
         return $this->hasOne(Rating::class)->where('user_id', Auth::id());
     }
