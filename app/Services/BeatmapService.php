@@ -332,8 +332,7 @@ class BeatmapService
             ->whereHas('beatmaps', function ($query) use ($modesArray) {
                 $query->whereIn('mode', $modesArray);
             })
-            ->with('creator')
-            ->withCount('beatmaps')
+            ->with(['creator', 'creatorName', 'beatmaps'])
             ->orderByDesc('date_ranked')
             ->limit($limit)
             ->get();
@@ -356,8 +355,7 @@ class BeatmapService
             ->whereHas('beatmaps', function ($query) use ($modesArray) {
                 $query->whereIn('mode', $modesArray);
             })
-            ->with('creator')
-            ->withCount('beatmaps')
+            ->with(['creator', 'creatorName', 'beatmaps'])
             ->orderByDesc('date_ranked')
             ->paginate($perPage);
     }
