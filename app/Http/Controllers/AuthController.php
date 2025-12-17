@@ -20,6 +20,7 @@ class AuthController extends Controller
     public function loginRedirect()
     {
         session(['url.intended' => url()->previous()]);
+
         return redirect()->route('auth.redirect');
     }
 
@@ -35,7 +36,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->intended(route('home'));
+        return redirect()->intended(route('home'))->with('success', 'login successful!');
     }
 
     public function logout()
@@ -44,6 +45,6 @@ class AuthController extends Controller
             Auth::logout();
         }
 
-        return redirect()->intended(route('home'));
+        return redirect()->intended(route('home'))->with('success', 'logout successful!');
     }
 }
