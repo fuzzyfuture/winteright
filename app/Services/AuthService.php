@@ -18,7 +18,10 @@ class AuthService
         return User::updateOrCreate(
             ['id' => $osuUser->getId()],
             [
-                'name' => $osuUser->getName()
+                'name' => $osuUser->getName(),
+                'osu_access_token' => $osuUser->token,
+                'osu_refresh_token' => $osuUser->refreshToken,
+                'osu_token_expires_at' => now()->addSeconds($osuUser->expiresIn),
             ]
         );
     }
