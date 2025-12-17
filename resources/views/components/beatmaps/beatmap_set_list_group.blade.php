@@ -14,11 +14,11 @@
                 <small class="text-muted d-block">
                     by {{ $set->creator_label }}
                 </small>
-                <small class="text-muted d-flex align-items-center gap-2 mt-1">
+                <div class="mt-1 d-flex align-items-center gap-2">
                     {{ $set->status_badge }}
-                    <span class="text-muted">{{ $set->date_ranked?->format('Y-m-d') }}</span>
-                    {{ $set->difficultySpread }}
-                </small>
+                    <small class="text-muted">{{ $set->date_ranked->format('Y-m-d') }}</small>
+                    <small class="text-muted">{{ $set->difficulty_spread }}</small>
+                </div>
             </div>
         </div>
     </div>
