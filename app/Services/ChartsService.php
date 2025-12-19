@@ -50,6 +50,10 @@ class ChartsService
                 });
         }
 
+        if ($userId) {
+            $beatmaps->load('userRating');
+        }
+
         return new LengthAwarePaginator(
             $beatmaps,
             $totalResults,
@@ -125,7 +129,7 @@ class ChartsService
                                           ?int $userId = null): Builder
     {
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
-        $query = Beatmap::with(['set', 'userRating', 'creators.user', 'creators.creatorName'])
+        $query = Beatmap::with(['set', 'creators.user', 'creators.creatorName'])
             ->withCount('ratings')
             ->where('blacklisted', false)
             ->whereHas('ratings')
