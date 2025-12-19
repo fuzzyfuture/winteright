@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\HideRatingsOption;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -123,6 +124,26 @@ class UserService
     {
         DB::transaction(function () use ($userId, $option) {
            User::where('id', $userId)->update(['hide_ratings' => $option->value]);
+        });
+    }
+
+    /**
+     * Updates a user's stored osu! OAuth tokens.
+     *
+     * @param int $userId The user's ID.
+     * @param string $accessToken The user's new access token.
+     * @param string $refreshToken The user's new refresh token.
+     * @param Carbon $expiry The expiry time for the new tokens.
+     * @throws Throwable
+     */
+    public function updateOsuTokens(int $userId, string $accessToken, string $refreshToken, Carbon $expiry): void
+    {
+        DB::transaction(function () use ($userId, $accessToken, $refreshToken, $expiry) {
+            User::where('id', $userId)->update([
+                'osu_access_token' => $accessToken,
+                'osu_refresh_token' => $refreshToken,
+                'osu_token_expires_at' => $expiry,
+            ]);
         });
     }
 }
