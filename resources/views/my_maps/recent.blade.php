@@ -2,14 +2,14 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>recently played</h1>
-    <h3 class="mb-3">last 24 hours</h3>
+    @include('my_maps._nav')
     <div class="list-group">
         @foreach ($beatmaps as $map)
             <div class="list-group-item">
                 <div class="row g-2">
                     <div class="col-md-2">
-                        <div class="audio-preview" style="background-image: url({{ $map->bg_url }})" data-playing="false">
+                        <div class="audio-preview" style="background-image: url({{ $map->bg_url }})"
+                             data-playing="false">
                             <audio src="https://b.ppy.sh/preview/{{ $map->set->id }}.mp3"></audio>
                             <div class="button-overlay">
                                 <i class="bi bi-play-fill h1 mb-0"></i>
