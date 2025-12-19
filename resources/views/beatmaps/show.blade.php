@@ -1,3 +1,4 @@
+@php use App\Enums\UserListItemType; @endphp
 @extends('layouts.app')
 
 @section('content')
@@ -18,7 +19,8 @@
                 mapset by
                 <strong>{!! $beatmapSet->creator_label !!}</strong>
             </p>
-            <div class="audio-preview rounded shadow-sm mb-4" style="height: 175px; background-image: url({{ $beatmapSet->bg_url }})">
+            <div class="audio-preview rounded shadow-sm mb-4"
+                 style="height: 175px; background-image: url({{ $beatmapSet->bg_url }})">
                 <audio src="{{ $beatmapSet->preview_url }}"></audio>
                 <div class="button-overlay">
                     <i class="bi bi-play-fill h1 mb-0"></i>
@@ -29,7 +31,7 @@
             <div class="d-flex">
                 <h4>info</h4>
                 @auth
-                    <a href="{{ route('lists.add', ['item_type' => \App\Enums\UserListItemType::BEATMAP_SET, 'item_id' => $beatmapSet->id]) }}"
+                    <a href="{{ route('lists.add', ['item_type' => UserListItemType::BEATMAP_SET, 'item_id' => $beatmapSet->id]) }}"
                        class="ms-auto btn btn-outline-primary">
                         <i class="bi bi-plus"></i><i class="bi bi-list"></i>
                         add to list
@@ -86,7 +88,7 @@
                         </div>
                         <div class="ms-auto text-end d-flex flex-row align-items-center">
                             @auth
-                                <a href="{{ route('lists.add', ['item_type' => \App\Enums\UserListItemType::BEATMAP, 'item_id' => $beatmap->id]) }}"
+                                <a href="{{ route('lists.add', ['item_type' => UserListItemType::BEATMAP, 'item_id' => $beatmap->id]) }}"
                                    class="ms-2 btn btn-sm btn-outline-primary p-1 py-0 opacity-50">
                                     <i class="bi bi-plus"></i><i class="bi bi-list"></i>
                                 </a>
@@ -112,7 +114,7 @@
         <div class="col-md-4">
             <h4 class="mb-3">ratings</h4>
             <div id='ratings'>
-                @include('partials.beatmapset.ratings')
+                @include('beatmaps._ratings')
             </div>
         </div>
     </div>
