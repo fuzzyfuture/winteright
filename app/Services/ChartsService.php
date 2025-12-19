@@ -6,6 +6,7 @@ use App\Enums\BeatmapMode;
 use App\Models\Beatmap;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 
 class ChartsService
@@ -21,20 +22,37 @@ class ChartsService
      * @param int $limit The amount to display per-page.
      * @return Collection The top beatmaps with the specified filter parameters.
      */
-    public function getTopBeatmaps(int $enabledModes, ?string $year = null, ?bool $excludeRated = false,
-                                   ?int $userId = null, int $offset = 0, int $limit = 50): Collection
+    public function getTopBeatmapsPaginated(int $enabledModes, ?string $year = null, ?bool $excludeRated = false,
+                                            ?int $userId = null, int $page = 1, int $perPage = 50,
+                                            int $maxPages = 200): LengthAwarePaginator
     {
-        $query = $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId)
-            ->skip($offset)
-            ->take($limit);
+        $maxResults = $perPage * $maxPages;
+        $offset = ($page - 1) * $perPage;
+        $actualCount = $this->getTopBeatmapsCount($enabledModes, $year, $excludeRated, $userId);
+        $totalResults = min($maxResults, $actualCount);
 
-        if ($excludeRated && $userId) {
-            return $query->get();
+        $beatmaps = $this->topBeatmapsBaseQuery($enabledModes, $year, $excludeRated, $userId)
+            ->skip($offset)
+            ->take($perPage);
+
+        if ($userId && $excludeRated) {
+            $beatmaps = $beatmaps->get();
+        } else {
+            $beatmaps = Cache::tags('charts')->remember(
+                'top_beatmaps_'.$enabledModes.'_'.$year.'_'.$page,
+                43200,
+                function () use ($beatmaps) {
+                    return $beatmaps->get();
+                });
         }
 
-        return Cache::tags('charts')->remember('top_beatmaps_'.$enabledModes.'_'.$year.'_'.$offset.'_'.$limit, 43200, function () use ($query) {
-           return $query->get();
-        });
+        return new LengthAwarePaginator(
+            $beatmaps,
+            $totalResults,
+            $perPage,
+            $page,
+            ['path' => request()->url()]
+        );
     }
 
     /**
