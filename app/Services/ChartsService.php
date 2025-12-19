@@ -4,10 +4,13 @@ namespace App\Services;
 
 use App\Enums\BeatmapMode;
 use App\Models\Beatmap;
+use App\Models\Rating;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ChartsService
 {
@@ -18,9 +21,10 @@ class ChartsService
      * @param ?string $year The year to filter beatmaps to.
      * @param bool $excludeRated True to exclude maps that the user has already rated.
      * @param ?int $userId The user's ID.
-     * @param int $offset The offset for results pagination.
-     * @param int $limit The amount to display per-page.
-     * @return Collection The top beatmaps with the specified filter parameters.
+     * @param int $page The current page.
+     * @param int $perPage The amount of results to include per-page.
+     * @param int $maxPages The maximum amount of pages.
+     * @return LengthAwarePaginator The top beatmaps with the specified filter parameters.
      */
     public function getTopBeatmapsPaginated(int $enabledModes, ?string $year = null, ?bool $excludeRated = false,
                                             ?int $userId = null, int $page = 1, int $perPage = 50,
@@ -77,6 +81,35 @@ class ChartsService
         return Cache::tags('charts')->remember('top_beatmaps_count'.$enabledModes.'_'.$year, 43200, function () use ($query) {
             return $query->count();
         });
+    }
+
+    /**
+     * Recalculates the bayesian average (which determines chart position) for every beatmap.
+     *
+     * @return void
+     */
+    public function recalculateBayesianAverages(): void
+    {
+        $totalRatings = Rating::count();
+        $averageRating = Rating::avg('score') ?? 0;
+
+        if ($totalRatings === 0) return;
+
+        DB::statement("
+            UPDATE beatmaps
+            INNER JOIN (
+                SELECT
+                    beatmap_id,
+                    COUNT(*) as ratings_count,
+                    SUM(score) as total_score
+                FROM ratings
+                GROUP BY beatmap_id
+            ) r ON beatmaps.id = r.beatmap_id
+            SET beatmaps.bayesian_avg = ((? * ?) + r.total_score) / (? + r.ratings_count)
+        ", [$averageRating, $totalRatings, $totalRatings]);
+
+        app(SiteInfoService::class)->storeLastUpdatedCharts(Carbon::now()->toDateTimeString());
+        Cache::tags(['charts'])->flush();
     }
 
     /**
