@@ -25,16 +25,19 @@ class UserController extends Controller
         $this->userListService = $userListService;
     }
 
-    public function show(int $id)
+    public function show(string $id)
     {
-        $user = $this->userService->get($id);
+        $user = is_numeric($id) ?
+            $this->userService->get($id) :
+            $this->userService->getByName($id);
+
         $enabledModes = Auth::user()->enabled_modes ?? 15;
 
-        $recentRatings = $this->ratingService->getForUser($id, $enabledModes);
-        $ratingSpread = $this->ratingService->getSpreadForUser($id, $enabledModes);
-        $lists = $this->userListService->getForUser($id);
-        $beatmapSets = $this->beatmapService->getBeatmapSetsForUser($id, $enabledModes);
-        $guestDifficulties = $this->beatmapService->getGuestDifficultiesForUser($id, $enabledModes);
+        $recentRatings = $this->ratingService->getForUser($user->id, $enabledModes);
+        $ratingSpread = $this->ratingService->getSpreadForUser($user->id, $enabledModes);
+        $lists = $this->userListService->getForUser($user->id);
+        $beatmapSets = $this->beatmapService->getBeatmapSetsForUser($user->id, $enabledModes);
+        $guestDifficulties = $this->beatmapService->getGuestDifficultiesForUser($user->id, $enabledModes);
 
         return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists',
             'beatmapSets', 'guestDifficulties'));

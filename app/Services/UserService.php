@@ -32,6 +32,17 @@ class UserService
     }
 
     /**
+     * Retrieves the user with the specified username.
+     *
+     * @param string $name The user's username.
+     * @return User The user.
+     */
+    public function getByName(string $name): User
+    {
+        return user::whereName($name)->firstOrFail();
+    }
+
+    /**
      * Retrieves a user's name from their ID. Uses the beatmap creator names table as a fallback, if the user is not
      * a winteright user.
      * @param int $id The user's ID.
