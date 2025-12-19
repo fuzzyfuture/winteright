@@ -8,6 +8,7 @@ use App\Services\SiteInfoService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class RecalculateBayesianAverages extends Command
 {
@@ -49,22 +50,18 @@ class RecalculateBayesianAverages extends Command
 
         $this->info('Recalculating Bayesian averages...');
 
-        Beatmap::withSum('ratings', 'score')
-            ->withCount('ratings')
-            ->chunkById(10000, function ($beatmaps) use ($totalRatings, $averageRating) {
-                foreach ($beatmaps as $beatmap) {
-                    $ratingsCount = $beatmap->ratings_count ?? 0;
-                    $totalScore = $beatmap->ratings_sum_score ?? 0;
-
-                    if ($ratingsCount === 0) continue;
-
-                    $bayesian = (($averageRating * $totalRatings) + $totalScore) / ($totalRatings + $ratingsCount);
-
-                    $beatmap->update([
-                        'bayesian_avg' => $bayesian,
-                    ]);
-                }
-            });
+        DB::statement("
+            UPDATE beatmaps
+            INNER JOIN (
+                SELECT
+                    beatmap_id,
+                    COUNT(*) as ratings_count,
+                    SUM(score) as total_score
+                FROM ratings
+                GROUP BY beatmap_id
+            ) r ON beatmaps.id = r.beatmap_id
+            SET beatmaps.bayesian_avg = ((? * ?) + r.total_score) / (? + r.ratings_count)
+        ", [$averageRating, $totalRatings, $totalRatings]);
 
         $this->siteInfoService->storeLastUpdatedCharts(Carbon::now()->toDateTimeString());
 
