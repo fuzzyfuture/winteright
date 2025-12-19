@@ -57,6 +57,12 @@
     <div class="container">
         @forelse($items as $item)
             <div class="row p-0 rounded shadow-sm mb-2 chart-beatmap-card">
+                @if($item->item == null)
+                    [item does not exist on winteright]
+                    id: {{ $item->item_id }}
+                    type: {{ $item->item_type }}
+                    @continue
+                @endif
                 @if($item->isUser())
                     <div class="col-md-2 p-2">
                         <div class="chart-beatmap-img w-100 h-100"
@@ -65,11 +71,7 @@
                     </div>
                     <div class="col-md-10 p-3 ps-1">
                         <div><small class="text-muted">user</small></div>
-                        @if ($item->item)
-                            <h5><a href="{{ route('users.show', $item->item_id) }}">{{ $item->item->name }}</a></h5>
-                        @else
-                            <h5>{{ $item->item_id }}<a href="https://osu.ppy.sh/users/{{ $item->item_id }}"></a></h5>
-                        @endif
+                        <h5><a href="{{ route('users.show', $item->item_id) }}">{{ $item->item->name }}</a></h5>
                         <div>{{ $item->description }}</div>
                     </div>
                 @elseif($item->isBeatmap())
