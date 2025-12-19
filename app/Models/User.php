@@ -21,7 +21,8 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = ['id', 'name', 'banned', 'bio', 'title', 'enabled_modes', 'hide_ratings'];
+    protected $fillable = ['id', 'name', 'banned', 'bio', 'title', 'enabled_modes', 'hide_ratings', 'osu_access_token',
+        'osu_refresh_token', 'osu_token_expires_at'];
     protected $casts = [
         'hide_ratings' => HideRatingsOption::class,
     ];
