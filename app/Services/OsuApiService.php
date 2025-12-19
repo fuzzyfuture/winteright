@@ -2,9 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\User;
+use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 use function Pest\Laravel\withToken;
 
 class OsuApiService
@@ -17,7 +22,7 @@ class OsuApiService
      */
     public function getPublicAccessToken(): string
     {
-        return Cache::remember('osu_public_api_token', 3600, function() {
+        return Cache::remember('osu_public_api_token', 86400, function() {
             $response = Http::asForm()->post('https://osu.ppy.sh/oauth/token', [
                 'client_id' => config('services.osu.client_id'),
                 'client_secret' => config('services.osu.client_secret'),
@@ -27,6 +32,55 @@ class OsuApiService
 
             return $response->json()['access_token'];
         });
+    }
+
+    /**
+     * Retrieves a user's access token for the osu! API. Intended for use while making API requests on behalf of a
+     * specific user. If the user does not currently have an access token, it will be refreshed.
+     *
+     * @param int $userId The user's ID.
+     * @return string The user's valid access token.
+     * @throws ConnectionException
+     * @throws AuthenticationException
+     * @throws Throwable
+     */
+    public function getIdentifiedAccessToken(int $userId): string
+    {
+        $user = app(UserService::class)->get($userId);
+
+        if ($user->osu_access_token && $user->osu_token_expires_at > now()) {
+            return $user->osu_access_token;
+        }
+
+        if ($user->osu_refresh_token) {
+            return $this->refreshIdentifiedAccessToken($user);
+        }
+
+        throw new AuthenticationException('Access token and refresh token both missing; re-authentication required.');
+    }
+
+    /**
+     * Refreshes a user's OAuth tokens and returns their new access token.
+     *
+     * @param User $user The user whose tokens need to be refreshed.
+     * @throws ConnectionException
+     * @throws Throwable
+     */
+    private function refreshIdentifiedAccessToken(User $user): string
+    {
+        $response = Http::asForm()->post('https://osu.ppy.sh/oauth/token', [
+            'client_id' => config('services.osu.client_id'),
+            'client_secret' => config('services.osu.client_secret'),
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $user->osu_refresh_token,
+        ]);
+
+        $data = $response->json();
+
+        app(UserService::class)->updateOsuTokens($user->id, $data['access_token'], $data['refresh_token'],
+            now()->addSeconds($data['expires_in']));
+
+        return $data['access_token'];
     }
 
     /**
@@ -86,20 +140,64 @@ class OsuApiService
     }
 
     /**
+     * Retrieves user info from the osu! API.
+     * https://osu.ppy.sh/docs/index.html#get-user
+     *
+     * @param int $id The user's ID.
+     * @return array The user's info, as a JSON array.
+     * @throws AuthenticationException
+     * @throws ConnectionException
+     * @throws Throwable
+     */
+    public function getUser(int $id): array
+    {
+        $token = $this->getIdentifiedAccessToken($id);
+        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/users/'.$id);
+
+        return $response->json();
+    }
+
+    /**
      * Retrieves scores of the specified user with the specified type from the osu! API.
      * https://osu.ppy.sh/docs/index.html#get-user-scores
      *
-     * @param string $token An access token with public scope.
      * @param int $id The user's ID.
      * @param string $type The type of score to retrieve. Must be 'best', 'firsts', or 'recent'.
      * @param int $limit The maximum number of scores to retrieve.
      * @return array The user's scores as a JSON array.
      * @throws ConnectionException
+     * @throws AuthenticationException
+     * @throws Throwable
      */
-    public function getUserScores(string $token, int $id, string $type, int $limit = 50): array
+    public function getUserScores(int $id, string $type, int $limit = 100): array
     {
+        $token = $this->getIdentifiedAccessToken($id);
         $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/users/'.$id.'/scores/'.$type, [
             'limit' => $limit
+        ]);
+
+        return $response->json();
+    }
+
+    /**
+     * Retrieves beatmap sets for a specific user via the osu! API.
+     * https://osu.ppy.sh/docs/index.html#get-user-beatmaps
+     *
+     * @param int $id The user's ID.
+     * @param string $type The type of beatmaps to retrieve. See osu! API documentation for available types.
+     * @param int $limit The maximum number of results to retrieve.
+     * @param int $offset The result offset for pagination.
+     * @return array The user's favorite beatmap sets as a JSON array.
+     * @throws AuthenticationException
+     * @throws ConnectionException
+     * @throws Throwable
+     */
+    public function getUserBeatmaps(int $id, string $type, int $limit = 100, int $offset = 0): array
+    {
+        $token = $this->getIdentifiedAccessToken($id);
+        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/users/'.$id.'/beatmapsets/'.$type, [
+            'limit' => $limit,
+            'offset' => $offset,
         ]);
 
         return $response->json();

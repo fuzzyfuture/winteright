@@ -13,24 +13,24 @@
     <meta property="og:site_name" content="winteright">
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <div class="flex-grow-1 py-4">
-        <div class="container" id="mainContainer">
-            @include('partials.header')
-            @if (session('success'))
-                <div class="alert alert-primary m-3 mb-0" data-bs-theme="dark">{{ session('success') }}</div>
-            @endif
-            @if ($errors->any())
-                @foreach ($errors->all() as $error)
-                    <div class="alert alert-primary m-3 mb-0" data-bs-theme="dark">{{ strtolower($error) }}</div>
-                @endforeach
-            @endif
-            <main class="content p-4">
-                @yield('content')
-            </main>
-            @include('partials.footer')
-        </div>
+<div class="flex-grow-1 py-4">
+    <div class="container" id="mainContainer">
+        @include('layouts._header')
+        @if (session('success'))
+            <div class="alert alert-primary m-3 mb-0" data-bs-theme="dark">{{ session('success') }}</div>
+        @endif
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
+                <div class="alert alert-primary m-3 mb-0" data-bs-theme="dark">{{ strtolower($error) }}</div>
+            @endforeach
+        @endif
+        <main class="content p-4">
+            @yield('content')
+        </main>
+        @include('layouts._footer')
     </div>
-    @yield('scripts')
-    @vite(['resources/js/app.js', 'resources/js/audio-preview.js'])
+</div>
+@yield('scripts')
+@vite(['resources/js/app.js', 'resources/js/audio-preview.js'])
 </body>
 </html>
