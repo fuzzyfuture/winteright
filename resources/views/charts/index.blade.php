@@ -65,7 +65,10 @@
                                     </div>
                                     @auth
                                         @if ($beatmap->userRating)
-                                            <div class="text-success">you rated: {{ number_format($beatmap->userRating->score / 2, 1) }}
+                                            <div>
+                                                <small class="text-muted">
+                                                    you rated: {{ number_format($beatmap->userRating->score / 2, 1) }}
+                                                </small>
                                             </div>
                                         @endif
                                     @endauth
