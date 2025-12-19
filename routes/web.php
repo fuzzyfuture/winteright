@@ -4,7 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeatmapSetController;
 use App\Http\Controllers\ChartsController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\PlayedController;
+use App\Http\Controllers\MyMapsController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
@@ -50,11 +50,13 @@ Route::controller(BeatmapSetController::class)
         Route::get('/mapsets/{set}/ratings', 'ratings')->name('ratings');
     });
 
-Route::controller(PlayedController::class)
-    ->as('played.')
+Route::controller(MyMapsController::class)
+    ->as('my_maps.')
     ->middleware('auth')
     ->group(function () {
-        Route::get('/played/recent', 'playedRecent')->name('recent');
+        Route::post('/my-maps/update', 'update')->name('update');
+        Route::get('/my-maps/recent', 'recentlyPlayed')->name('recent');
+        Route::get('/my-maps/favorites', 'favorites')->name('favorites');
     });
 
 Route::get('/charts', [ChartsController::class, 'index'])->name('charts.index');
