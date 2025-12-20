@@ -25,7 +25,7 @@ class SearchService
                            int $pageForCache = 1): LengthAwarePaginator
     {
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
-        $query = BeatmapSet::with(['creator', 'creatorName'])
+        $query = BeatmapSet::with(['creator', 'creatorName', 'beatmaps'])
             ->whereHas('beatmaps', function ($query) use ($modesArray) {
                 $query->whereIn('mode', $modesArray);
             });
