@@ -21,7 +21,7 @@ class SearchController extends Controller
         $artistTitle = $request->query('artist_title');
         $mapperName = $request->query('mapper_name');
         $mapperId = $request->query('mapper_id');
-        $page = $request->query('page');
+        $page = $request->query('page') ?? 1;
 
         $searchResults = $this->searchService->search(Auth::user()->enabled_modes ?? 15, $artistTitle,
             $mapperName, $mapperId, $page);

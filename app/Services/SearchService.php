@@ -17,21 +17,21 @@ class SearchService
      * @param ?string $artistTitle The artist/title to search for.
      * @param ?string $mapperName The mapper name to search for.
      * @param ?string $mapperId The mapper ID to search for.
-     * @param ?int $pageForCache The current page. This parameter is only used for the cache key
+     * @param int $pageForCache The current page. This parameter is only used for the cache key
      * (results are cached when the query is empty), it does not determine the page retrieved from the database.
      * @return LengthAwarePaginator The paginated search results.
      */
     public function search(int  $enabledModes, ?string $artistTitle, ?string $mapperName, ?string $mapperId,
-                           ?int $pageForCache = 1): LengthAwarePaginator
+                           int $pageForCache = 1): LengthAwarePaginator
     {
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
-        $query = BeatmapSet::with(['creator', 'creatorName'])
+        $query = BeatmapSet::with(['creator', 'creatorName', 'beatmaps'])
             ->whereHas('beatmaps', function ($query) use ($modesArray) {
                 $query->whereIn('mode', $modesArray);
             });
 
         if (blank($artistTitle) && blank($mapperName) && blank($mapperId)) {
-            return Cache::tags('search')->remember('search_'.$enabledModes.'_'.$pageForCache, 600, function () use ($query) {
+            return Cache::tags('search')->remember('beatmap_sets:search:'.$enabledModes.':'.$pageForCache, 600, function () use ($query) {
                 return $query->orderBy('date_ranked', 'desc')
                     ->paginate(50);
             });

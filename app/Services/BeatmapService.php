@@ -193,11 +193,10 @@ class BeatmapService
     public function getRecentBeatmapSets(int $enabledModes, int $limit = 10): Collection
     {
         return Cache::tags('recent_beatmap_sets')
-            ->remember('recent_'.$limit.'_beatmap_sets_'.$enabledModes, 600, function () use ($limit, $enabledModes) {
+            ->remember('beatmap_sets:recent:'.$limit.':'.$enabledModes, 600, function () use ($limit, $enabledModes) {
                 $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
-                return BeatmapSet::withCount('beatmaps')
-                    ->with('creator')
+                return BeatmapSet::with(['creator', 'creatorName', 'beatmaps'])
                     ->whereHas('beatmaps', function($query) use ($modesArray) {
                         $query->whereIn('mode', $modesArray);
                     })
@@ -325,16 +324,21 @@ class BeatmapService
      */
     public function getBeatmapSetsForUser(int $userId, int $enabledModes = 15, int $limit = 5): Collection
     {
-        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+        return Cache::tags('user_maps')->remember(
+            'beatmap_sets:user:'.$userId.':'.$enabledModes.':'.$limit,
+            3600,
+            function () use ($limit, $userId, $enabledModes) {
+                $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
-        return BeatmapSet::where('creator_id', $userId)
-            ->whereHas('beatmaps', function ($query) use ($modesArray) {
-                $query->whereIn('mode', $modesArray);
-            })
-            ->with(['creator', 'creatorName', 'beatmaps'])
-            ->orderByDesc('date_ranked')
-            ->limit($limit)
-            ->get();
+                return BeatmapSet::where('creator_id', $userId)
+                    ->whereHas('beatmaps', function ($query) use ($modesArray) {
+                        $query->whereIn('mode', $modesArray);
+                    })
+                    ->with(['creator', 'creatorName', 'beatmaps'])
+                    ->orderByDesc('date_ranked')
+                    ->limit($limit)
+                    ->get();
+        });
     }
 
     /**
@@ -343,20 +347,28 @@ class BeatmapService
      * @param int $userId The user's ID.
      * @param int $enabledModes Bitfield of enabled modes.
      * @param int $perPage The amount of beatmap sets to display per-page.
+     * @param int $pageForCache The current page. This parameter is only used for the cache key, it does not determine
+     * the page retrieved from the database.
      * @return LengthAwarePaginator The user's paginated beatmap sets.
      */
-    public function getBeatmapSetsForUserPaginated(int $userId, int $enabledModes = 15,
+    public function getBeatmapSetsForUserPaginated(int $userId, int $enabledModes = 15, int $pageForCache = 1,
                                                    int $perPage = 50): LengthAwarePaginator
     {
-        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+        return Cache::tags('user_maps')->remember(
+            'beatmap_sets:user:'.$userId.':'.$enabledModes.':'.$perPage.':'.$pageForCache,
+            3600,
+            function () use ($perPage, $userId, $enabledModes) {
+                $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
-        return BeatmapSet::where('creator_id', $userId)
-            ->whereHas('beatmaps', function ($query) use ($modesArray) {
-                $query->whereIn('mode', $modesArray);
-            })
-            ->with(['creator', 'creatorName', 'beatmaps'])
-            ->orderByDesc('date_ranked')
-            ->paginate($perPage);
+                return BeatmapSet::where('creator_id', $userId)
+                    ->whereHas('beatmaps', function ($query) use ($modesArray) {
+                        $query->whereIn('mode', $modesArray);
+                    })
+                    ->with(['creator', 'creatorName', 'beatmaps'])
+                    ->orderByDesc('date_ranked')
+                    ->paginate($perPage);
+            }
+        );
     }
 
     /**
@@ -369,21 +381,27 @@ class BeatmapService
      */
     public function getGuestDifficultiesForUser(int $userId, int $enabledModes = 15, int $limit = 5): Collection
     {
-        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+        return Cache::tags('user_maps')->remember(
+            'beatmaps:user:'.$userId.':'.$enabledModes.':'.$limit,
+            3600,
+            function () use ($limit, $userId, $enabledModes) {
+                $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
-        return Beatmap::whereHas('creators', function ($query) use ($userId) {
-                $query->where('creator_id', $userId);
-            })
-            ->whereHas('set', function ($query) use ($userId) {
-                $query->where('creator_id', '!=', $userId);
-            })
-            ->whereIn('mode', $modesArray)
-            ->with(['set', 'creators.user', 'creators.creatorName'])
-            ->join('beatmap_sets', 'beatmaps.set_id', '=', 'beatmap_sets.id')
-            ->orderByDesc('beatmap_sets.date_ranked')
-            ->select('beatmaps.*')
-            ->limit($limit)
-            ->get();
+                return Beatmap::whereHas('creators', function ($query) use ($userId) {
+                        $query->where('creator_id', $userId);
+                    })
+                    ->whereHas('set', function ($query) use ($userId) {
+                        $query->where('creator_id', '!=', $userId);
+                    })
+                    ->whereIn('mode', $modesArray)
+                    ->with(['set', 'creators.user', 'creators.creatorName'])
+                    ->join('beatmap_sets', 'beatmaps.set_id', '=', 'beatmap_sets.id')
+                    ->orderByDesc('beatmap_sets.date_ranked')
+                    ->select('beatmaps.*')
+                    ->limit($limit)
+                    ->get();
+            }
+        );
     }
 
     /**
@@ -393,25 +411,33 @@ class BeatmapService
      * @param int $userId The user's ID.
      * @param int $enabledModes Bitfield of enabled modes.
      * @param int $perPage The amount of guest difficulties to display per page.
+     * @param ?int $pageForCache The current page. This parameter is only used for the cache key, it does not determine
+     * the page retrieved from the database.
      * @return LengthAwarePaginator The paginated guest difficulties.
      */
-    public function getGuestDifficultiesForUserPaginated(int $userId, int $enabledModes = 15,
+    public function getGuestDifficultiesForUserPaginated(int $userId, int $enabledModes = 15, int $pageForCache = 1,
                                                          int $perPage = 50): LengthAwarePaginator
     {
-        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+        return Cache::tags('user_maps')->remember(
+            'beatmaps:user:'.$userId.':'.$enabledModes.':'.$perPage.':'.$pageForCache,
+            3600,
+            function () use ($perPage, $userId, $enabledModes) {
+                $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
-        return Beatmap::whereHas('creators', function ($query) use ($userId) {
-                $query->where('creator_id', $userId);
-            })
-            ->whereHas('set', function ($query) use ($userId) {
-                $query->where('creator_id', '!=', $userId);
-            })
-            ->whereIn('mode', $modesArray)
-            ->with(['set', 'creators.user', 'creators.creatorName'])
-            ->join('beatmap_sets', 'beatmaps.set_id', '=', 'beatmap_sets.id')
-            ->orderByDesc('beatmap_sets.date_ranked')
-            ->select('beatmaps.*')
-            ->paginate($perPage);
+                return Beatmap::whereHas('creators', function ($query) use ($userId) {
+                    $query->where('creator_id', $userId);
+                })
+                    ->whereHas('set', function ($query) use ($userId) {
+                        $query->where('creator_id', '!=', $userId);
+                    })
+                    ->whereIn('mode', $modesArray)
+                    ->with(['set', 'creators.user', 'creators.creatorName'])
+                    ->join('beatmap_sets', 'beatmaps.set_id', '=', 'beatmap_sets.id')
+                    ->orderByDesc('beatmap_sets.date_ranked')
+                    ->select('beatmaps.*')
+                    ->paginate($perPage);
+            }
+        );
     }
 
     /**
@@ -453,8 +479,8 @@ class BeatmapService
 
         $offset = ($page - 1) * $perPage;
 
-        $ids = Cache::tags('api_'.$userId)->remember(
-            'api_favorites_'.$userId.'_'.$page,
+        $ids = Cache::tags('api:'.$userId)->remember(
+            'api:favorites:'.$userId.':'.$page,
             86400,
             function () use ($userId, $osuApiService, $perPage, $offset) {
                 $favorites = $osuApiService->getUserBeatmaps($userId, 'favourite', $perPage, $offset);
@@ -462,8 +488,8 @@ class BeatmapService
             }
         );
 
-        $apiUser = Cache::tags('api_'.$userId)->remember(
-            'api_users_'.$userId,
+        $apiUser = Cache::tags('api:'.$userId)->remember(
+            'api:users:'.$userId,
             86400,
             function () use ($userId, $osuApiService) {
                 return $osuApiService->getUser($userId);

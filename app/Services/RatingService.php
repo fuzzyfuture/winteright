@@ -68,7 +68,7 @@ class RatingService
      */
     public function getRecent(int $enabledModes, int $limit = 15): Collection
     {
-        return Cache::remember('recent_'.$limit.'_ratings_'.$enabledModes, 120, function () use ($enabledModes, $limit) {
+        return Cache::remember('ratings:recent:'.$limit.':'.$enabledModes, 120, function () use ($enabledModes, $limit) {
             $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
             return Rating::orderByDesc('updated_at')

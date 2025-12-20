@@ -43,7 +43,7 @@ class ChartsService
             $beatmaps = $beatmaps->get();
         } else {
             $beatmaps = Cache::tags('charts')->remember(
-                'top_beatmaps_'.$enabledModes.'_'.$year.'_'.$page,
+                'beatmaps:top:'.$enabledModes.':'.$year.':'.$page,
                 43200,
                 function () use ($beatmaps) {
                     return $beatmaps->get();
@@ -82,7 +82,7 @@ class ChartsService
             return $query->count();
         }
 
-        return Cache::tags('charts')->remember('top_beatmaps_count'.$enabledModes.'_'.$year, 43200, function () use ($query) {
+        return Cache::tags('charts')->remember('top_beatmaps_count:'.$enabledModes.':'.$year, 43200, function () use ($query) {
             return $query->count();
         });
     }
