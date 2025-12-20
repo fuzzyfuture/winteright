@@ -21,7 +21,7 @@ class MyMapsController extends Controller
 
     public function update()
     {
-        Cache::tags('api_'.Auth::id())->flush();
+        Cache::tags('api:'.Auth::id())->flush();
 
         return redirect()->back()->with('success', 'updated successfully!');
     }

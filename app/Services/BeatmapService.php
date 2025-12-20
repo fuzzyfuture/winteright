@@ -193,7 +193,7 @@ class BeatmapService
     public function getRecentBeatmapSets(int $enabledModes, int $limit = 10): Collection
     {
         return Cache::tags('recent_beatmap_sets')
-            ->remember('recent_'.$limit.'_beatmap_sets_'.$enabledModes, 600, function () use ($limit, $enabledModes) {
+            ->remember('recent_beatmap_sets:'.$limit.':'.$enabledModes, 600, function () use ($limit, $enabledModes) {
                 $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
                 return BeatmapSet::with(['creator', 'creatorName', 'beatmaps'])
@@ -452,8 +452,8 @@ class BeatmapService
 
         $offset = ($page - 1) * $perPage;
 
-        $ids = Cache::tags('api_'.$userId)->remember(
-            'api_favorites_'.$userId.'_'.$page,
+        $ids = Cache::tags('api:'.$userId)->remember(
+            'api:favorites:'.$userId.':'.$page,
             86400,
             function () use ($userId, $osuApiService, $perPage, $offset) {
                 $favorites = $osuApiService->getUserBeatmaps($userId, 'favourite', $perPage, $offset);
@@ -461,8 +461,8 @@ class BeatmapService
             }
         );
 
-        $apiUser = Cache::tags('api_'.$userId)->remember(
-            'api_users_'.$userId,
+        $apiUser = Cache::tags('api:'.$userId)->remember(
+            'api:users:'.$userId,
             86400,
             function () use ($userId, $osuApiService) {
                 return $osuApiService->getUser($userId);
