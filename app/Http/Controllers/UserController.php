@@ -74,9 +74,9 @@ class UserController extends Controller
     {
         $user = $this->userService->get($id);
         $enabledModes = Auth::user()->enabled_modes ?? 15;
-        $page = $request->get('page');
+        $page = $request->get('page') ?? 1;
 
-        $mapsets = $this->beatmapService->getBeatmapSetsForUserPaginated($id, $enabledModes, $page ?? 1);
+        $mapsets = $this->beatmapService->getBeatmapSetsForUserPaginated($id, $enabledModes, $page);
 
         return view('users.mapsets', compact('user', 'mapsets'));
     }
@@ -85,9 +85,9 @@ class UserController extends Controller
     {
         $user = $this->userService->get($id);
         $enabledModes = Auth::user()->enabled_modes ?? 15;
-        $page = $request->get('page');
+        $page = $request->get('page') ?? 1;
 
-        $gds = $this->beatmapService->getGuestDifficultiesForUserPaginated($id, $enabledModes, $page ?? 1);
+        $gds = $this->beatmapService->getGuestDifficultiesForUserPaginated($id, $enabledModes, $page);
 
         return view('users.gds', compact('user', 'gds'));
     }
