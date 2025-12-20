@@ -193,7 +193,7 @@ class BeatmapService
     public function getRecentBeatmapSets(int $enabledModes, int $limit = 10): Collection
     {
         return Cache::tags('recent_beatmap_sets')
-            ->remember('recent_beatmap_sets:'.$limit.':'.$enabledModes, 600, function () use ($limit, $enabledModes) {
+            ->remember('beatmap_sets:recent:'.$limit.':'.$enabledModes, 600, function () use ($limit, $enabledModes) {
                 $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
                 return BeatmapSet::with(['creator', 'creatorName', 'beatmaps'])

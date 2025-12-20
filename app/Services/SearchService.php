@@ -31,7 +31,7 @@ class SearchService
             });
 
         if (blank($artistTitle) && blank($mapperName) && blank($mapperId)) {
-            return Cache::tags('search')->remember('search:'.$enabledModes.':'.$pageForCache, 600, function () use ($query) {
+            return Cache::tags('search')->remember('beatmap_sets:search:'.$enabledModes.':'.$pageForCache, 600, function () use ($query) {
                 return $query->orderBy('date_ranked', 'desc')
                     ->paginate(50);
             });

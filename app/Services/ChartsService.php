@@ -43,7 +43,7 @@ class ChartsService
             $beatmaps = $beatmaps->get();
         } else {
             $beatmaps = Cache::tags('charts')->remember(
-                'top_beatmaps:'.$enabledModes.':'.$year.':'.$page,
+                'beatmaps:top:'.$enabledModes.':'.$year.':'.$page,
                 43200,
                 function () use ($beatmaps) {
                     return $beatmaps->get();
