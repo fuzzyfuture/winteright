@@ -196,8 +196,7 @@ class BeatmapService
             ->remember('recent_'.$limit.'_beatmap_sets_'.$enabledModes, 600, function () use ($limit, $enabledModes) {
                 $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
-                return BeatmapSet::withCount('beatmaps')
-                    ->with('creator')
+                return BeatmapSet::with(['creator', 'creatorName', 'beatmaps'])
                     ->whereHas('beatmaps', function($query) use ($modesArray) {
                         $query->whereIn('mode', $modesArray);
                     })
