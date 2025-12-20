@@ -17,12 +17,12 @@ class SearchService
      * @param ?string $artistTitle The artist/title to search for.
      * @param ?string $mapperName The mapper name to search for.
      * @param ?string $mapperId The mapper ID to search for.
-     * @param ?int $pageForCache The current page. This parameter is only used for the cache key
+     * @param int $pageForCache The current page. This parameter is only used for the cache key
      * (results are cached when the query is empty), it does not determine the page retrieved from the database.
      * @return LengthAwarePaginator The paginated search results.
      */
     public function search(int  $enabledModes, ?string $artistTitle, ?string $mapperName, ?string $mapperId,
-                           ?int $pageForCache = 1): LengthAwarePaginator
+                           int $pageForCache = 1): LengthAwarePaginator
     {
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
         $query = BeatmapSet::with(['creator', 'creatorName'])
