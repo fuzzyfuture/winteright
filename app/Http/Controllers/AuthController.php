@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Providers\OsuSocialiteProvider;
 use App\Services\AuthService;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -26,12 +27,17 @@ class AuthController extends Controller
 
     public function redirect()
     {
-        return Socialite::driver('osu')->redirect();
+        /** @var OsuSocialiteProvider $driver */
+        $driver = Socialite::driver('osu');
+
+        return $driver->stateless()->redirect();
     }
 
     public function callback()
     {
-        $osuUser = Socialite::driver('osu')->user();
+        /** @var OsuSocialiteProvider $driver */
+        $driver = Socialite::driver('osu');
+        $osuUser = $driver->stateless()->user();
         $user = $this->authService->resolveUserFromOsu($osuUser);
 
         Auth::login($user);
