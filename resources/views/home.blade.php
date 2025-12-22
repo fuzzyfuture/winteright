@@ -1,3 +1,4 @@
+@php use App\Helpers\OsuUrl; @endphp
 @extends('layouts.app')
 
 @section('content')
@@ -27,12 +28,13 @@
             <div class="d-flex align-items-end mb-3">
                 <h3 class="mb-0">recently added</h3>
                 @if ($lastSynced)
-                    <small class="text-muted d-block ms-3">last updated: {{ \Carbon\Carbon::parse($lastSynced)->diffForHumans() }}</small>
+                    <small class="text-muted d-block ms-3">last
+                        updated: {{ \Carbon\Carbon::parse($lastSynced)->diffForHumans() }}</small>
                 @endif
             </div>
             <ul class="list-group">
                 @foreach ($recentlyRanked as $set)
-                    <x-beatmaps.beatmap_set_list_group :set="$set" />
+                    <x-beatmaps.beatmap_set_list_group :set="$set"/>
                 @endforeach
             </ul>
         </div>
@@ -41,16 +43,19 @@
             <ul class="list-group mb-3">
                 @foreach ($recentRatings as $rating)
                     <div class="list-group-item d-flex align-items-center ps-1 pe-2">
-                        <a href="{{ url("/users/".$rating->user->id) }}" class="d-flex align-items-start flex-nowrap ms-1">
-                            <img src="https://a.ppy.sh/{{ $rating->user->id }}" width="16" height="16" alt="Avatar">
+                        <a href="{{ url("/users/".$rating->user->id) }}"
+                           class="d-flex align-items-start flex-nowrap ms-1">
+                            <img src="{{ $rating->user->avatar_url }}" width="16" height="16" alt="Avatar">
                             <small class="ms-2">{{ $rating->user->name }}</small>
                         </a>
                         <small class="ms-1">rated</small>
-                        <a href="{{ url('/mapsets/'.$rating->beatmap->set->id) }}" class="ms-1 d-flex">
+                        <a href="{{ route('beatmaps.show', $rating->beatmap->set->id) }}" class="ms-1 d-flex">
                             <small>{{ $rating->beatmap->set->title }} [{{ $rating->beatmap->difficulty_name }}]</small>
                         </a>
-                        <span class="ms-auto badge bg-main fs-6"><small>{{ number_format($rating->score / 2, 1) }}</small></span>
-                        <small class="ms-2 text-nowrap" title="{{ $rating->updated_at }}">{{ $rating->updated_at->diffForHumans() }}</small>
+                        <span
+                            class="ms-auto badge bg-main fs-6"><small>{{ number_format($rating->score / 2, 1) }}</small></span>
+                        <small class="ms-2 text-nowrap"
+                               title="{{ $rating->updated_at }}">{{ $rating->updated_at->diffForHumans() }}</small>
                     </div>
                 @endforeach
             </ul>
@@ -60,13 +65,13 @@
         <h3>faq</h3>
         <h4>why "winteright"?</h4>
         <p>
-            i was playing <a href="https://osu.ppy.sh/beatmapsets/1281337#osu/2661429" target="_blank">this map</a>
+            i was playing <a href="{{ OsuUrl::beatmapInfo(1281337, 'osu', 2661429) }}" target="_blank">this map</a>
             when i decided i want to actually start this project! <small class="text-muted">great map :-)</small>
         </p>
         <h4>how do i blacklist my maps?</h4>
         <p>
             feel free to contact me via <a href="https://x.com/tsukafan" target="_blank">twitter</a> or
-            <a href="https://osu.ppy.sh/users/2966685" target="_blank">osu!</a> and i'll add you asap!
+            <a href="{{ OsuUrl::userProfile(2966685) }}" target="_blank">osu!</a> and i'll add you asap!
         </p>
     </div>
 @endsection

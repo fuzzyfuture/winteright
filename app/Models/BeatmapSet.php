@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BeatmapMode;
+use App\Helpers\OsuUrl;
 use App\Services\BeatmapService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -85,6 +86,31 @@ class BeatmapSet extends Model
         };
     }
 
+    public function getInfoUrlAttribute(): string
+    {
+        return OsuUrl::beatmapSetInfo($this->id);
+    }
+
+    public function getBgUrlAttribute(): string
+    {
+        return OsuUrl::beatmapCover($this->id);
+    }
+
+    public function getPreviewUrlAttribute(): string
+    {
+        return OsuUrl::beatmapPreview($this->id);
+    }
+
+    public function getDirectUrlAttribute(): string
+    {
+        return OsuUrl::beatmapDirect($this->beatmaps->first()->id);
+    }
+
+    public function getCreatorProfileUrlAttribute(): string
+    {
+        return OsuUrl::userProfile($this->creator_id);
+    }
+
     public function getCreatorLabelAttribute(): HtmlString
     {
         if ($this->creator) {
@@ -95,7 +121,7 @@ class BeatmapSet extends Model
             $localLink = $this->creator_id;
         }
 
-        $extLink = '<a href="https://osu.ppy.sh/users/'.$this->creator_id.'"
+        $extLink = '<a href="'.$this->creator_profile_url.'"
                     target="_blank"
                     rel="noopener noreferrer"
                     title="view on osu!"
@@ -106,13 +132,13 @@ class BeatmapSet extends Model
         return new HtmlString($localLink.$extLink);
     }
 
-    public function getUrlAttribute(): HtmlString
+    public function getLinkAttribute(): HtmlString
     {
         $localUrl = route('beatmaps.show', $this->id);
         $text = $this->artist.' - '.$this->title;
 
         $localLink = '<a href="'.$localUrl.'">'.e($text).'</a>';
-        $extLink = '<a href="https://osu.ppy.sh/beatmapsets/'.$this->id.'"
+        $extLink = '<a href="'.$this->info_url.'"
                        target="_blank"
                        rel="noopener noreferrer"
                        title="view on osu!"
@@ -121,16 +147,6 @@ class BeatmapSet extends Model
                     </a>';
 
         return new HtmlString($localLink.$extLink);
-    }
-
-    public function getBgUrlAttribute(): string
-    {
-        return 'https://assets.ppy.sh/beatmaps/'.$this->id.'/covers/cover.jpg';
-    }
-
-    public function getPreviewUrlAttribute(): string
-    {
-        return 'https://b.ppy.sh/preview/'.$this->id.'.mp3';
     }
 
     public function getDifficultySpreadAttribute(): HtmlString

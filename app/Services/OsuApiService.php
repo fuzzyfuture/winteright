@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\OsuUrl;
 use App\Models\User;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
@@ -23,7 +24,7 @@ class OsuApiService
     public function getPublicAccessToken(): string
     {
         return Cache::remember('osu_public_api_token', 86400, function() {
-            $response = Http::asForm()->post('https://osu.ppy.sh/oauth/token', [
+            $response = Http::asForm()->post(OsuUrl::apiOauthToken(), [
                 'client_id' => config('services.osu.client_id'),
                 'client_secret' => config('services.osu.client_secret'),
                 'grant_type' => 'client_credentials',
@@ -68,7 +69,7 @@ class OsuApiService
      */
     private function refreshIdentifiedAccessToken(User $user): string
     {
-        $response = Http::asForm()->post('https://osu.ppy.sh/oauth/token', [
+        $response = Http::asForm()->post(OsuUrl::apiOauthToken(), [
             'client_id' => config('services.osu.client_id'),
             'client_secret' => config('services.osu.client_secret'),
             'grant_type' => 'refresh_token',
@@ -93,7 +94,7 @@ class OsuApiService
      */
     public function getMe(string $token): array
     {
-        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/me');
+        $response = Http::withToken($token)->get(OsuUrl::apiUserMe());
 
         return $response->json();
     }
@@ -113,7 +114,7 @@ class OsuApiService
     public function searchBeatmapSets(string $token, string $status, string $sort, bool $nsfw,
                                       ?string $cursor = null): array
     {
-        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/search', [
+        $response = Http::withToken($token)->get(OsuUrl::apiBeatmapSetSearch(), [
            'status' => $status,
            'sort' => $sort,
            'nsfw' => $nsfw ? 'true' : 'false',
@@ -134,7 +135,7 @@ class OsuApiService
      */
     public function getBeatmapSetFullDetails(string $token, int $setId): array
     {
-        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/'.$setId);
+        $response = Http::withToken($token)->get(OsuUrl::apiBeatmapSetInfo($setId));
 
         return $response->json();
     }
@@ -152,7 +153,7 @@ class OsuApiService
     public function getUser(int $id): array
     {
         $token = $this->getIdentifiedAccessToken($id);
-        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/users/'.$id);
+        $response = Http::withToken($token)->get(OsuUrl::apiUserInfo($id));
 
         return $response->json();
     }
@@ -172,7 +173,7 @@ class OsuApiService
     public function getUserScores(int $id, string $type, int $limit = 100): array
     {
         $token = $this->getIdentifiedAccessToken($id);
-        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/users/'.$id.'/scores/'.$type, [
+        $response = Http::withToken($token)->get(OsuUrl::apiUserScores($id, $type), [
             'limit' => $limit
         ]);
 
@@ -195,7 +196,7 @@ class OsuApiService
     public function getUserBeatmaps(int $id, string $type, int $limit = 100, int $offset = 0): array
     {
         $token = $this->getIdentifiedAccessToken($id);
-        $response = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/users/'.$id.'/beatmapsets/'.$type, [
+        $response = Http::withToken($token)->get(OsuUrl::apiUserBeatmapSets($id, $type), [
             'limit' => $limit,
             'offset' => $offset,
         ]);

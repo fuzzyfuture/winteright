@@ -13,7 +13,7 @@
         </div>
         <div class="col-md-9">
             <div>
-                <strong>{{ $map->url }}</strong>
+                <strong>{{ $map->link }}</strong>
                 <small class="text-muted d-block">
                     by {{ $map->creator_label }}
                 </small>

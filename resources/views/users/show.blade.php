@@ -2,11 +2,11 @@
 
 @section('content')
     <div class="d-flex align-items-center mb-4">
-        <img src="https://a.ppy.sh/{{ $user->id }}" alt="Avatar" class="me-3" width="64" height="64">
+        <img src="{{ $user->avatar_url }}" alt="Avatar" class="me-3" width="64" height="64">
         <div>
             <h2 class="mb-0">
                 {{ $user->name }}
-                <a href="https://osu.ppy.sh/users/{{ $user->id }}"
+                <a href="{{ $user->profile_url }}"
                    target="_blank"
                    rel="noopener noreferrer"
                    title="view on osu!"
