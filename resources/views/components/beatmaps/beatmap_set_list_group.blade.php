@@ -10,7 +10,7 @@
         </div>
         <div class="col-md-9">
             <div>
-                <strong>{{ $set->url }}</strong>
+                <strong>{{ $set->link }}</strong>
                 <small class="text-muted d-block">
                     by {{ $set->creator_label }}
                 </small>

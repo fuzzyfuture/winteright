@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\HideRatingsOption;
+use App\Helpers\OsuUrl;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -62,11 +63,21 @@ class User extends Authenticatable
         return (bool) ($this->enabled_modes & (1 << $mode->value));
     }
 
-    public function getUrlAttribute(): HtmlString
+    public function getProfileUrlAttribute(): string
+    {
+        return OsuUrl::userProfile($this->id);
+    }
+
+    public function getAvatarUrlAttribute(): string
+    {
+        return OsuUrl::userAvatar($this->id);
+    }
+
+    public function getLinkAttribute(): HtmlString
     {
         $localUrl = route('users.show', $this->id);
         $localLink = '<a href="'.$localUrl.'">'.$this->name.'</a>';
-        $extLink = '<a href="https://osu.ppy.sh/users/'.$this->id.'"
+        $extLink = '<a href="'.$this->profile_url.'"
                target="_blank"
                rel="noopener noreferrer"
                title="view on osu!"

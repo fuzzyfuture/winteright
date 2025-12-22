@@ -11,7 +11,7 @@
                     <div class="col-md-2">
                         <div class="audio-preview" style="background-image: url({{ $set->bg_url }})"
                              data-playing="false">
-                            <audio src="https://b.ppy.sh/preview/{{ $set->id }}.mp3"></audio>
+                            <audio src="{{ $set->preview_url }}"></audio>
                             <div class="button-overlay">
                                 <i class="bi bi-play-fill h1 mb-0"></i>
                             </div>
@@ -20,7 +20,7 @@
                     <div class="col-md-10">
                         <div class="d-flex flex-row align-items-center">
                             <div>
-                                <strong>{{ $set->url }}</strong>
+                                <strong>{{ $set->link }}</strong>
                                 <small class="text-muted d-block">
                                     by {{ $set->creator_label }}
                                 </small>

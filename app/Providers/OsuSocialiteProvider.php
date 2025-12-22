@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Helpers\OsuUrl;
 use App\Services\OsuApiService;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\ConnectionException;
@@ -15,12 +16,12 @@ class OsuSocialiteProvider extends AbstractProvider implements ProviderInterface
 
     protected function getAuthUrl($state): string
     {
-        return $this->buildAuthUrlFromBase('https://osu.ppy.sh/oauth/authorize', $state);
+        return $this->buildAuthUrlFromBase(OsuUrl::apiOauthAuthorize(), $state);
     }
 
     protected function getTokenUrl(): string
     {
-        return 'https://osu.ppy.sh/oauth/token';
+        return OsuUrl::apiOauthToken();
     }
 
     protected function getCodeFields($state = null) : array

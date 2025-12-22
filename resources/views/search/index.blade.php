@@ -39,7 +39,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h5 class="mb-1">
-                                {{ $beatmapSet->url }}
+                                {{ $beatmapSet->link }}
                             </h5>
                             <div>
                                 mapped by: {{ $beatmapSet->creator_label }}

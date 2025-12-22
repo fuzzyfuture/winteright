@@ -20,7 +20,7 @@
                 @if (Auth::check())
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <img src="https://a.ppy.sh/{{ Auth::id() }}" class="me-1" width="16" height="16" alt="Avatar">
+                            <img src="{{ Auth::user()->avatar_url }}" class="me-1" width="16" height="16" alt="Avatar">
                             <span class="text-body">{{ Auth::user()->name }}</span>
                         </a>
                         <ul class="dropdown-menu">

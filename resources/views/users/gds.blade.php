@@ -2,7 +2,7 @@
 
 @section('content')
     <h1>mapped guest difficulties</h1>
-    <h3 class="mb-3">{{ $user->url }}</h3>
+    <h3 class="mb-3">{{ $user->link }}</h3>
     {{ $gds->links() }}
     <div class="list-group mb-3">
         @forelse ($gds as $gd)

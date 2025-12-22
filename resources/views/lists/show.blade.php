@@ -33,7 +33,7 @@
     </div>
     <h2>
         {{ $list->name }} by <a href="{{ url('/users/'.$list->user_id) }}">{{ $list->owner->name }}</a>
-        <a href="https://osu.ppy.sh/users/{{ $list->user_id }}"
+        <a href="{{ $list->owner->profile_url }}"
            target="_blank"
            rel="noopener noreferrer"
            title="view on osu!"
@@ -66,7 +66,7 @@
                 @if($item->isUser())
                     <div class="col-md-2 p-2">
                         <div class="chart-beatmap-img w-100 h-100"
-                             style="background-image: url('https://a.ppy.sh/{{ $item->item_id }}');">
+                             style="background-image: url('{{ $item->item->avatar_url }}');">
                         </div>
                     </div>
                     <div class="col-md-10 p-3 ps-1">
@@ -85,7 +85,7 @@
                     </div>
                     <div class="col-md-10 pb-2 p-md-3 ps-md-1">
                         <div><small class="text-muted">beatmap</small></div>
-                        <h5 class="mb-1">{{ $item->item->url }}</h5>
+                        <h5 class="mb-1">{{ $item->item->link }}</h5>
                         <div class="mb-2">mapped by: {{ $item->item->creator_label }}</div>
                         <div>{{ $item->description }}</div>
                     </div>
@@ -100,7 +100,7 @@
                     </div>
                     <div class="col-md-10 pb-2 p-md-3 ps-md-1">
                         <div><small class="text-muted">beatmap set</small></div>
-                        <h5 class="mb-1">{{ $item->item->url }}</h5>
+                        <h5 class="mb-1">{{ $item->item->link }}</h5>
                         <div class="mb-2">mapped by: {{ $item->item->creator_label }}</div>
                         <div>{{ $item->description }}</div>
                     </div>

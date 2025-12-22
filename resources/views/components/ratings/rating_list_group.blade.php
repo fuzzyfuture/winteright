@@ -14,7 +14,7 @@
         <div class="col-md-9">
             <div class="d-flex align-items-center">
                 <div>
-                    <strong>{{ $rating->beatmap->url }}</strong>
+                    <strong>{{ $rating->beatmap->link }}</strong>
                     <small class="text-muted d-block">
                         by {{ $rating->beatmap->creator_label }}
                     </small>

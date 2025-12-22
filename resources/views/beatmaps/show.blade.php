@@ -4,16 +4,7 @@
 @section('content')
     <div class="row">
         <div class="col-md-6">
-            <h1>
-                {{ $beatmapSet->title }}
-                <a href="https://osu.ppy.sh/beatmapsets/{{ $beatmapSet->id }}"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   title="view on osu!"
-                   class="opacity-50 small">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                </a>
-            </h1>
+            <h1>{{ $beatmapSet->title }}</h1>
             <h3>{{ $beatmapSet->artist }}</h3>
             <p class="text-muted">
                 mapset by
@@ -27,9 +18,25 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
+            <h4>info</h4>
+            <ul class="list-unstyled">
+                <li><strong>date ranked:</strong> {{ $beatmapSet->date_ranked->toFormattedDateString() }}</li>
+                <li><strong>genre:</strong> {{ $beatmapSet->genre_label }}</li>
+                <li><strong>language:</strong> {{ $beatmapSet->language_label }}</li>
+                <li><strong>storyboard:</strong> {{ $beatmapSet->has_storyboard ? 'yes' : 'no' }}</li>
+                <li><strong>video:</strong> {{ $beatmapSet->has_video ? 'yes' : 'no' }}</li>
+            </ul>
+            <h4 class="mb-3">osu! links</h4>
+            <a class="btn btn-sm btn-outline-primary w-100 mb-2" href="{{ $beatmapSet->info_url }}" target="_blank">
+                <i class="bi bi-info-circle me-1"></i> beatmap info
+            </a>
+            <a class="btn btn-sm btn-outline-primary w-100 mb-2" href="{{ $beatmapSet->direct_url }}">
+                <i class="bi bi-download me-1"></i> osu!direct
+            </a>
+        </div>
+        <div class="col-md-3">
             <div class="d-flex">
-                <h4>info</h4>
                 @auth
                     <a href="{{ route('lists.add', ['item_type' => UserListItemType::BEATMAP_SET, 'item_id' => $beatmapSet->id]) }}"
                        class="ms-auto btn btn-outline-primary">
@@ -38,17 +45,6 @@
                     </a>
                 @endauth
             </div>
-            <ul class="list-unstyled">
-                <li><strong>date ranked:</strong> {{ $beatmapSet->date_ranked->toFormattedDateString() }}</li>
-                <li><strong>genre:</strong> {{ $beatmapSet->genre_label }}</li>
-                <li><strong>language:</strong> {{ $beatmapSet->language_label }}</li>
-                <li><strong>storyboard:</strong> {{ $beatmapSet->has_storyboard ? 'yes' : 'no' }}</li>
-                <li><strong>video:</strong> {{ $beatmapSet->has_video ? 'yes' : 'no' }}</li>
-            </ul>
-            <h4>osu! link</h4>
-            <a href="https://osu.ppy.sh/beatmapsets/{{ $beatmapSet->id }}" target="_blank">
-                view on osu! <i class="bi bi-box-arrow-up-right"></i>
-            </a>
         </div>
     </div>
     <hr>

@@ -2,7 +2,7 @@
     @foreach ($ratings as $rating)
         <div class="list-group-item d-flex align-items-center ps-1 pe-2">
             <a href="{{ url("/users/".$rating->user->id) }}" class="d-flex align-items-start flex-nowrap ms-1">
-                <img src="https://a.ppy.sh/{{ $rating->user->id }}" width="16" height="16" alt="Avatar">
+                <img src="{{ $rating->user->avatar_url }}" width="16" height="16" alt="Avatar">
                 <small class="ms-2">{{ $rating->user->name }}</small>
             </a>
             <small class="ms-1">rated <strong>[{{ $rating->beatmap->difficulty_name }}]</strong></small>

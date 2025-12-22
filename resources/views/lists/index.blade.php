@@ -42,7 +42,7 @@
         @forelse($lists as $list)
             <div class="p-3 rounded shadow-sm mb-2 chart-beatmap-card">
                 <h5 class="mb-1"><a href="{{ route('lists.show', $list->id) }}">{{ $list->name }}</a></h5>
-                <div><small>by {{ $list->owner->url }}</small></div>
+                <div><small>by {{ $list->owner->link }}</small></div>
                 <div>
                     <small class="text-muted">
                         {{ $list->items_count }} items | {{ $list->favorites_count }} favs | last updated: {{ $list->updated_at?->toFormattedDateString() ?? 'never' }}

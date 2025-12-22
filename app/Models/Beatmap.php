@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BeatmapMode;
+use App\Helpers\OsuUrl;
 use App\Models\BeatmapCreator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -71,6 +72,26 @@ class Beatmap extends Model
         };
     }
 
+    public function getInfoUrlAttribute(): string
+    {
+        return OsuUrl::beatmapInfo($this->set_id, 'osu', $this->id);
+    }
+
+    public function getBgUrlAttribute(): string
+    {
+        return OsuUrl::beatmapCover($this->set_id);
+    }
+
+    public function getPreviewUrlAttribute(): string
+    {
+        return OsuUrl::beatmapPreview($this->set_id);
+    }
+
+    public function getDirectUrlAttribute(): string
+    {
+        return OsuUrl::beatmapDirect($this->id);
+    }
+
     public static function getModeIcon(BeatmapMode $mode): HtmlString
     {
         $fileName = match ($mode) {
@@ -95,37 +116,56 @@ class Beatmap extends Model
         }
 
         $urls = $this->creators->map(function ($creator) {
-            return $creator->url->toHtml();
+            return $creator->link->toHtml();
         });
 
         return new HtmlString($urls->implode(', '));
     }
 
-    public function getUrlAttribute(): HtmlString
+    public function getLocalLink(): HtmlString
     {
         $localUrl = route('beatmaps.show', $this->set_id);
         $text = $this->set->artist.' - '.$this->set->title.' ['.$this->difficulty_name.']';
 
-        $localLink = '<a href="'.$localUrl.'">'.e($text).'</a>';
-        $extLink = '<a href="https://osu.ppy.sh/beatmapsets/'.$this->set_id.'#osu/'.$this->id.'"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       title="view on osu!"
-                       class="opacity-50 small">
-                        <i class="bi bi-box-arrow-up-right"></i>
-                    </a>';
+        return new HtmlString('<a href="'.$localUrl.'">'.e($text).'</a>');
+    }
+
+    public function getExtLink(): HtmlString
+    {
+        return new HtmlString('<a href="'.$this->info_url.'"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       title="view on osu!"
+                                       class="opacity-50 small">
+                                        <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>');
+    }
+
+    public function getDirectLink(): HtmlString
+    {
+        return new HtmlString('<a href="'.$this->direct_url.'"
+                                       rel="noopener noreferrer"
+                                       title="osu!direct"
+                                       class="opacity-50 small">
+                                        <i class="bi bi-download"></i>
+                                    </a>');
+    }
+
+    public function getLinkAttribute(): HtmlString
+    {
+        $localLink = $this->getLocalLink();
+        $extLink = $this->getExtLink();
 
         return new HtmlString($localLink.$extLink);
     }
 
-    public function getBgUrlAttribute(): string
+    public function getLinkWithDirectAttribute(): HtmlString
     {
-        return 'https://assets.ppy.sh/beatmaps/'.$this->set_id.'/covers/cover.jpg';
-    }
+        $localLink = $this->getLocalLink();
+        $extLink = $this->getExtLink();
+        $directLink = $this->getDirectLink();
 
-    public function getPreviewUrlAttribute(): string
-    {
-        return 'https://b.ppy.sh/preview/'.$this->set_id.'.mp3';
+        return new HtmlString($localLink.$directLink.$extLink);
     }
 
     public function getStatusBadgeAttribute(): HtmlString

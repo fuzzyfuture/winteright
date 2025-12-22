@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\OsuUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\HtmlString;
@@ -20,7 +21,7 @@ class BeatmapCreator extends Model
         return $this->belongsTo(BeatmapCreatorName::class, 'creator_id');
     }
 
-    public function getUrlAttribute(): HtmlString
+    public function getLinkAttribute(): HtmlString
     {
         if ($this->user) {
             $localLink = '<a href="'.route('users.show', $this->creator_id).'">'.e($this->user->name).'</a>';
@@ -30,7 +31,7 @@ class BeatmapCreator extends Model
             $localLink = $this->creator_id;
         }
 
-        $extLink = '<a href="https://osu.ppy.sh/users/'.$this->creator_id.'"
+        $extLink = '<a href="'.OsuUrl::userProfile($this->creator_id).'"
                     target="_blank"
                     rel="noopener noreferrer"
                     title="view on osu!"

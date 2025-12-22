@@ -10,7 +10,7 @@
                     <div class="col-md-2">
                         <div class="audio-preview" style="background-image: url({{ $map->bg_url }})"
                              data-playing="false">
-                            <audio src="https://b.ppy.sh/preview/{{ $map->set->id }}.mp3"></audio>
+                            <audio src="{{ $map->set->preview_url }}"></audio>
                             <div class="button-overlay">
                                 <i class="bi bi-play-fill h1 mb-0"></i>
                             </div>
@@ -22,7 +22,7 @@
                     <div class="col-md-10">
                         <div class="d-flex flex-row align-items-center">
                             <div>
-                                <strong>{{ $map->url }}</strong>
+                                <strong>{{ $map->link }}</strong>
                                 <small class="text-muted d-block">
                                     by {{ $map->creator_label }}
                                 </small>
