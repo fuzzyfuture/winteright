@@ -411,7 +411,7 @@ class BeatmapService
      * @param int $userId The user's ID.
      * @param int $enabledModes Bitfield of enabled modes.
      * @param int $perPage The amount of guest difficulties to display per page.
-     * @param ?int $pageForCache The current page. This parameter is only used for the cache key, it does not determine
+     * @param int $pageForCache The current page. This parameter is only used for the cache key, it does not determine
      * the page retrieved from the database.
      * @return LengthAwarePaginator The paginated guest difficulties.
      */
