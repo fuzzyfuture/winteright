@@ -23,8 +23,8 @@ return [
                     'beatmap_sets' => '/users/{id}/beatmapsets/{type}',
                 ],
                 'beatmap_set' => [
-                    'search' => 'https://osu.ppy.sh/api/v2/beatmapsets/search',
-                    'info' => 'https://osu.ppy.sh/api/v2/beatmapsets/{set_id}'
+                    'search' => '/beatmapsets/search',
+                    'info' => '/beatmapsets/{set_id}'
                 ],
             ],
             'oauth' => [
