@@ -1,4 +1,4 @@
-@php use App\Enums\HideRatingsOption; @endphp
+@php use App\Enums\HideRatingsOption;use App\Enums\UserListItemType; @endphp
 @extends('layouts.app')
 
 @section('content')
@@ -20,14 +20,13 @@
             @endif
         </div>
         @auth
-            <a href="{{ route('lists.add', ['item_type' => \App\Enums\UserListItemType::USER, 'item_id' => $user->id]) }}"
+            <a href="{{ route('lists.add', ['item_type' => UserListItemType::USER, 'item_id' => $user->id]) }}"
                class="ms-auto btn btn-outline-primary align-self-start">
                 <i class="bi bi-plus"></i><i class="bi bi-list"></i>
                 add to list
             </a>
         @endauth
     </div>
-
     @if ($user->bio)
         <p class="mb-4">{{ $user->bio }}</p>
     @endif
@@ -80,18 +79,37 @@
             this user's ratings are private.
         </div>
     @endif
-    <h4 class="mb-3">lists</h4>
-    <div class="list-group mb-4">
-        @forelse ($lists as $list)
-            <x-lists.list_list_group :list="$list"/>
-        @empty
-            <div class="text-muted">no lists found.</div>
-        @endforelse
-        @if ($lists->isNotEmpty())
-            <div class="list-group-item text-end">
-                <a href="{{ route('users.lists', $user->id) }}">view all</a>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+            <h4 class="mb-3">top-rated mappers</h4>
+            <div class="list-group">
+                @forelse ($topRatedMappers as $mapper)
+                    <x-users.top_rated_mapper_list_group :mapper="$mapper"/>
+                @empty
+                    <div class="text-muted">no ratings found.</div>
+                @endforelse
+                @if ($topRatedMappers->isNotEmpty() && Auth::id() == $user->id)
+                    <div class="list-group-item text-end">
+                        <a href="{{ route('affinities.mappers') }}">view all</a>
+                    </div>
+                @endif
             </div>
-        @endif
+        </div>
+        <div class="col-lg-8">
+            <h4 class="mb-3">lists</h4>
+            <div class="list-group">
+                @forelse ($lists as $list)
+                    <x-lists.list_list_group :list="$list"/>
+                @empty
+                    <div class="text-muted">no lists found.</div>
+                @endforelse
+                @if ($lists->isNotEmpty())
+                    <div class="list-group-item text-end">
+                        <a href="{{ route('users.lists', $user->id) }}">view all</a>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
     <div class="row g-4">
         <div class="col-lg-6">
