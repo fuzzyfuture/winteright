@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AffinitiesController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeatmapSetController;
 use App\Http\Controllers\ChartsController;
@@ -95,3 +96,9 @@ Route::controller(UserListController::class)
         Route::get('/lists/{id}', 'show')->name('show');
     });
 
+Route::controller(AffinitiesController::class)
+    ->as('affinities.')
+    ->middleware('auth')
+    ->group(function () {
+       Route::get('/affinities/mappers', 'mappers')->name('mappers');
+    });
