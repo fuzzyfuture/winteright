@@ -2,10 +2,18 @@
 
 namespace App\Services;
 
+use App\DataObjects\TopRatedMapper;
 use App\Enums\HideRatingsOption;
+use App\Models\BeatmapCreator;
+use App\Models\Rating;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 use Throwable;
 
 class UserService
@@ -156,5 +164,88 @@ class UserService
                 'osu_token_expires_at' => $expiry,
             ]);
         });
+    }
+
+    /**
+     * Retrieves a user's top-rated mappers, calculated using the bayesian average rating that the user has on each
+     * mapper's beatmaps.
+     *
+     * @param int $userId The user's ID.
+     * @param int $limit The amount of results to retrieve.
+     * @return Collection The user's top-rated mappers.
+     */
+    public function getTopRatedMappersForUser(int $userId, int $limit = 5): Collection
+    {
+        $totalRatings = Rating::where('user_id', $userId)->count();
+        $averageRating = Rating::where('user_id', $userId)->avg('score') ?? 0;
+
+        return Cache::remember('top_rated_mappers:'.$userId.':'.$limit, 3600, function () use ($userId, $totalRatings, $averageRating, $limit) {
+            $results = $this->getTopRatedMappersForUserBase($userId, $totalRatings, $averageRating)
+                ->limit($limit)
+                ->get();
+
+            return $results->map(function (stdClass $result) {
+                return new TopRatedMapper(
+                    $result->creator_id,
+                    $result->username,
+                    $result->creator_name,
+                    $result->rating_count,
+                    $result->average_score,
+                    $result->bayesian
+                );
+            });
+        });
+    }
+
+    /**
+     * Retrieves and paginates a user's top-rated mappers, calculated using the bayesian average rating that the user
+     * has on each mapper's beatmaps.
+     *
+     * @param int $userId The user's ID.
+     * @param int $perPage The amount of results to retrieve per-page.
+     * @return LengthAwarePaginator The user's top-rated mappers, paginated.
+     */
+    public function getTopRatedMappersForUserPaginated(int $userId, int $perPage = 50): LengthAwarePaginator
+    {
+        $totalRatings = Rating::where('user_id', $userId)->count();
+        $averageRating = Rating::where('user_id', $userId)->avg('score') ?? 0;
+
+        return $this->getTopRatedMappersForUserBase($userId, $totalRatings, $averageRating)
+            ->paginate($perPage)
+            ->through((function (stdClass $result) {
+                return new TopRatedMapper(
+                    $result->creator_id,
+                    $result->username,
+                    $result->creator_name,
+                    $result->rating_count,
+                    $result->average_score,
+                    $result->bayesian
+                );
+            }));
+    }
+
+    /**
+     * Base query for retrieving a user's top-rated mappers.
+     *
+     * @param int $userId The user's ID.
+     * @param int $totalRatings The user's total rating count.
+     * @param float $averageRating The user's average rating across all of their ratings.
+     * @return Builder The base query for retrieving a user's top-rated mappers.
+     */
+    private function getTopRatedMappersForUserBase(int $userId, int $totalRatings, float $averageRating): Builder
+    {
+        return DB::table('beatmap_creators')
+            ->leftJoin('users', 'beatmap_creators.creator_id', '=', 'users.id')
+            ->leftJoin('beatmap_creator_names', 'beatmap_creators.creator_id', '=', 'beatmap_creator_names.id')
+            ->join('ratings', 'ratings.beatmap_id', '=', 'beatmap_creators.beatmap_id')
+            ->where('ratings.user_id', $userId)
+            ->select('beatmap_creators.creator_id')
+            ->selectRaw('users.name as username')
+            ->selectRaw('beatmap_creator_names.name as creator_name')
+            ->selectRaw('count(*) as rating_count')
+            ->selectRaw('avg(score) as average_score')
+            ->selectRaw('(((? * ?) + sum(score)) / (? + count(*))) as bayesian', [$averageRating, $totalRatings, $totalRatings])
+            ->groupBy('beatmap_creators.creator_id', 'users.name', 'beatmap_creator_names.name')
+            ->orderBy('bayesian', 'desc');
     }
 }
