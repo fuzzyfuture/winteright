@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DataObjects\RatingGroup;
 use App\Enums\BeatmapMode;
 use App\Enums\HideRatingsOption;
 use App\Models\Rating;
@@ -70,8 +71,7 @@ class RatingService
     {
         return Cache::remember('ratings:recent:'.$limit.':'.$enabledModes, 120, function () use ($enabledModes, $limit) {
             $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
-
-            return Rating::orderByDesc('updated_at')
+            $ratings = Rating::orderByDesc('updated_at')
                 ->with('user')
                 ->with('beatmap.set')
                 ->whereHas('beatmap', function ($query) use ($modesArray) {
@@ -81,8 +81,26 @@ class RatingService
                 ->whereHas('user', function ($query) {
                     $query->where('hide_ratings', HideRatingsOption::NONE->value);
                 })
-                ->limit($limit)
+                ->limit(1000)
                 ->get();
+
+            $grouped = collect();
+            $currentGroup = null;
+
+            foreach ($ratings as $rating) {
+                if ($currentGroup && $currentGroup->user->id == $rating->user_id &&
+                    $currentGroup->time->diffInMinutes($rating->updated_at) <= 5) {
+                    $currentGroup->ratings->push($rating);
+                    continue;
+                }
+
+                if ($grouped->count() == $limit) break;
+
+                $currentGroup = new RatingGroup($rating->user, collect([$rating]), $rating->updated_at);
+                $grouped->push($currentGroup);
+            }
+
+            return $grouped;
         });
     }
 
