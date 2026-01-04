@@ -153,9 +153,10 @@ class UserListService
      * Retrieves a user's favorite lists.
      *
      * @param int $userId The user's ID.
+     * @param int $perPage The amount of results to retrieve per-page.
      * @return LengthAwarePaginator The user's favorite lists, paginated.
      */
-    public function getFavorites(int $userId): LengthAwarePaginator
+    public function getFavorites(int $userId, int $perPage = 50): LengthAwarePaginator
     {
         return UserList::whereHas('favorites', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
@@ -163,7 +164,7 @@ class UserListService
             ->with('owner')
             ->withCount('items')
             ->withCount('favorites')
-            ->paginate(50);
+            ->paginate($perPage);
     }
 
     /**
