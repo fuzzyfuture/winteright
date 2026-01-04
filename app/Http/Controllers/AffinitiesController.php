@@ -14,8 +14,8 @@ class AffinitiesController extends Controller
     public function mappers()
     {
         $user = Auth::user();
-        $favoriteMappers = $this->userService->getTopRatedMappersForUserPaginated($user->id);
+        $topRatedMappers = $this->userService->getTopRatedMappersForUserPaginated($user->id);
 
-        return view('affinities.mappers', compact('user', 'favoriteMappers'));
+        return view('affinities.mappers', compact('user', 'topRatedMappers'));
     }
 }
