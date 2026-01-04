@@ -61,7 +61,7 @@ class RatingService
     }
 
     /**
-     * Retrieves recent ratings.
+     * Retrieves and groups recent ratings.
      *
      * @param int $enabledModes Bitfield of enabled modes.
      * @param int $limit The amount of recent ratings to retrieve. Defaults to 20.
