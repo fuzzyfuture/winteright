@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 use Throwable;
@@ -178,19 +179,21 @@ class UserService
         $totalRatings = Rating::where('user_id', $userId)->count();
         $averageRating = Rating::where('user_id', $userId)->avg('score') ?? 0;
 
-        $results = $this->getTopRatedMappersForUserBase($userId, $totalRatings, $averageRating)
-            ->limit($limit)
-            ->get();
+        return Cache::remember('top_rated_mappers:'.$userId.':'.$limit, 3600, function () use ($userId, $totalRatings, $averageRating, $limit) {
+            $results = $this->getTopRatedMappersForUserBase($userId, $totalRatings, $averageRating)
+                ->limit($limit)
+                ->get();
 
-        return $results->map(function (stdClass $result) {
-           return new TopRatedMapper(
-               $result->creator_id,
-               $result->username,
-               $result->creator_name,
-               $result->rating_count,
-               $result->average_score,
-               $result->bayesian
-           );
+            return $results->map(function (stdClass $result) {
+                return new TopRatedMapper(
+                    $result->creator_id,
+                    $result->username,
+                    $result->creator_name,
+                    $result->rating_count,
+                    $result->average_score,
+                    $result->bayesian
+                );
+            });
         });
     }
 
