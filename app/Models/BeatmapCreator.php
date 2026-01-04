@@ -11,6 +11,11 @@ class BeatmapCreator extends Model
 {
     protected $fillable = ['beatmap_id', 'creator_id'];
 
+    public function beatmap(): BelongsTo
+    {
+        return $this->belongsTo(Beatmap::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'creator_id');
