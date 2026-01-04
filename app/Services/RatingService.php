@@ -88,8 +88,7 @@ class RatingService
             $currentGroup = null;
 
             foreach ($ratings as $rating) {
-                if ($currentGroup && $currentGroup->user->id == $rating->user_id &&
-                    $currentGroup->time->diffInMinutes($rating->updated_at) <= 5) {
+                if ($currentGroup && $currentGroup->user->id == $rating->user_id) {
                     $currentGroup->ratings->push($rating);
                     continue;
                 }
