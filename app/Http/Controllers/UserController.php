@@ -35,12 +35,13 @@ class UserController extends Controller
 
         $recentRatings = $this->ratingService->getForUser($user->id, $enabledModes);
         $ratingSpread = $this->ratingService->getSpreadForUser($user->id, $enabledModes);
+        $topRatedMappers = $this->userService->getTopRatedMappersForUser($user->id);
         $lists = $this->userListService->getForUser($user->id);
         $beatmapSets = $this->beatmapService->getBeatmapSetsForUser($user->id, $enabledModes);
         $guestDifficulties = $this->beatmapService->getGuestDifficultiesForUser($user->id, $enabledModes);
 
         return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists',
-            'beatmapSets', 'guestDifficulties'));
+            'beatmapSets', 'guestDifficulties', 'topRatedMappers'));
     }
 
     public function ratings(Request $request, int $id)
