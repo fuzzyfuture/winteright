@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\BeatmapMode;
+use App\Enums\HideRatingsOption;
 use App\Models\Rating;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
@@ -67,7 +68,7 @@ class RatingService
      */
     public function getRecent(int $enabledModes, int $limit = 15): Collection
     {
-        return Cache::remember('recent_'.$limit.'_ratings_'.$enabledModes, 30, function () use ($enabledModes, $limit) {
+        return Cache::remember('ratings:recent:'.$limit.':'.$enabledModes, 120, function () use ($enabledModes, $limit) {
             $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
             return Rating::orderByDesc('updated_at')
@@ -76,6 +77,9 @@ class RatingService
                 ->whereHas('beatmap', function ($query) use ($modesArray) {
                     $query->whereIn('mode', $modesArray)
                         ->where('blacklisted', false);
+                })
+                ->whereHas('user', function ($query) {
+                    $query->where('hide_ratings', HideRatingsOption::NONE->value);
                 })
                 ->limit($limit)
                 ->get();
@@ -102,50 +106,26 @@ class RatingService
                 $query->whereIn('mode', $modesArray)
                     ->where('blacklisted', false);
             })
+            ->whereHas('user', function ($query) {
+                $query->where('hide_ratings', '!=', HideRatingsOption::ALL->value);
+            })
             ->simplePaginate($perPage);
-    }
-
-    /**
-     * Retrieves all ratings for a given user.
-     *
-     * @param int $enabledModes Bitfield of enabled modes.
-     * @param int $userId The user's ID.
-     * @param int $perPage The amount of ratings to display per page.
-     * @return LengthAwarePaginator The paginated ratings.
-     */
-    public function getForUser(int $enabledModes, int $userId, ?float $score, int $perPage = 50): LengthAwarePaginator
-    {
-        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
-        $query = Rating::orderByDesc('updated_at')
-            ->with('beatmap.set')
-            ->where('user_id', $userId)
-            ->whereHas('beatmap', function ($query) use ($modesArray) {
-                $query->whereIn('mode', $modesArray)
-                    ->where('blacklisted', false);
-            });
-
-        if (!is_null($score)) {
-            $query->whereRaw('score / 2 = '.$score);
-        }
-
-        return $query->paginate($perPage);
     }
 
     /**
      * Retrieves recent ratings for a specified user.
      *
-     * @param int $enabledModes Bitfield of enabled modes.
      * @param int $userId The user's ID.
+     * @param int $enabledModes Bitfield of enabled modes.
      * @param int $limit The amount of recent ratings to retrieve.
      * @return Collection The user's recent ratings.
      */
-    public function getRecentForUser(int $enabledModes, int $userId, int $limit = 5): Collection
+    public function getForUser(int $userId, int $enabledModes = 15, int $limit = 5): Collection
     {
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
         return Rating::where('user_id', $userId)
-            ->with('user')
-            ->with('beatmap.set')
+            ->with(['user', 'beatmap.set', 'beatmap.creators.user', 'beatmap.creators.creatorName'])
             ->whereHas('beatmap', function ($query) use ($modesArray) {
                 $query->whereIn('mode', $modesArray);
             })
@@ -155,14 +135,42 @@ class RatingService
     }
 
     /**
-     * Retrieves the users rating spread as an array of the rating bin (e.g. 0.5, 1.0) and the amount of ratings
-     * in that bin.
+     * Retrieves and paginates all ratings for a given user.
      *
      * @param int $enabledModes Bitfield of enabled modes.
      * @param int $userId The user's ID.
+     * @param int $perPage The amount of ratings to display per page.
+     * @return LengthAwarePaginator The paginated ratings.
+     */
+    public function getForUserPaginated(int $enabledModes, int $userId, ?float $score,
+                                        int $perPage = 50): LengthAwarePaginator
+    {
+        $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
+
+        $query = Rating::where('user_id', $userId)
+            ->with(['beatmap.set', 'beatmap.creators.user', 'beatmap.creators.creatorName'])
+            ->whereHas('beatmap', function ($query) use ($modesArray) {
+                $query->whereIn('mode', $modesArray)
+                    ->where('blacklisted', false);
+            })
+            ->orderByDesc('updated_at');
+
+        if (!is_null($score)) {
+            $query->whereRaw('score / 2 = '.$score);
+        }
+
+        return $query->paginate($perPage);
+    }
+
+    /**
+     * Retrieves the users rating spread as an array of the rating bin (e.g. 0.5, 1.0) and the amount of ratings
+     * in that bin.
+     *
+     * @param int $userId The user's ID.
+     * @param int $enabledModes Bitfield of enabled modes.
      * @return Collection The user's rating spread.
      */
-    public function getSpreadForUser(int $enabledModes, int $userId): Collection
+    public function getSpreadForUser(int $userId, int $enabledModes = 15): Collection
     {
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 

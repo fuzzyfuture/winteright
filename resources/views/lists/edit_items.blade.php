@@ -14,7 +14,7 @@
                 @if($item->isUser())
                     <div class="col-md-2 p-2">
                         <div class="chart-beatmap-img w-100 h-100"
-                             style="background-image: url('https://a.ppy.sh/{{ $item->item_id }}');">
+                             style="background-image: url('{{ $item->item->avatar_url }}');">
                         </div>
                     </div>
                     <div class="col-md-10 p-3 ps-1">
@@ -24,7 +24,7 @@
                                 @if ($item->item)
                                     <h5><a href="{{ route('users.show', $item->item_id) }}">{{ $item->item->name }}</a></h5>
                                 @else
-                                    <h5>{{ $item->item_id }}<a href="https://osu.ppy.sh/users/{{ $item->item_id }}"></a></h5>
+                                    <h5>{{ $item->item_id }}<a href="{{ $item->item->profile_url }}"></a></h5>
                                 @endif
                             </div>
                             {{ html()->form('DELETE', route('lists.delete-item', $item->id))->class('ms-auto')->attribute('onsubmit', 'return confirm(\'are you sure you want to delete this item?\')')->open() }}
@@ -53,7 +53,7 @@
                         <div class="d-flex">
                             <div>
                                 <div><small class="text-muted">beatmap</small></div>
-                                <h5 class="mb-1">{{ $item->item->url }}</h5>
+                                <h5 class="mb-1">{{ $item->item->link }}</h5>
                                 <div class="mb-2">mapped by: {{ $item->item->creator_label }}</div>
                             </div>
                             {{ html()->form('DELETE', route('lists.delete-item', $item->id))->class('ms-auto')->attribute('onsubmit', 'return confirm(\'are you sure you want to delete this item?\')')->open() }}
@@ -82,7 +82,7 @@
                         <div class="d-flex">
                             <div>
                                 <div><small class="text-muted">beatmap set</small></div>
-                                <h5 class="mb-1">{{ $item->item->url }}</h5>
+                                <h5 class="mb-1">{{ $item->item->link }}</h5>
                                 <div class="mb-3">mapped by: {{ $item->item->creator_label }}</div>
                             </div>
                             {{ html()->form('DELETE', route('lists.delete-item', $item->id))->class('ms-auto')->attribute('onsubmit', 'return confirm(\'are you sure you want to delete this item?\')')->open() }}

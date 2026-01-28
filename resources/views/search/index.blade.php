@@ -27,23 +27,28 @@
     <div class="container">
         @forelse ($searchResults as $beatmapSet)
             <div class="row p-0 rounded overflow-hidden shadow-sm mb-2 chart-beatmap-card">
-                <div class="col-md-2 p-2">
-                    <div class="chart-beatmap-img w-100 h-100"
-                         style="background-image: url('https://assets.ppy.sh/beatmaps/{{ $beatmapSet->id }}/covers/cover.jpg');">
+                <div class="col-md-2 py-2">
+                    <div class="ms-md-1 audio-preview" style="background-image: url({{ $beatmapSet->bg_url }})" data-playing="false">
+                        <audio src="{{ $beatmapSet->preview_url }}"></audio>
+                        <div class="button-overlay">
+                            <i class="bi bi-play-fill h1 mb-0"></i>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-10 p-3 ps-1">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
+                <div class="col-md-10 pt-1 pb-3 p-md-3 ps-md-1">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h5 class="mb-1">
-                                {{ $beatmapSet->url }}
+                                {{ $beatmapSet->link }}
                             </h5>
                             <div>
                                 mapped by: {{ $beatmapSet->creator_label }}
                             </div>
-                            @if ($beatmapSet->date_ranked)
-                                <div>ranked: {{ $beatmapSet->date_ranked->format('Y-m-d') }}</div>
-                            @endif
+                            <div class="mt-1 d-flex align-items-center gap-2">
+                                {{ $beatmapSet->status_badge }}
+                                <span class="text-muted">{{ $beatmapSet->date_ranked?->format('Y-m-d') }}</span>
+                                {{ $beatmapSet->difficulty_spread }}
+                            </div>
                         </div>
                     </div>
                 </div>

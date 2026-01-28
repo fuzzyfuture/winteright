@@ -9,7 +9,6 @@ use App\Http\Requests\UserLists\UpdateUserListItemRequest;
 use App\Http\Requests\UserLists\UpdateUserListRequest;
 use App\Services\BeatmapService;
 use App\Services\UserListService;
-use App\Validators\UserListValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -46,12 +45,6 @@ class UserListController extends Controller
         }
 
         $items = $this->userListService->getItems($listId);
-
-        $beatmapItems = $items->where('item_type', UserListItemType::BEATMAP);
-        $beatmapSetItems = $items->where('item_type', UserListItemType::BEATMAP_SET);
-
-        $this->beatmapService->applyCreatorLabels($beatmapItems->map->item);
-        $this->beatmapService->applyCreatorLabelsToSets($beatmapSetItems->map->item);
 
         return view('lists.show', compact('list', 'items'));
     }
@@ -121,7 +114,7 @@ class UserListController extends Controller
 
     public function getAddItem(Request $request)
     {
-        $listOptions = $this->userListService->getForUser(Auth::id(), true)
+        $listOptions = $this->userListService->getForUser(Auth::id(), true, null)
             ->mapWithKeys(fn ($list) => [$list->id => $list->name])
             ->toArray();
 
@@ -162,12 +155,6 @@ class UserListController extends Controller
         }
 
         $items = $this->userListService->getItems($listId);
-
-        $beatmapItems = $items->where('item_type', UserListItemType::BEATMAP);
-        $beatmapSetItems = $items->where('item_type', UserListItemType::BEATMAP_SET);
-
-        $this->beatmapService->applyCreatorLabels($beatmapItems->map->item);
-        $this->beatmapService->applyCreatorLabelsToSets($beatmapSetItems->map->item);
 
         return view('lists.edit_items', compact('list', 'items'));
     }

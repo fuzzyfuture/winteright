@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Users\UpdateEnabledModesRequest;
 use App\Services\BeatmapService;
 use App\Services\RatingService;
 use App\Services\UserListService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Throwable;
 
 class UserController extends Controller
 {
@@ -27,21 +25,23 @@ class UserController extends Controller
         $this->userListService = $userListService;
     }
 
-    public function show(int $id)
+    public function show(string $id)
     {
-        $user = $this->userService->get($id);
+        $user = is_numeric($id) ?
+            $this->userService->get($id) :
+            $this->userService->getByName($id);
 
         $enabledModes = Auth::user()->enabled_modes ?? 15;
 
-        $recentRatings = $this->ratingService->getRecentForUser($enabledModes, $id);
+        $recentRatings = $this->ratingService->getForUser($user->id, $enabledModes);
+        $ratingSpread = $this->ratingService->getSpreadForUser($user->id, $enabledModes);
+        $topRatedMappers = $this->userService->getTopRatedMappersForUser($user->id);
+        $lists = $this->userListService->getForUser($user->id);
+        $beatmapSets = $this->beatmapService->getBeatmapSetsForUser($user->id, $enabledModes);
+        $guestDifficulties = $this->beatmapService->getGuestDifficultiesForUser($user->id, $enabledModes);
 
-        $beatmapService = app(BeatmapService::class);
-        $beatmapService->applyCreatorLabels($recentRatings->pluck('beatmap'));
-
-        $ratingSpread = $this->ratingService->getSpreadForUser($enabledModes, $id);
-        $lists = $this->userListService->getForUser($id);
-
-        return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists'));
+        return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists',
+            'beatmapSets', 'guestDifficulties', 'topRatedMappers'));
     }
 
     public function ratings(Request $request, int $id)
@@ -57,10 +57,8 @@ class UserController extends Controller
 
         $enabledModes = Auth::user()->enabled_modes ?? 15;
 
-        $ratings = $this->ratingService->getForUser($enabledModes, $id, $score ? floatval($score) : null);
+        $ratings = $this->ratingService->getForUserPaginated($enabledModes, $id, $score ? floatval($score) : null);
         $ratings->appends($request->query());
-
-        $this->beatmapService->applyCreatorLabels($ratings->getCollection()->pluck('beatmap'));
 
         return view('users.ratings', compact('user', 'ratings', 'score'));
     }
@@ -68,20 +66,30 @@ class UserController extends Controller
     public function lists(int $id)
     {
         $user = $this->userService->get($id);
-        $lists = $this->userListService->getForProfile($id, Auth::check() && Auth::id() == $id);
+        $lists = $this->userListService->getForUserPaginated($id, Auth::check() && Auth::id() == $id);
 
         return view('users.lists', compact('user', 'lists'));
     }
 
-    public function postModes(UpdateEnabledModesRequest $request)
+    public function mapsets(Request $request, int $id)
     {
-        try {
-            $this->userService->updateEnabledModes(Auth::id(), $request->boolean('osu'),
-                $request->boolean('taiko'), $request->boolean('fruits'), $request->boolean('mania'));
-        } catch (Throwable $e) {
-            return back()->withErrors('error updating modes: '.$e->getMessage());
-        }
+        $user = $this->userService->get($id);
+        $enabledModes = Auth::user()->enabled_modes ?? 15;
+        $page = $request->get('page') ?? 1;
 
-        return redirect()->back()->with('success', 'enabled modes updated successfully!');
+        $mapsets = $this->beatmapService->getBeatmapSetsForUserPaginated($id, $enabledModes, $page);
+
+        return view('users.mapsets', compact('user', 'mapsets'));
+    }
+
+    public function gds(Request $request, int $id)
+    {
+        $user = $this->userService->get($id);
+        $enabledModes = Auth::user()->enabled_modes ?? 15;
+        $page = $request->get('page') ?? 1;
+
+        $gds = $this->beatmapService->getGuestDifficultiesForUserPaginated($id, $enabledModes, $page);
+
+        return view('users.gds', compact('user', 'gds'));
     }
 }

@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\AffinitiesController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeatmapSetController;
 use App\Http\Controllers\ChartsController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MyMapsController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserListController;
 use Illuminate\Support\Facades\Route;
@@ -24,13 +27,21 @@ Route::controller(AuthController::class)
 Route::controller(UserController::class)
     ->as('users.')
     ->group(function () {
-        Route::middleware('auth')->group(function () {
-            Route::post('/modes', 'postModes')->name('postModes');
-        });
-
         Route::get('/users/{id}', 'show')->name('show');
         Route::get('/users/{id}/ratings', 'ratings')->name('ratings');
         Route::get('/users/{id}/lists', 'lists')->name('lists');
+        Route::get('/users/{id}/mapsets', 'mapsets')->name('mapsets');
+        Route::get('/users/{id}/gds', 'gds')->name('gds');
+    });
+
+Route::controller(SettingsController::class)
+    ->as('settings.')
+    ->middleware('auth')
+    ->group(function () {
+       Route::get('/settings', 'show')->name('show');
+
+       Route::post('/settings/general/enabled-modes', 'enabledModes')->name('enabled_modes');
+       Route::post('/settings/general/hide-ratings', 'hideRatings')->name('hide_ratings');
     });
 
 Route::controller(BeatmapSetController::class)
@@ -38,6 +49,15 @@ Route::controller(BeatmapSetController::class)
     ->group(function () {
         Route::get('/mapsets/{set}', 'show')->name('show');
         Route::get('/mapsets/{set}/ratings', 'ratings')->name('ratings');
+    });
+
+Route::controller(MyMapsController::class)
+    ->as('my_maps.')
+    ->middleware('auth')
+    ->group(function () {
+        Route::post('/my-maps/update', 'update')->name('update');
+        Route::get('/my-maps/recent', 'recentlyPlayed')->name('recent');
+        Route::get('/my-maps/favorites', 'favorites')->name('favorites');
     });
 
 Route::get('/charts', [ChartsController::class, 'index'])->name('charts.index');
@@ -76,3 +96,9 @@ Route::controller(UserListController::class)
         Route::get('/lists/{id}', 'show')->name('show');
     });
 
+Route::controller(AffinitiesController::class)
+    ->as('affinities.')
+    ->middleware('auth')
+    ->group(function () {
+       Route::get('/affinities/mappers', 'mappers')->name('mappers');
+    });

@@ -4,10 +4,13 @@ namespace App\Console\Commands;
 
 use App\Models\Beatmap;
 use App\Models\Rating;
+use App\Services\ChartsService;
+use App\Services\RatingService;
 use App\Services\SiteInfoService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class RecalculateBayesianAverages extends Command
 {
@@ -25,11 +28,11 @@ class RecalculateBayesianAverages extends Command
      */
     protected $description = 'Recalculate and update Bayesian averages for all beatmaps.';
 
-    protected SiteInfoService $siteInfoService;
+    protected ChartsService $chartsService;
 
-    public function __construct(SiteInfoService $siteInfoService)
+    public function __construct(ChartsService $chartsService)
     {
-        $this->siteInfoService = $siteInfoService;
+        $this->chartsService = $chartsService;
 
         parent::__construct();
     }
@@ -39,36 +42,9 @@ class RecalculateBayesianAverages extends Command
      */
     public function handle(): void
     {
-        $totalRatings = Rating::count();
-        $averageRating = Rating::avg('score') ?? 0;
-
-        if ($totalRatings === 0) {
-            $this->warn('No ratings found.');
-            return;
-        }
-
         $this->info('Recalculating Bayesian averages...');
 
-        Beatmap::withSum('ratings', 'score')
-            ->withCount('ratings')
-            ->chunkById(10000, function ($beatmaps) use ($totalRatings, $averageRating) {
-                foreach ($beatmaps as $beatmap) {
-                    $ratingsCount = $beatmap->ratings_count ?? 0;
-                    $totalScore = $beatmap->ratings_sum_score ?? 0;
-
-                    if ($ratingsCount === 0) continue;
-
-                    $bayesian = (($averageRating * $totalRatings) + $totalScore) / ($totalRatings + $ratingsCount);
-
-                    $beatmap->update([
-                        'bayesian_avg' => $bayesian,
-                    ]);
-                }
-            });
-
-        $this->siteInfoService->storeLastUpdatedCharts(Carbon::now()->toDateTimeString());
-
-        Cache::tags(['charts'])->flush();
+        $this->chartsService->recalculateBayesianAverages();
 
         $this->info('Bayesian averages updated successfully.');
     }

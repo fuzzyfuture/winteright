@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\BeatmapMode;
+use App\Helpers\OsuUrl;
 use App\Services\BeatmapService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,16 +21,19 @@ class BeatmapSet extends Model
         'date_ranked' => 'datetime',
     ];
 
-    protected array $externalCreatorLabel = [];
-
-    public function beatmaps(): HasMany
+    public function beatmaps(): BeatmapSet|HasMany
     {
         return $this->hasMany(Beatmap::class, 'set_id', 'id');
     }
 
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'creator_id', 'id');
+        return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    public function creatorName(): BelongsTo
+    {
+        return $this->belongsTo(BeatmapCreatorName::class, 'creator_id');
     }
 
     public function comments(): HasMany
@@ -38,10 +43,10 @@ class BeatmapSet extends Model
 
     public function getStatusLabelAttribute(): string
     {
-        $statuses = $this->beatmaps->pluck('status')->unique()->sort();
+        $statuses = $this->beatmaps->pluck('status')->unique();
 
         if ($statuses->count() === 1) {
-            return Beatmap::statusLabel($statuses->first());
+            return Beatmap::getStatusLabel($statuses->first());
         }
 
         return 'mixed';
@@ -86,62 +91,59 @@ class BeatmapSet extends Model
         };
     }
 
-    public function setExternalCreatorLabel(array $label): void
+    public function getInfoUrlAttribute(): string
     {
-        $this->externalCreatorLabel = $label;
+        return OsuUrl::beatmapSetInfo($this->id);
+    }
+
+    public function getBgUrlAttribute(): string
+    {
+        return OsuUrl::beatmapCover($this->id);
+    }
+
+    public function getPreviewUrlAttribute(): string
+    {
+        return OsuUrl::beatmapPreview($this->id);
+    }
+
+    public function getDirectUrlAttribute(): string
+    {
+        return OsuUrl::beatmapDirect($this->beatmaps->first()->id);
+    }
+
+    public function getCreatorProfileUrlAttribute(): string
+    {
+        return OsuUrl::userProfile($this->creator_id);
     }
 
     public function getCreatorLabelAttribute(): HtmlString
     {
-        $label = $this->externalCreatorLabel;
-
-        if (empty($label)) {
-            $id = $this->creator_id;
-
-            if ($this->creator) {
-                $name = e($this->creator->name);
-                $isWinteright = true;
-            } else {
-                $beatmapService = app(BeatmapService::class);
-                $name = $beatmapService->getCreatorName($this->creator_id);
-                $isWinteright = false;
-            }
-
-            $label = [
-              'id' => $id,
-              'name' => $name,
-              'isWinteright' => $isWinteright,
-            ];
-        }
-
-        if ($label['isWinteright']) {
-            $url = url('/users/'.$label['id']);
-            $name = e($label['name']);
-            $localLink = '<a href="'.$url.'">'.$name.'</a>';
-        } else if (!blank($label['name'])) {
-            $localLink = e($label['name']);
+        if ($this->creator) {
+            $localLink = '<a href="'.route('users.show', $this->creator_id).'">'.e($this->creator->name).'</a>';
+        } else if ($this->creatorName) {
+            $localLink = e($this->creatorName->name);
         } else {
-            $localLink = e($label['id']);
+            $localLink = $this->creator_id;
         }
 
-        $extLink = '<a href="https://osu.ppy.sh/users/'.$label['id'].'"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       title="view on osu!"
-                       class="opacity-50 small">
+        $extLink = '<a href="'.$this->creator_profile_url.'"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="view on osu!"
+                    class="opacity-50 small">
                         <i class="bi bi-box-arrow-up-right"></i>
-                    </a>';
+                </a>';
 
         return new HtmlString($localLink.$extLink);
     }
 
-    public function getUrlAttribute(): HtmlString
+    public function getLinkAttribute(): HtmlString
     {
         $localUrl = route('beatmaps.show', $this->id);
         $text = $this->artist.' - '.$this->title;
 
         $localLink = '<a href="'.$localUrl.'">'.e($text).'</a>';
-        $extLink = '<a href="https://osu.ppy.sh/beatmapsets/'.$this->id.'"
+        $extLink = '<a href="'.$this->info_url.'"
                        target="_blank"
                        rel="noopener noreferrer"
                        title="view on osu!"
@@ -152,8 +154,22 @@ class BeatmapSet extends Model
         return new HtmlString($localLink.$extLink);
     }
 
-    public function getBgUrlAttribute(): string
+    public function getDifficultySpreadAttribute(): HtmlString
     {
-        return 'https://assets.ppy.sh/beatmaps/'.$this->id.'/covers/cover.jpg';
+        $modeCounts = $this->beatmaps->groupBy('mode')->map->count();
+        $output = $modeCounts->map(function ($count, $mode) {
+            $icon = Beatmap::getModeIcon(BeatmapMode::from($mode));
+
+            return '<span class="mode-badge d-flex align-items-center">'.$icon.'<span class="count">'.$count.'</span></span>';
+        })->implode(' ');
+
+        return new HtmlString('<div class="d-flex align-items-center gap-2">'.$output.'</div>');
+    }
+
+    public function getStatusBadgeAttribute(): HtmlString
+    {
+        $output = '<span class="badge text-bg-primary">'.$this->status_label.'</span>';
+
+        return new HtmlString($output);
     }
 }

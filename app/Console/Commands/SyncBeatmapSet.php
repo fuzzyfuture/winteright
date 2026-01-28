@@ -44,10 +44,10 @@ class SyncBeatmapSet extends Command
 
         $this->info('Fetching beatmap set '.$setId.'...');
 
-        $token = $this->osuApiService->getAccessToken();
+        $token = $this->osuApiService->getPublicAccessToken();
 
         try {
-            $fullDetails = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/'.$setId)->json();
+            $fullDetails = $this->osuApiService->getBeatmapSetFullDetails($token, $setId);
         } catch (Throwable $e) {
             $this->error('Error while attempting to fetch beatmap set with ID '.$setId.': '.$e->getMessage());
             return;

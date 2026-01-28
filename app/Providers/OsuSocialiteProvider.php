@@ -2,22 +2,26 @@
 
 namespace App\Providers;
 
+use App\Helpers\OsuUrl;
+use App\Services\OsuApiService;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\Client\ConnectionException;
 use Laravel\Socialite\Two\AbstractProvider;
+use Laravel\Socialite\Two\ProviderInterface;
 use Laravel\Socialite\Two\User;
 
-class OsuSocialiteProvider extends AbstractProvider
+class OsuSocialiteProvider extends AbstractProvider implements ProviderInterface
 {
     protected $scopes = ['public', 'identify'];
 
     protected function getAuthUrl($state): string
     {
-        return $this->buildAuthUrlFromBase('https://osu.ppy.sh/oauth/authorize', $state);
+        return $this->buildAuthUrlFromBase(OsuUrl::apiOauthAuthorize(), $state);
     }
 
     protected function getTokenUrl(): string
     {
-        return 'https://osu.ppy.sh/oauth/token';
+        return OsuUrl::apiOauthToken();
     }
 
     protected function getCodeFields($state = null) : array
@@ -43,34 +47,11 @@ class OsuSocialiteProvider extends AbstractProvider
     }
 
     /**
-     * @throws GuzzleException
-     */
-    public function getAccessTokenResponse($code)
-    {
-        $response = $this->getHttpClient()->post($this->getTokenUrl(), [
-            'headers' => [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/x-www-form-urlencoded',
-            ],
-            'form_params' => $this->getTokenFields($code),
-        ]);
-
-        return json_decode((string) $response->getBody(), true);
-    }
-
-    /**
-     * @throws GuzzleException
+     * @throws ConnectionException
      */
     protected function getUserByToken($token)
     {
-        $response = $this->getHttpClient()->get('https://osu.ppy.sh/api/v2/me', [
-            'headers' => [
-                'Authorization' => 'Bearer '.$token,
-                'Accept' => 'application/json',
-            ],
-        ]);
-
-        return json_decode((string) $response->getBody(), true);
+        return app(OsuApiService::class)->getMe($token);
     }
 
     protected function mapUserToObject(array $user): User

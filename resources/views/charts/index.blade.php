@@ -32,22 +32,28 @@
             <div class="container">
                 @forelse ($topBeatmaps as $beatmap)
                     <div class="row p-0 rounded overflow-hidden shadow-sm mb-2 chart-beatmap-card">
-                        <div class="col-md-2 p-2">
-                            <div class="chart-beatmap-img w-100 h-100"
-                                 style="background-image: url('https://assets.ppy.sh/beatmaps/{{ $beatmap->set->id }}/covers/cover.jpg');">
+                        <div class="col-md-3 py-2">
+                            <div class="ms-md-1 audio-preview" style="background-image: url({{ $beatmap->set->bg_url }})" data-playing="false">
+                                <audio src="{{ $beatmap->set->preview_url }}"></audio>
+                                <div class="button-overlay">
+                                    <i class="bi bi-play-fill h1 mb-0"></i>
+                                </div>
+                                <div class="mode-icon-overlay">
+                                    {{ $beatmap->mode_icon }}
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-10 p-3 ps-1">
+                        <div class="col-md-9 pt-1 pb-3 p-md-3 ps-md-1">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <div>
-                                    <h5 class="mb-1">{{ $beatmap->url }}</h5>
+                                    <h5 class="mb-1">{{ $beatmap->link_with_direct }}</h5>
                                     <div>
                                         mapped by: {{ $beatmap->creator_label }}
                                     </div>
-                                    <div>status: {{ $beatmap->status_label }}</div>
-                                    @if ($beatmap->set->date_ranked)
-                                        <div>{{ $beatmap->date_label }}: {{ $beatmap->set->date_ranked->format('Y-m-d') }}</div>
-                                    @endif
+                                    <div class="mt-1 d-flex align-items-center gap-2">
+                                        {{ $beatmap->status_badge }}
+                                        <small class="text-muted">{{ $beatmap->set->date_ranked->format('Y-m-d') }}</small>
+                                    </div>
                                 </div>
 
                                 <div class="text-end">
@@ -59,7 +65,10 @@
                                     </div>
                                     @auth
                                         @if ($beatmap->userRating)
-                                            <div class="text-success">you rated: {{ number_format($beatmap->userRating->score / 2, 1) }}
+                                            <div>
+                                                <small class="text-muted">
+                                                    you rated: {{ number_format($beatmap->userRating->score / 2, 1) }}
+                                                </small>
                                             </div>
                                         @endif
                                     @endauth

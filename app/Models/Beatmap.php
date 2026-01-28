@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Enums\BeatmapMode;
+use App\Helpers\OsuUrl;
+use App\Models\BeatmapCreator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\HtmlString;
 
 class Beatmap extends Model
@@ -23,26 +25,29 @@ class Beatmap extends Model
         'mode' => BeatmapMode::class,
     ];
 
-    protected array $externalCreatorLabels = [];
-
     public function set(): BelongsTo
     {
         return $this->belongsTo(BeatmapSet::class, 'set_id', 'id');
     }
 
-    public function ratings(): HasMany|Beatmap
+    public function ratings(): HasMany
     {
         return $this->hasMany(Rating::class);
     }
 
-    public function userRating()
+    public function userRating(): HasOne
     {
         return $this->hasOne(Rating::class)->where('user_id', Auth::id());
     }
 
-    public function getStatusLabelAttribute(): string
+    public function creators(): HasMany
     {
-        return match ($this->status) {
+        return $this->hasMany(BeatmapCreator::class, 'beatmap_id');
+    }
+
+    public static function getStatusLabel(int $status): string
+    {
+        return match ($status) {
             -2 => 'graveyard',
             1 => 'ranked',
             2 => 'approved',
@@ -50,6 +55,11 @@ class Beatmap extends Model
             4 => 'loved',
             default => 'unknown',
         };
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return self::getStatusLabel($this->status);
     }
 
     public function getDateLabelAttribute(): string
@@ -62,9 +72,29 @@ class Beatmap extends Model
         };
     }
 
-    public function getModeIconAttribute(): HtmlString
+    public function getInfoUrlAttribute(): string
     {
-        $fileName = match ($this->mode) {
+        return OsuUrl::beatmapInfo($this->set_id, 'osu', $this->id);
+    }
+
+    public function getBgUrlAttribute(): string
+    {
+        return OsuUrl::beatmapCover($this->set_id);
+    }
+
+    public function getPreviewUrlAttribute(): string
+    {
+        return OsuUrl::beatmapPreview($this->set_id);
+    }
+
+    public function getDirectUrlAttribute(): string
+    {
+        return OsuUrl::beatmapDirect($this->id);
+    }
+
+    public static function getModeIcon(BeatmapMode $mode): HtmlString
+    {
+        $fileName = match ($mode) {
             BeatmapMode::OSU => 'mode-osu-small',
             BeatmapMode::TAIKO => 'mode-taiko-small',
             BeatmapMode::FRUITS => 'mode-fruits-small',
@@ -74,65 +104,74 @@ class Beatmap extends Model
         return new HtmlString('<img src="'.asset('/img/modes/'.$fileName.'.png').'"/>');
     }
 
-    public function setExternalCreatorLabels(array $labels): void
+    public function getModeIconAttribute(): HtmlString
     {
-        $this->externalCreatorLabels = $labels;
+        return self::getModeIcon($this->mode);
     }
 
     public function getCreatorLabelAttribute(): HtmlString
     {
-        $labels = $this->externalCreatorLabels;
-
-        if (empty($labels)) {
-            return $this->set?->creator?->url ?? new HtmlString('unknown');
+        if ($this->creators->isEmpty()) {
+            return $this->set->creator_label;
         }
 
-        $output = '';
-        $chunks = [];
+        $urls = $this->creators->map(function ($creator) {
+            return $creator->link->toHtml();
+        });
 
-        foreach ($labels as $creator) {
-            if ($creator['isWinteright']) {
-                $localLink = '<a href="'.route('users.show', $creator['id']).'">'.e($creator['name']).'</a>';
-            } else if (!empty($creator['name'])) {
-                $localLink = e($creator['name']);
-            } else {
-                $localLink = e($creator['id']);
-            }
-
-            $extLink = '<a href="https://osu.ppy.sh/users/'.$creator['id'].'"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   title="view on osu!"
-                   class="opacity-50 small">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                </a>';
-
-            $chunks[] = $localLink.$extLink;
-        }
-
-        $output .= implode(', ', $chunks);
-        return new HtmlString($output);
+        return new HtmlString($urls->implode(', '));
     }
 
-    public function getUrlAttribute(): HtmlString
+    public function getLocalLink(): HtmlString
     {
         $localUrl = route('beatmaps.show', $this->set_id);
         $text = $this->set->artist.' - '.$this->set->title.' ['.$this->difficulty_name.']';
 
-        $localLink = '<a href="'.$localUrl.'">'.e($text).'</a>';
-        $extLink = '<a href="https://osu.ppy.sh/beatmapsets/'.$this->set_id.'#osu/'.$this->id.'"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       title="view on osu!"
-                       class="opacity-50 small">
-                        <i class="bi bi-box-arrow-up-right"></i>
-                    </a>';
+        return new HtmlString('<a href="'.$localUrl.'">'.e($text).'</a>');
+    }
+
+    public function getExtLink(): HtmlString
+    {
+        return new HtmlString('<a href="'.$this->info_url.'"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       title="view on osu!"
+                                       class="opacity-50 small">
+                                        <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>');
+    }
+
+    public function getDirectLink(): HtmlString
+    {
+        return new HtmlString('<a href="'.$this->direct_url.'"
+                                       rel="noopener noreferrer"
+                                       title="osu!direct"
+                                       class="opacity-50 small">
+                                        <i class="bi bi-download"></i>
+                                    </a>');
+    }
+
+    public function getLinkAttribute(): HtmlString
+    {
+        $localLink = $this->getLocalLink();
+        $extLink = $this->getExtLink();
 
         return new HtmlString($localLink.$extLink);
     }
 
-    public function getBgUrlAttribute(): string
+    public function getLinkWithDirectAttribute(): HtmlString
     {
-        return 'https://assets.ppy.sh/beatmaps/'.$this->set_id.'/covers/cover.jpg';
+        $localLink = $this->getLocalLink();
+        $extLink = $this->getExtLink();
+        $directLink = $this->getDirectLink();
+
+        return new HtmlString($localLink.$directLink.$extLink);
+    }
+
+    public function getStatusBadgeAttribute(): HtmlString
+    {
+        $output = '<span class="badge text-bg-primary">'.$this->status_label.'</span>';
+
+        return new HtmlString($output);
     }
 }

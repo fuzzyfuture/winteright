@@ -56,18 +56,17 @@ class AuditBeatmapCreators extends Command
 
         $this->newLine();
         if ($this->confirm('Do you want to fix these beatmaps by retrieving their creators?')) {
-            $token = $this->osuApiService->getAccessToken();
+            $token = $this->osuApiService->getPublicAccessToken();
 
             foreach ($beatmapSets as $set) {
                 $id = $set->id;
-
                 $this->info('Updating '.$set->artist.' - '.$set->title.'...');
 
                 // 1.1-second delay between requests (~55 req/min), per osu! api guidelines. you're welcome peppy
                 usleep(1100000);
 
                 try {
-                    $fullDetails = Http::withToken($token)->get('https://osu.ppy.sh/api/v2/beatmapsets/'.$id)->json();
+                    $fullDetails = $this->osuApiService->getBeatmapSetFullDetails($token, $id);
                 } catch (Throwable $e) {
                     $this->error('Error while attempting to fetch beatmap set with ID '.$id.': '.$e->getMessage());
                     return;

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\UserListItemType;
 use App\Models\Beatmap;
+use App\Models\BeatmapSet;
 use App\Models\UserList;
 use App\Models\UserListFavorite;
 use App\Models\UserListItem;
@@ -58,23 +59,18 @@ class UserListService
      */
     public function getItems(int $id, int $perPage = 50): LengthAwarePaginator
     {
-        $items = UserListItem::where('list_id', $id)
-            ->with('item')
+        return UserListItem::where('list_id', $id)
+            ->with([
+                'item' => function ($morphTo) {
+                    $morphTo->morphWith([
+                        Beatmap::class => ['set', 'creators.user', 'creators.creatorName'],
+                        BeatmapSet::class => ['creator', 'creatorName'],
+                    ]);
+                }
+            ])
             ->orderByDesc('order')
             ->orderBy('created_at')
             ->paginate($perPage);
-
-        $beatmaps = $items->getCollection()
-            ->filter(function ($item) {
-               return $item->item_type == UserListItemType::BEATMAP && $item->item instanceof Beatmap;
-            })
-            ->map(function ($item) {
-                return $item->item;
-            });
-
-        $beatmaps->load('set');
-
-        return $items;
     }
 
     /**
@@ -111,30 +107,11 @@ class UserListService
      *
      * @param int $userId The user's ID.
      * @param bool $includePrivate Whether to include private lists in the results. Defaults to false.
+     * @param ?int $limit The maximum number of lists to retrieve.
      */
-    public function getForUser(int $userId, bool $includePrivate = false): Collection
-    {
-        $query = UserList::where('user_id', $userId);
-
-        if (!$includePrivate) {
-            $query->where('is_public', true);
-        }
-
-        return $query->get();
-    }
-
-    /**
-     * Retrieves a user's lists for their profile.
-     *
-     * @param int $userId The user's ID.
-     * @param bool $includePrivate Whether to include private lists in the results. Defaults to false. Should only
-     * be true when a user is viewing their own profile.
-     * @return LengthAwarePaginator The user's lists, paginated.
-     */
-    public function getForProfile(int $userId, bool $includePrivate = false): LengthAwarePaginator
+    public function getForUser(int $userId, bool $includePrivate = false, ?int $limit = 5): Collection
     {
         $query = UserList::where('user_id', $userId)
-            ->with('owner')
             ->withCount('items')
             ->withCount('favorites');
 
@@ -142,16 +119,44 @@ class UserListService
             $query->where('is_public', true);
         }
 
-        return $query->paginate(50);
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Retrieves and paginates a user's lists.
+     *
+     * @param int $userId The user's ID.
+     * @param bool $includePrivate Whether to include private lists in the results. Defaults to false. Should only
+     * be true when a user is viewing their own profile.
+     * @param int $perPage The amount of results to retrieve per-page.
+     * @return LengthAwarePaginator The user's lists, paginated.
+     */
+    public function getForUserPaginated(int $userId, bool $includePrivate = false,
+                                        int $perPage = 50): LengthAwarePaginator
+    {
+        $query = UserList::where('user_id', $userId)
+            ->withCount('items')
+            ->withCount('favorites');
+
+        if (!$includePrivate) {
+            $query->where('is_public', true);
+        }
+
+        return $query->paginate($perPage);
     }
 
     /**
      * Retrieves a user's favorite lists.
      *
      * @param int $userId The user's ID.
+     * @param int $perPage The amount of results to retrieve per-page.
      * @return LengthAwarePaginator The user's favorite lists, paginated.
      */
-    public function getFavorites(int $userId): LengthAwarePaginator
+    public function getFavorites(int $userId, int $perPage = 50): LengthAwarePaginator
     {
         return UserList::whereHas('favorites', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
@@ -159,7 +164,7 @@ class UserListService
             ->with('owner')
             ->withCount('items')
             ->withCount('favorites')
-            ->paginate(50);
+            ->paginate($perPage);
     }
 
     /**
