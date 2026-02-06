@@ -4,6 +4,7 @@ use App\Http\Controllers\AffinitiesController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeatmapSetController;
 use App\Http\Controllers\ChartsController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MyMapsController;
 use App\Http\Controllers\RatingController;
@@ -94,6 +95,14 @@ Route::controller(UserListController::class)
 
         Route::get('/lists', 'index')->name('index');
         Route::get('/lists/{id}', 'show')->name('show');
+    });
+
+Route::controller(CommentController::class)
+    ->as('comments.')
+    ->middleware('auth')
+    ->group(function () {
+        Route::post('/beatmaps/{id}/comment', 'postNew')->middleware('throttle:5,1')->name('new.post');
+        Route::delete('/comments/{id}', 'delete')->name('delete');
     });
 
 Route::controller(AffinitiesController::class)
