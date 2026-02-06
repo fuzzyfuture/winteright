@@ -40,6 +40,13 @@ class CommentService
             ->get();
     }
 
+    /**
+     * Retrieves recent comments for all beatmap sets.
+     *
+     * @param int $enabledModes Bitfield of enabled modes.
+     * @param int $limit The amount of recent comments to retrieve.
+     * @return Collection The recent comments.
+     */
     public function getRecent(int $enabledModes, int $limit = 15): Collection
     {
         return Cache::remember('comments:recent:'.$limit.':'.$enabledModes, 120, function () use ($enabledModes, $limit) {
