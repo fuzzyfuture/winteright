@@ -48,7 +48,7 @@
         </div>
     </div>
     <hr>
-    <div class="row">
+    <div class="row mb-3">
         <div class="col-md-8">
             <h4 class="mb-3">difficulties</h4>
             @if ($beatmapSet->beatmaps->contains('blacklisted', true))
@@ -113,5 +113,34 @@
                 @include('beatmaps._ratings')
             </div>
         </div>
+    </div>
+    <h4 class="mb-3">comments</h4>
+    @auth
+        {{ html()->form('POST', route('comments.new.post', ['id' => $beatmapSet->id]))->class('mb-3')->open() }}
+            {{ html()->textarea('content')->class('form-control mb-2') }}
+            {{ html()->submit('submit')->class('btn btn-primary') }}
+        {{ html()->form()->close() }}
+    @endauth
+    <div class="list-group comments-box">
+        @foreach ($comments as $comment)
+            <div class="list-group-item">
+                <div class="d-flex align-items-start flex-nowrap">
+                    <a href="{{ route('users.show', $comment->user->id) }}"
+                       class="d-flex align-items-start flex-nowrap">
+                        <img src="{{ $comment->user->avatar_url }}" width="16" height="16" alt="Avatar">
+                        <small class="ms-2">{{ $comment->user->name }}</small>
+                    </a>
+                    <small class="text-muted ms-2" title="{{ $comment->created_at }}">
+                        {{ $comment->created_at->diffForHumans() }}
+                    </small>
+                    @can('delete', $comment)
+                        {{ html()->form('DELETE', route('comments.delete', $comment->id))->class('ms-2 d-flex align-items-start')->attribute('onsubmit', 'return confirm(\'are you sure you want to delete this comment?\')')->open() }}
+                        {{ html()->submit('<small>delete</small>')->class('btn btn-link p-0 border-0 d-flex text-muted text-center') }}
+                        {{ html()->form()->close() }}
+                    @endcan
+                </div>
+                {{ $comment->content }}
+            </div>
+        @endforeach
     </div>
 @endsection
