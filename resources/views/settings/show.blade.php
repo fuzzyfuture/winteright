@@ -33,10 +33,14 @@
             <div class="card mt-3">
                 <div class="card-header"><b>privacy</b></div>
                 <div class="card-body">
-                    {{ html()->form('POST', route('settings.hide_ratings'))->open() }}
+                    {{ html()->form('POST', route('settings.privacy'))->open() }}
                         <div class="mb-3">
                             {{ html()->label('hide ratings:', 'hide_ratings')->class('form-label') }}
                             {{ html()->select('hide_ratings', $hideRatingsOptions, Auth::user()->hide_ratings->value)->class('form-select') }}
+                        </div>
+                        <div class="mb-3">
+                            {{ html()->label('hide comments:', 'hide_comments')->class('form-label') }}
+                            {{ html()->select('hide_comments', $hideCommentsOptions, Auth::user()->hide_comments->value)->class('form-select') }}
                         </div>
                         {{ html()->submit('submit')->class('btn btn-primary float-end') }}
                     {{ html()->form()->close() }}
