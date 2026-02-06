@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DataObjects\TopRatedMapper;
+use App\Enums\HideCommentsOption;
 use App\Enums\HideRatingsOption;
 use App\Models\BeatmapCreator;
 use App\Models\Rating;
@@ -133,16 +134,21 @@ class UserService
     }
 
     /**
-     * Update's a user's hide ratings setting.
+     * Update's a user's privacy settings.
      *
      * @param int $userId The user's ID.
-     * @param HideRatingsOption $option The selected option.
+     * @param HideRatingsOption $hideRatingsOption The selected "hide ratings" option.
+     * @param HideCommentsOption $hideCommentsOption The selected "hide comments" option.
      * @throws Throwable
      */
-    public function updateHideRatings(int $userId, HideRatingsOption $option): void
+    public function updatePrivacySettings(int $userId, HideRatingsOption $hideRatingsOption,
+                                          HideCommentsOption $hideCommentsOption): void
     {
-        DB::transaction(function () use ($userId, $option) {
-           User::where('id', $userId)->update(['hide_ratings' => $option->value]);
+        DB::transaction(function () use ($userId, $hideRatingsOption, $hideCommentsOption) {
+           User::where('id', $userId)->update([
+               'hide_ratings' => $hideRatingsOption->value,
+               'hide_comments' => $hideCommentsOption->value,
+           ]);
         });
     }
 

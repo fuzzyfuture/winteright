@@ -36,6 +36,11 @@ class BeatmapSet extends Model
         return $this->belongsTo(BeatmapCreatorName::class, 'creator_id');
     }
 
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class, 'beatmap_set_id', 'id');
+    }
+
     public function getStatusLabelAttribute(): string
     {
         $statuses = $this->beatmaps->pluck('status')->unique();
