@@ -27,32 +27,38 @@ class CommentService
      * Retrieves all comments for a specified beatmap set.
      *
      * @param int $beatmapSetId The ID of the beatmap set.
+     * @param bool $withTrashed True if soft-deleted comments should be included.
      * @return Collection The beatmap set's comments.
      */
-    public function getAllForBeatmapSet(int $beatmapSetId): Collection
+    public function getAllForBeatmapSet(int $beatmapSetId, bool $withTrashed = false): Collection
     {
-        return Comment::where('beatmap_set_id', $beatmapSetId)
+        $query = Comment::where('beatmap_set_id', $beatmapSetId)
             ->with('user')
             ->whereHas('user', function ($query) {
                 $query->where('hide_comments', '!=', HideRatingsOption::ALL->value);
             })
-            ->orderByDesc('created_at')
-            ->get();
+            ->orderByDesc('created_at');
+
+        if ($withTrashed) {
+            $query->withTrashed();
+        }
+
+        return $query->get();
     }
 
     /**
      * Retrieves recent comments for all beatmap sets.
      *
      * @param int $enabledModes Bitfield of enabled modes.
+     * @param bool $withTrashed True if soft-deleted comments should be included.
      * @param int $limit The amount of recent comments to retrieve.
      * @return Collection The recent comments.
      */
-    public function getRecent(int $enabledModes, int $limit = 15): Collection
+    public function getRecent(int $enabledModes, bool $withTrashed = false, int $limit = 15): Collection
     {
-        return Cache::remember('comments:recent:'.$limit.':'.$enabledModes, 120, function () use ($enabledModes, $limit) {
+        return Cache::remember('comments:recent:'.$limit.':'.$enabledModes, 120, function () use ($enabledModes, $limit, $withTrashed) {
             $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
-
-            return Comment::orderByDesc('created_at')
+            $query = Comment::orderByDesc('created_at')
                 ->with('user')
                 ->with('set')
                 ->whereHas('set.beatmaps', function ($query) use ($modesArray) {
@@ -62,8 +68,13 @@ class CommentService
                 ->whereHas('user', function ($query) {
                     $query->where('hide_comments', HideRatingsOption::NONE->value);
                 })
-                ->limit($limit)
-                ->get();
+                ->limit($limit);
+
+            if ($withTrashed) {
+                $query->withTrashed();
+            }
+
+            return $query->get();
         });
     }
 
