@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\HideCommentsOption;
 use App\Enums\HideRatingsOption;
 use App\Http\Requests\Settings\UpdateEnabledModesRequest;
 use App\Http\Requests\Settings\UpdateHideRatingsRequest;
@@ -21,8 +22,9 @@ class SettingsController extends Controller
     public function show()
     {
         $hideRatingsOptions = HideRatingsOption::options();
+        $hideCommentsOptions = HideCommentsOption::options();
 
-        return view('settings.show', compact('hideRatingsOptions'));
+        return view('settings.show', compact('hideRatingsOptions', 'hideCommentsOptions'));
     }
 
     public function enabledModes(UpdateEnabledModesRequest $request)
@@ -37,17 +39,17 @@ class SettingsController extends Controller
         return redirect()->back()->with('success', 'enabled modes updated successfully!');
     }
 
-    public function hideRatings(UpdateHideRatingsRequest $request)
+    public function privacy(UpdateHideRatingsRequest $request)
     {
         try {
-            $this->userService->updateHideRatings(
+            $this->userService->updatePrivacySettings(
                 Auth::id(),
                 HideRatingsOption::from($request->get('hide_ratings'))
             );
         } catch (Throwable $e) {
-            return back()->withErrors('error updating hide ratings setting: '.$e->getMessage());
+            return back()->withErrors('error updating privacy settings: '.$e->getMessage());
         }
 
-        return redirect()->back()->with('success', 'hide ratings setting updated successfully!');
+        return redirect()->back()->with('success', 'privacy settings updated successfully!');
     }
 }
