@@ -96,7 +96,7 @@
             <h3 class="mb-3">recent comments</h3>
             <ul class="list-group mb-3">
                 @foreach ($recentComments as $comment)
-                    <div class="list-group-item">
+                    <div class="list-group-item {{ $comment->trashed() ? 'opacity-50' : '' }}">
                         <div class="d-flex align-items-start flex-nowrap">
                             <a href="{{ route('users.show', $comment->user->id) }}"
                                class="d-flex align-items-start flex-nowrap">
