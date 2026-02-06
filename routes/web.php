@@ -42,7 +42,7 @@ Route::controller(SettingsController::class)
        Route::get('/settings', 'show')->name('show');
 
        Route::post('/settings/general/enabled-modes', 'enabledModes')->name('enabled_modes');
-       Route::post('/settings/general/hide-ratings', 'hideRatings')->name('hide_ratings');
+       Route::post('/settings/general/privacy', 'privacy')->name('privacy');
     });
 
 Route::controller(BeatmapSetController::class)
