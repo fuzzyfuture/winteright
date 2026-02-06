@@ -236,3 +236,8 @@ a:has(i) {
 .rating-group-rating {
     border-top: 1px solid $card-border-color;
 }
+
+.comments-box {
+    height: 400px;
+    overflow-y: auto;
+}
