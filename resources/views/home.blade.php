@@ -32,15 +32,28 @@
                         updated: {{ Carbon::parse($lastSynced)->diffForHumans() }}</small>
                 @endif
             </div>
-            <ul class="list-group">
+            <ul class="list-group mb-4">
                 @foreach ($recentlyRanked as $set)
                     <x-beatmaps.beatmap_set_list_group :set="$set"/>
                 @endforeach
             </ul>
+            <div>
+                <h3 class="mb-3">faq</h3>
+                <h4>why "winteright"?</h4>
+                <p>
+                    i was playing <a href="{{ OsuUrl::beatmapInfo(1281337, 'osu', 2661429) }}" target="_blank">this map</a>
+                    when i decided i want to actually start this project! <small class="text-muted">great map :-)</small>
+                </p>
+                <h4>how do i blacklist my maps?</h4>
+                <p>
+                    feel free to contact me via <a href="https://x.com/tsukafan" target="_blank">twitter</a> or
+                    <a href="{{ OsuUrl::userProfile(2966685) }}" target="_blank">osu!</a> and i'll add you asap!
+                </p>
+            </div>
         </div>
         <div class="col-lg-5">
             <h3 class="mb-3">recent ratings</h3>
-            <ul class="list-group mb-3">
+            <ul class="list-group mb-4">
                 @foreach ($recentRatings as $group)
                     @if ($group->isSingle())
                         <x-ratings.rating_list_group_small :rating="$group->ratings->first()" />
@@ -80,19 +93,32 @@
                     @endif
                 @endforeach
             </ul>
+            <h3 class="mb-3">recent comments</h3>
+            <ul class="list-group mb-3">
+                @foreach ($recentComments as $comment)
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-start flex-nowrap">
+                            <a href="{{ route('users.show', $comment->user->id) }}"
+                               class="d-flex align-items-start flex-nowrap">
+                                <img src="{{ $comment->user->avatar_url }}" width="16" height="16" alt="Avatar">
+                                <small class="ms-2">{{ $comment->user->name }}</small>
+                            </a>
+                            <small class="ms-1">on</small>
+                            <a href="{{ route('beatmaps.show', $comment->set->id ?? 0) }}" class="ms-1 d-flex">
+                                <small>
+                                    {{ $comment->set->title }}
+                                </small>
+                            </a>
+                            <small class="text-muted ms-auto" title="{{ $comment->created_at }}">
+                                {{ $comment->created_at->diffForHumans() }}
+                            </small>
+                        </div>
+                        <div>
+                            {{ $comment->content }}
+                        </div>
+                    </div>
+                @endforeach
+            </ul>
         </div>
-    </div>
-    <div>
-        <h3>faq</h3>
-        <h4>why "winteright"?</h4>
-        <p>
-            i was playing <a href="{{ OsuUrl::beatmapInfo(1281337, 'osu', 2661429) }}" target="_blank">this map</a>
-            when i decided i want to actually start this project! <small class="text-muted">great map :-)</small>
-        </p>
-        <h4>how do i blacklist my maps?</h4>
-        <p>
-            feel free to contact me via <a href="https://x.com/tsukafan" target="_blank">twitter</a> or
-            <a href="{{ OsuUrl::userProfile(2966685) }}" target="_blank">osu!</a> and i'll add you asap!
-        </p>
     </div>
 @endsection
