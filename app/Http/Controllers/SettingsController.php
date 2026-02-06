@@ -44,7 +44,8 @@ class SettingsController extends Controller
         try {
             $this->userService->updatePrivacySettings(
                 Auth::id(),
-                HideRatingsOption::from($request->get('hide_ratings'))
+                HideRatingsOption::from($request->get('hide_ratings')),
+                HideCommentsOption::from($request->get('hide_comments')),
             );
         } catch (Throwable $e) {
             return back()->withErrors('error updating privacy settings: '.$e->getMessage());
