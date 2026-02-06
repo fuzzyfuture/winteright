@@ -37,7 +37,7 @@ class HomeController extends Controller
         $recentlyRanked = $this->beatmapService->getRecentBeatmapSets($enabledModes);
         $recentRatings = $this->ratingService->getRecent($enabledModes);
         $lastSynced = $this->siteInfoService->getLastSyncedRankedBeatmaps();
-        $recentComments = $this->commentService->getRecent($enabledModes, $user->isAdmin());
+        $recentComments = $this->commentService->getRecent($enabledModes, $user && $user->isAdmin());
 
         return view('home', compact('user', 'stats', 'recentlyRanked', 'recentRatings',
             'lastSynced', 'recentComments'));
