@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\BeatmapService;
+use App\Services\CommentService;
 use App\Services\RatingService;
 use App\Services\SiteInfoService;
 use App\Services\StatsService;
@@ -14,14 +15,17 @@ class HomeController extends Controller
     protected BeatmapService $beatmapService;
     protected SiteInfoService $siteInfoService;
     protected RatingService $ratingService;
+    protected CommentService $commentService;
 
     public function __construct(StatsService $statsService, BeatmapService $beatmapService,
-                                SiteInfoService $siteInfoService, RatingService $ratingService)
+                                SiteInfoService $siteInfoService, RatingService $ratingService,
+                                CommentService $commentService)
     {
         $this->statsService = $statsService;
         $this->beatmapService = $beatmapService;
         $this->siteInfoService = $siteInfoService;
         $this->ratingService = $ratingService;
+        $this->commentService = $commentService;
     }
 
     public function index()
@@ -33,8 +37,9 @@ class HomeController extends Controller
         $recentlyRanked = $this->beatmapService->getRecentBeatmapSets($enabledModes);
         $recentRatings = $this->ratingService->getRecent($enabledModes);
         $lastSynced = $this->siteInfoService->getLastSyncedRankedBeatmaps();
+        $recentComments = $this->commentService->getRecent($enabledModes);
 
         return view('home', compact('user', 'stats', 'recentlyRanked', 'recentRatings',
-            'lastSynced'));
+            'lastSynced', 'recentComments'));
     }
 }
