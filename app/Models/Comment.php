@@ -17,7 +17,7 @@ class Comment extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function beatmapSet(): BelongsTo
+    public function set(): BelongsTo
     {
         return $this->belongsTo(BeatmapSet::class, 'beatmap_set_id');
     }
