@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\BeatmapService;
 use App\Services\SearchService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

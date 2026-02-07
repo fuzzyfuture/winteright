@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Providers\OsuSocialiteProvider;
 use App\Services\AuthService;
 use GuzzleHttp\Exception\ClientException;

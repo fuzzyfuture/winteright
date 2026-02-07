@@ -29,14 +29,14 @@ class BeatmapCreator extends Model
     public function getLinkAttribute(): HtmlString
     {
         if ($this->user) {
-            $localLink = '<a href="'.route('users.show', $this->creator_id).'">'.e($this->user->name).'</a>';
-        } else if ($this->creatorName) {
+            $localLink = '<a href="' . route('users.show', $this->creator_id) . '">' . e($this->user->name) . '</a>';
+        } elseif ($this->creatorName) {
             $localLink = e($this->creatorName->name);
         } else {
             $localLink = $this->creator_id;
         }
 
-        $extLink = '<a href="'.OsuUrl::userProfile($this->creator_id).'"
+        $extLink = '<a href="' . OsuUrl::userProfile($this->creator_id) . '"
                     target="_blank"
                     rel="noopener noreferrer"
                     title="view on osu!"
@@ -44,6 +44,6 @@ class BeatmapCreator extends Model
                         <i class="bi bi-box-arrow-up-right"></i>
                 </a>';
 
-        return new HtmlString($localLink.$extLink);
+        return new HtmlString($localLink . $extLink);
     }
 }

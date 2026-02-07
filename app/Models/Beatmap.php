@@ -4,10 +4,8 @@ namespace App\Models;
 
 use App\Enums\BeatmapMode;
 use App\Helpers\OsuUrl;
-use App\Models\BeatmapCreator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +22,30 @@ class Beatmap extends Model
     protected $casts = [
         'mode' => BeatmapMode::class,
     ];
+
+    public static function getStatusLabel(int $status): string
+    {
+        return match ($status) {
+            -2 => 'graveyard',
+            1 => 'ranked',
+            2 => 'approved',
+            3 => 'qualified',
+            4 => 'loved',
+            default => 'unknown',
+        };
+    }
+
+    public static function getModeIcon(BeatmapMode $mode): HtmlString
+    {
+        $fileName = match ($mode) {
+            BeatmapMode::OSU => 'mode-osu-small',
+            BeatmapMode::TAIKO => 'mode-taiko-small',
+            BeatmapMode::FRUITS => 'mode-fruits-small',
+            BeatmapMode::MANIA => 'mode-mania-small',
+        };
+
+        return new HtmlString('<img src="' . asset('/img/modes/' . $fileName . '.png') . '"/>');
+    }
 
     public function set(): BelongsTo
     {
@@ -43,18 +65,6 @@ class Beatmap extends Model
     public function creators(): HasMany
     {
         return $this->hasMany(BeatmapCreator::class, 'beatmap_id');
-    }
-
-    public static function getStatusLabel(int $status): string
-    {
-        return match ($status) {
-            -2 => 'graveyard',
-            1 => 'ranked',
-            2 => 'approved',
-            3 => 'qualified',
-            4 => 'loved',
-            default => 'unknown',
-        };
     }
 
     public function getStatusLabelAttribute(): string
@@ -92,18 +102,6 @@ class Beatmap extends Model
         return OsuUrl::beatmapDirect($this->id);
     }
 
-    public static function getModeIcon(BeatmapMode $mode): HtmlString
-    {
-        $fileName = match ($mode) {
-            BeatmapMode::OSU => 'mode-osu-small',
-            BeatmapMode::TAIKO => 'mode-taiko-small',
-            BeatmapMode::FRUITS => 'mode-fruits-small',
-            BeatmapMode::MANIA => 'mode-mania-small',
-        };
-
-        return new HtmlString('<img src="'.asset('/img/modes/'.$fileName.'.png').'"/>');
-    }
-
     public function getModeIconAttribute(): HtmlString
     {
         return self::getModeIcon($this->mode);
@@ -125,14 +123,14 @@ class Beatmap extends Model
     public function getLocalLink(): HtmlString
     {
         $localUrl = route('beatmaps.show', $this->set_id);
-        $text = $this->set->artist.' - '.$this->set->title.' ['.$this->difficulty_name.']';
+        $text = $this->set->artist . ' - ' . $this->set->title . ' [' . $this->difficulty_name . ']';
 
-        return new HtmlString('<a href="'.$localUrl.'">'.e($text).'</a>');
+        return new HtmlString('<a href="' . $localUrl . '">' . e($text) . '</a>');
     }
 
     public function getExtLink(): HtmlString
     {
-        return new HtmlString('<a href="'.$this->info_url.'"
+        return new HtmlString('<a href="' . $this->info_url . '"
                                        target="_blank"
                                        rel="noopener noreferrer"
                                        title="view on osu!"
@@ -143,7 +141,7 @@ class Beatmap extends Model
 
     public function getDirectLink(): HtmlString
     {
-        return new HtmlString('<a href="'.$this->direct_url.'"
+        return new HtmlString('<a href="' . $this->direct_url . '"
                                        rel="noopener noreferrer"
                                        title="osu!direct"
                                        class="opacity-50 small">
@@ -156,7 +154,7 @@ class Beatmap extends Model
         $localLink = $this->getLocalLink();
         $extLink = $this->getExtLink();
 
-        return new HtmlString($localLink.$extLink);
+        return new HtmlString($localLink . $extLink);
     }
 
     public function getLinkWithDirectAttribute(): HtmlString
@@ -165,12 +163,12 @@ class Beatmap extends Model
         $extLink = $this->getExtLink();
         $directLink = $this->getDirectLink();
 
-        return new HtmlString($localLink.$directLink.$extLink);
+        return new HtmlString($localLink . $directLink . $extLink);
     }
 
     public function getStatusBadgeAttribute(): HtmlString
     {
-        $output = '<span class="badge text-bg-primary">'.$this->status_label.'</span>';
+        $output = '<span class="badge text-bg-primary">' . $this->status_label . '</span>';
 
         return new HtmlString($output);
     }

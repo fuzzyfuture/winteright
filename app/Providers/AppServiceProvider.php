@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Socialite::extend('osu', function ($app) {
             $config = $app['config']['services.osu'];
+
             return Socialite::buildProvider(OsuSocialiteProvider::class, $config);
         });
         Paginator::useBootstrapFive();

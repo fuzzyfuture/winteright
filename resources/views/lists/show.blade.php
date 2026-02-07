@@ -55,15 +55,15 @@
         {{ $items->links() }}
     </div>
     <div class="container">
-        @forelse($items as $item)
+        @forelse ($items as $item)
             <div class="row p-0 rounded shadow-sm mb-2 chart-beatmap-card">
-                @if($item->item == null)
+                @if ($item->item == null)
                     [item does not exist on winteright]
                     id: {{ $item->item_id }}
                     type: {{ $item->item_type }}
                     @continue
                 @endif
-                @if($item->isUser())
+                @if ($item->isUser())
                     <div class="col-md-2 p-2">
                         <div class="chart-beatmap-img w-100 h-100"
                              style="background-image: url('{{ $item->item->avatar_url }}');">
@@ -74,7 +74,7 @@
                         <h5><a href="{{ route('users.show', $item->item_id) }}">{{ $item->item->name }}</a></h5>
                         <div>{{ $item->description }}</div>
                     </div>
-                @elseif($item->isBeatmap())
+                @elseif ($item->isBeatmap())
                     <div class="col-md-2 p-2">
                         <div class="ms-md-1 audio-preview" style="background-image: url({{ $item->item->bg_url }})" data-playing="false">
                             <audio src="{{ $item->item->preview_url }}"></audio>
@@ -89,7 +89,7 @@
                         <div class="mb-2">mapped by: {{ $item->item->creator_label }}</div>
                         <div>{{ $item->description }}</div>
                     </div>
-                @elseif($item->isBeatmapSet())
+                @elseif ($item->isBeatmapSet())
                     <div class="col-md-2 p-2">
                         <div class="ms-md-1 audio-preview" style="background-image: url({{ $item->item->bg_url }})" data-playing="false">
                             <audio src="{{ $item->item->preview_url }}"></audio>

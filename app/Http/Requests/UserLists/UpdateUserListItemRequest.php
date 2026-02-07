@@ -22,6 +22,7 @@ class UpdateUserListItemRequest extends FormRequest
 
         try {
             $item = $userListService->getItem($itemId);
+
             return Gate::allows('update', $item->list);
         } catch (Throwable) {
             return false;

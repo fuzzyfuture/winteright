@@ -18,8 +18,8 @@ class HomeController extends Controller
     protected CommentService $commentService;
 
     public function __construct(StatsService $statsService, BeatmapService $beatmapService,
-                                SiteInfoService $siteInfoService, RatingService $ratingService,
-                                CommentService $commentService)
+        SiteInfoService $siteInfoService, RatingService $ratingService,
+        CommentService $commentService)
     {
         $this->statsService = $statsService;
         $this->beatmapService = $beatmapService;

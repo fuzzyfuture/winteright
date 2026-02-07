@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    @if(empty($listOptions))
+    @if (empty($listOptions))
         <div class="alert alert-primary" data-bs-theme="dark">
             you don't have any lists yet! <a href="{{ route('lists.new') }}">click here</a> to create your first list.
         </div>

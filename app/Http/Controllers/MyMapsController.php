@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\BeatmapService;
-use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +20,7 @@ class MyMapsController extends Controller
 
     public function update()
     {
-        Cache::tags('api:'.Auth::id())->flush();
+        Cache::tags('api:' . Auth::id())->flush();
 
         return redirect()->back()->with('success', 'updated successfully!');
     }

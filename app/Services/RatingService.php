@@ -17,10 +17,11 @@ class RatingService
 {
     /**
      * Sets a rating.
-     * @param int $userId The user ID to set a rating for.
-     * @param int $beatmapId The beatmap ID to set a rating for.
-     * @param int $score The rating score to set.
-     * @return void
+     *
+     * @param  int  $userId  The user ID to set a rating for.
+     * @param  int  $beatmapId  The beatmap ID to set a rating for.
+     * @param  int  $score  The rating score to set.
+     *
      * @throws Throwable
      */
     public function set(int $userId, int $beatmapId, int $score): void
@@ -43,9 +44,10 @@ class RatingService
 
     /**
      * Deletes a rating.
-     * @param int $userId The user ID of the rating to be deleted.
-     * @param int $beatmapId The beatmap ID of the rating to be deleted.
-     * @return void
+     *
+     * @param  int  $userId  The user ID of the rating to be deleted.
+     * @param  int  $beatmapId  The beatmap ID of the rating to be deleted.
+     *
      * @throws Throwable
      */
     public function clear(int $userId, int $beatmapId): void
@@ -63,13 +65,13 @@ class RatingService
     /**
      * Retrieves and groups recent ratings.
      *
-     * @param int $enabledModes Bitfield of enabled modes.
-     * @param int $limit The amount of recent ratings to retrieve. Defaults to 20.
+     * @param  int  $enabledModes  Bitfield of enabled modes.
+     * @param  int  $limit  The amount of recent ratings to retrieve. Defaults to 20.
      * @return Collection The recent ratings.
      */
     public function getRecent(int $enabledModes, int $limit = 15): Collection
     {
-        return Cache::remember('ratings:recent:'.$limit.':'.$enabledModes, 120, function () use ($enabledModes, $limit) {
+        return Cache::remember('ratings:recent:' . $limit . ':' . $enabledModes, 120, function () use ($enabledModes, $limit) {
             $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
             $ratings = Rating::orderByDesc('updated_at')
                 ->with('user')
@@ -90,10 +92,13 @@ class RatingService
             foreach ($ratings as $rating) {
                 if ($currentGroup && $currentGroup->user->id == $rating->user_id) {
                     $currentGroup->ratings->push($rating);
+
                     continue;
                 }
 
-                if ($grouped->count() == $limit) break;
+                if ($grouped->count() == $limit) {
+                    break;
+                }
 
                 $currentGroup = new RatingGroup($rating->user, collect([$rating]), $rating->updated_at);
                 $grouped->push($currentGroup);
@@ -106,9 +111,9 @@ class RatingService
     /**
      * Retrieves all ratings for a given list of beatmap IDs.
      *
-     * @param Collection $ids The list of beatmap IDs.
-     * @param int $enabledModes Bitfield of enabled modes.
-     * @param int $perPage The amount of ratings to display per page.
+     * @param  Collection  $ids  The list of beatmap IDs.
+     * @param  int  $enabledModes  Bitfield of enabled modes.
+     * @param  int  $perPage  The amount of ratings to display per page.
      * @return Paginator The paginated ratings.
      */
     public function getForBeatmaps(Collection $ids, int $enabledModes, int $perPage = 15): Paginator
@@ -132,9 +137,9 @@ class RatingService
     /**
      * Retrieves recent ratings for a specified user.
      *
-     * @param int $userId The user's ID.
-     * @param int $enabledModes Bitfield of enabled modes.
-     * @param int $limit The amount of recent ratings to retrieve.
+     * @param  int  $userId  The user's ID.
+     * @param  int  $enabledModes  Bitfield of enabled modes.
+     * @param  int  $limit  The amount of recent ratings to retrieve.
      * @return Collection The user's recent ratings.
      */
     public function getForUser(int $userId, int $enabledModes = 15, int $limit = 5): Collection
@@ -154,13 +159,13 @@ class RatingService
     /**
      * Retrieves and paginates all ratings for a given user.
      *
-     * @param int $enabledModes Bitfield of enabled modes.
-     * @param int $userId The user's ID.
-     * @param int $perPage The amount of ratings to display per page.
+     * @param  int  $enabledModes  Bitfield of enabled modes.
+     * @param  int  $userId  The user's ID.
+     * @param  int  $perPage  The amount of ratings to display per page.
      * @return LengthAwarePaginator The paginated ratings.
      */
     public function getForUserPaginated(int $enabledModes, int $userId, ?float $score,
-                                        int $perPage = 50): LengthAwarePaginator
+        int $perPage = 50): LengthAwarePaginator
     {
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
@@ -172,8 +177,8 @@ class RatingService
             })
             ->orderByDesc('updated_at');
 
-        if (!is_null($score)) {
-            $query->whereRaw('score / 2 = '.$score);
+        if (! is_null($score)) {
+            $query->whereRaw('score / 2 = ' . $score);
         }
 
         return $query->paginate($perPage);
@@ -183,8 +188,8 @@ class RatingService
      * Retrieves the users rating spread as an array of the rating bin (e.g. 0.5, 1.0) and the amount of ratings
      * in that bin.
      *
-     * @param int $userId The user's ID.
-     * @param int $enabledModes Bitfield of enabled modes.
+     * @param  int  $userId  The user's ID.
+     * @param  int  $enabledModes  Bitfield of enabled modes.
      * @return Collection The user's rating spread.
      */
     public function getSpreadForUser(int $userId, int $enabledModes = 15): Collection

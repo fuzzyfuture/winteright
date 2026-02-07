@@ -24,7 +24,7 @@ return [
                 ],
                 'beatmap_set' => [
                     'search' => '/beatmapsets/search',
-                    'info' => '/beatmapsets/{set_id}'
+                    'info' => '/beatmapsets/{set_id}',
                 ],
             ],
             'oauth' => [

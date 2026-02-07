@@ -11,19 +11,22 @@ enum BeatmapMode: int implements JsonSerializable
     case FRUITS = 2;
     case MANIA = 3;
 
-    public function jsonSerialize(): int
-    {
-        return $this->value;
-    }
-
     public static function bitfieldToArray(int $bitfield): array
     {
         $modes = [];
 
-        if ($bitfield & 1) $modes[] = BeatmapMode::OSU;
-        if ($bitfield & 2) $modes[] = BeatmapMode::TAIKO;
-        if ($bitfield & 4) $modes[] = BeatmapMode::FRUITS;
-        if ($bitfield & 8) $modes[] = BeatmapMode::MANIA;
+        if ($bitfield & 1) {
+            $modes[] = BeatmapMode::OSU;
+        }
+        if ($bitfield & 2) {
+            $modes[] = BeatmapMode::TAIKO;
+        }
+        if ($bitfield & 4) {
+            $modes[] = BeatmapMode::FRUITS;
+        }
+        if ($bitfield & 8) {
+            $modes[] = BeatmapMode::MANIA;
+        }
 
         return $modes;
     }
@@ -37,5 +40,10 @@ enum BeatmapMode: int implements JsonSerializable
         }
 
         return $bitfield;
+    }
+
+    public function jsonSerialize(): int
+    {
+        return $this->value;
     }
 }

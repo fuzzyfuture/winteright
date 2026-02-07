@@ -63,7 +63,7 @@ class UserListController extends Controller
             $list = $this->userListService->create($userId, $validated['name'], $validated['description'],
                 $validated['is_public']);
         } catch (Throwable $e) {
-            return back()->withErrors('error creating list: '.$e->getMessage());
+            return back()->withErrors('error creating list: ' . $e->getMessage());
         }
 
         return redirect()->route('lists.show', ['id' => $list->id])
@@ -89,7 +89,7 @@ class UserListController extends Controller
             $this->userListService->update($listId, $validated['name'], $validated['description'],
                 $validated['is_public']);
         } catch (Throwable $e) {
-            return back()->withErrors('error updating list: '.$e->getMessage());
+            return back()->withErrors('error updating list: ' . $e->getMessage());
         }
 
         return redirect()->route('lists.show', ['id' => $listId])->with('success', 'list updated successfully!');
@@ -106,7 +106,7 @@ class UserListController extends Controller
         try {
             $this->userListService->delete($listId);
         } catch (Throwable $e) {
-            return back()->withErrors('error deleting list: '.$e->getMessage());
+            return back()->withErrors('error deleting list: ' . $e->getMessage());
         }
 
         return redirect()->route('lists.index')->with('success', 'list deleted successfully!');
@@ -139,7 +139,7 @@ class UserListController extends Controller
             $this->userListService->createItem($validated['list_id'], $itemType, $validated['item_id'],
                 $validated['description'], $validated['order']);
         } catch (Throwable $e) {
-            return back()->withErrors('error adding item: '.$e->getMessage());
+            return back()->withErrors('error adding item: ' . $e->getMessage());
         }
 
         return redirect()->route('lists.show', ['id' => $validated['list_id']])
@@ -166,7 +166,7 @@ class UserListController extends Controller
         try {
             $this->userListService->updateItem($itemId, $validated['description'], $validated['order']);
         } catch (Throwable $e) {
-            return back()->withErrors('error updating item: '.$e->getMessage());
+            return back()->withErrors('error updating item: ' . $e->getMessage());
         }
 
         return redirect()->back()->with('success', 'item updated successfully!');
@@ -183,7 +183,7 @@ class UserListController extends Controller
         try {
             $this->userListService->deleteItem($itemId);
         } catch (Throwable $e) {
-            return back()->withErrors('error deleting item: '.$e->getMessage());
+            return back()->withErrors('error deleting item: ' . $e->getMessage());
         }
 
         return redirect()->back()->with('success', 'item deleted successfully!');
@@ -200,7 +200,7 @@ class UserListController extends Controller
         try {
             $this->userListService->favorite(Auth::id(), $listId);
         } catch (Throwable $e) {
-            return back()->withErrors('error favoriting list: '.$e->getMessage());
+            return back()->withErrors('error favoriting list: ' . $e->getMessage());
         }
 
         return redirect()->back()->with('success', 'list favorited successfully!');
@@ -217,7 +217,7 @@ class UserListController extends Controller
         try {
             $this->userListService->unfavorite(Auth::id(), $listId);
         } catch (Throwable $e) {
-            return back()->withErrors('error unfavoriting list: '.$e->getMessage());
+            return back()->withErrors('error unfavoriting list: ' . $e->getMessage());
         }
 
         return redirect()->back()->with('success', 'list unfavorited successfully!');

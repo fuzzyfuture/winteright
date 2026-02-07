@@ -23,6 +23,7 @@ class AuditBlacklist extends Command
     protected $description = 'Check if blacklisted users have any beatmaps not marked as blacklisted';
 
     protected BlacklistService $blacklistService;
+
     protected BeatmapService $beatmapService;
 
     public function __construct(BlacklistService $blacklistService, BeatmapService $beatmapService)
@@ -45,7 +46,7 @@ class AuditBlacklist extends Command
         $problemBeatmaps = [];
 
         foreach ($blacklistedUserIds as $userId) {
-            $this->info('Checking '.$userId.'...');
+            $this->info('Checking ' . $userId . '...');
             $unblacklistedBeatmaps = $this->beatmapService->getUnblacklistedForUser($userId);
 
             if ($unblacklistedBeatmaps->isNotEmpty()) {
@@ -56,16 +57,17 @@ class AuditBlacklist extends Command
 
         if (empty($problemBeatmaps)) {
             $this->info('All beatmaps by blacklisted users are properly blacklisted.');
+
             return;
         }
 
-        $this->warn('Found '.$totalIssues.' unblacklisted beatmaps belonging to blacklisted users:');
+        $this->warn('Found ' . $totalIssues . ' unblacklisted beatmaps belonging to blacklisted users:');
 
         foreach ($problemBeatmaps as $userId => $maps) {
-            $this->line('User '.$userId.':');
+            $this->line('User ' . $userId . ':');
             foreach ($maps as $map) {
-                $this->line('   '.$map->set->artist.' - '.$map->set->title.' ['.$map->difficulty_name.']');
-                $this->line('   set '.$map->set->id.', map '.$map->id.', ranked '.$map->set->date_ranked);
+                $this->line('   ' . $map->set->artist . ' - ' . $map->set->title . ' [' . $map->difficulty_name . ']');
+                $this->line('   set ' . $map->set->id . ', map ' . $map->id . ', ranked ' . $map->set->date_ranked);
                 $this->newLine();
             }
         }
@@ -79,7 +81,7 @@ class AuditBlacklist extends Command
                 $fixCount += count($beatmapIds);
             }
 
-            $this->info('Fixed '.$fixCount.' beatmaps by marking them as blacklisted.');
+            $this->info('Fixed ' . $fixCount . ' beatmaps by marking them as blacklisted.');
         } else {
             $this->line('No changes were made.');
         }

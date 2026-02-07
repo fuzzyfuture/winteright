@@ -6,7 +6,6 @@ use App\Services\BeatmapService;
 use App\Services\ChartsService;
 use App\Services\SiteInfoService;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
 class ChartsController extends Controller

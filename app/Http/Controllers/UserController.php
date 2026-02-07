@@ -17,7 +17,7 @@ class UserController extends Controller
     protected UserListService $userListService;
 
     public function __construct(UserService $userService, RatingService $ratingService, BeatmapService $beatmapService,
-                                UserListService $userListService)
+        UserListService $userListService)
     {
         $this->userService = $userService;
         $this->ratingService = $ratingService;
@@ -51,7 +51,7 @@ class UserController extends Controller
         $validScores = ['0.0', '0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0'];
         $score = $request->query('score');
 
-        if (!is_null($score) && !in_array($score, $validScores)) {
+        if (! is_null($score) && ! in_array($score, $validScores)) {
             $score = '0.0';
         }
 

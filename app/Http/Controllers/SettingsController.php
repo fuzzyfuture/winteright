@@ -33,7 +33,7 @@ class SettingsController extends Controller
             $this->userService->updateEnabledModes(Auth::id(), $request->boolean('osu'),
                 $request->boolean('taiko'), $request->boolean('fruits'), $request->boolean('mania'));
         } catch (Throwable $e) {
-            return back()->withErrors('error updating modes: '.$e->getMessage());
+            return back()->withErrors('error updating modes: ' . $e->getMessage());
         }
 
         return redirect()->back()->with('success', 'enabled modes updated successfully!');
@@ -48,7 +48,7 @@ class SettingsController extends Controller
                 HideCommentsOption::from($request->get('hide_comments')),
             );
         } catch (Throwable $e) {
-            return back()->withErrors('error updating privacy settings: '.$e->getMessage());
+            return back()->withErrors('error updating privacy settings: ' . $e->getMessage());
         }
 
         return redirect()->back()->with('success', 'privacy settings updated successfully!');

@@ -6,7 +6,6 @@ use App\Enums\HideRatingsOption;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Enum;
 
 class UpdateHideRatingsRequest extends FormRequest
 {
@@ -21,7 +20,7 @@ class UpdateHideRatingsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'hide_ratings' => ['required', Rule::enum(HideRatingsOption::class)]
+            'hide_ratings' => ['required', Rule::enum(HideRatingsOption::class)],
         ];
     }
 }

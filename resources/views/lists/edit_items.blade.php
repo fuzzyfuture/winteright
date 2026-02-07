@@ -9,9 +9,9 @@
         {{ $items->links() }}
     </div>
     <div class="container">
-        @forelse($items as $item)
+        @forelse ($items as $item)
             <div class="row p-0 rounded shadow-sm mb-2 chart-beatmap-card">
-                @if($item->isUser())
+                @if ($item->isUser())
                     <div class="col-md-2 p-2">
                         <div class="chart-beatmap-img w-100 h-100"
                              style="background-image: url('{{ $item->item->avatar_url }}');">
@@ -43,7 +43,7 @@
                             {{ html()->submit('save')->class('btn btn-primary') }}
                         {{ html()->form()->close() }}
                     </div>
-                @elseif($item->isBeatmap())
+                @elseif ($item->isBeatmap())
                     <div class="col-md-2 p-2">
                         <div class="chart-beatmap-img w-100 h-100"
                              style="background-image: url('{{ $item->item->bg_url }}');">
@@ -72,7 +72,7 @@
                             {{ html()->submit('save')->class('btn btn-primary') }}
                         {{ html()->form()->close() }}
                     </div>
-                @elseif($item->isBeatmapSet())
+                @elseif ($item->isBeatmapSet())
                     <div class="col-md-2 p-2">
                         <div class="chart-beatmap-img w-100 h-100"
                              style="background-image: url('{{ $item->item->bg_url }}');">

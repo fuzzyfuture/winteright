@@ -33,7 +33,7 @@ class BeatmapSetController extends Controller
         $beatmapIds = $beatmapSet->beatmaps->pluck('id');
 
         $ratings = $this->ratingService->getForBeatmaps($beatmapIds, Auth::user()->enabled_modes ?? 15, 10);
-        $ratings->withPath('/mapsets/'.$setId.'/ratings');
+        $ratings->withPath('/mapsets/' . $setId . '/ratings');
 
         $comments = $this->commentService->getAllForBeatmapSet($setId, Auth::user() && Auth::user()->isAdmin());
 
@@ -49,7 +49,7 @@ class BeatmapSetController extends Controller
         $beatmapIds = $beatmapSet->beatmaps->pluck('id');
 
         $ratings = $this->ratingService->getForBeatmaps($beatmapIds, Auth::user()->enabled_modes ?? 15, 10);
-        $ratings->withPath('/mapsets/'.$setId.'/ratings');
+        $ratings->withPath('/mapsets/' . $setId . '/ratings');
 
         return view('beatmaps._ratings', compact('ratings'));
     }
