@@ -25,16 +25,16 @@ class UserListItem extends Model
 
     public function isUser(): bool
     {
-        return $this->item_type == UserListItemType::USER;
+        return $this->item_type === UserListItemType::USER;
     }
 
     public function isBeatmap(): bool
     {
-        return $this->item_type == UserListItemType::BEATMAP;
+        return $this->item_type === UserListItemType::BEATMAP;
     }
 
     public function isBeatmapSet(): bool
     {
-        return $this->item_type == UserListItemType::BEATMAP_SET;
+        return $this->item_type === UserListItemType::BEATMAP_SET;
     }
 }

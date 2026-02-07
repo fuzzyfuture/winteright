@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BeatmapCreatorName extends Model
 {
-    protected $fillable = ['id', 'name'];
-
     public $timestamps = false;
+
+    protected $fillable = ['id', 'name'];
 }

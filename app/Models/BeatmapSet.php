@@ -20,7 +20,7 @@ class BeatmapSet extends Model
         'date_ranked' => 'datetime',
     ];
 
-    public function beatmaps(): BeatmapSet|HasMany
+    public function beatmaps(): self|HasMany
     {
         return $this->hasMany(Beatmap::class, 'set_id', 'id');
     }

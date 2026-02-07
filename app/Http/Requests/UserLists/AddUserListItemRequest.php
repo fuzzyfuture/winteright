@@ -59,19 +59,19 @@ class AddUserListItemRequest extends FormRequest
             $itemType = $this->input('item_type');
             $enumCase = UserListItemType::tryFrom($itemType);
 
-            if ($enumCase == UserListItemType::USER) {
+            if ($enumCase === UserListItemType::USER) {
                 $userService = app(UserService::class);
 
                 if (! $userService->exists($value)) {
                     $fail('user with id '.$value.' does not exist.');
                 }
-            } elseif ($enumCase == UserListItemType::BEATMAP) {
+            } elseif ($enumCase === UserListItemType::BEATMAP) {
                 $beatmapService = app(BeatmapService::class);
 
                 if (! $beatmapService->exists($value)) {
                     $fail('beatmap with id '.$value.' does not exist.');
                 }
-            } elseif ($enumCase == UserListItemType::BEATMAP_SET) {
+            } elseif ($enumCase === UserListItemType::BEATMAP_SET) {
                 $beatmapService = app(BeatmapService::class);
 
                 if (! $beatmapService->setExists($value)) {

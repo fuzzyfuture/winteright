@@ -90,13 +90,13 @@ class RatingService
             $currentGroup = null;
 
             foreach ($ratings as $rating) {
-                if ($currentGroup && $currentGroup->user->id == $rating->user_id) {
+                if ($currentGroup && $currentGroup->user->id === $rating->user_id) {
                     $currentGroup->ratings->push($rating);
 
                     continue;
                 }
 
-                if ($grouped->count() == $limit) {
+                if ($grouped->count() === $limit) {
                     break;
                 }
 

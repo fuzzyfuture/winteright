@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Beatmap;
 use App\Services\BeatmapService;
 use Illuminate\Console\Command;
+use Throwable;
 
 class RecalculateWeightedAverages extends Command
 {
@@ -34,7 +35,7 @@ class RecalculateWeightedAverages extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $this->info('Recalculating weighted averages...');
 
@@ -42,7 +43,7 @@ class RecalculateWeightedAverages extends Command
             foreach ($beatmaps as $beatmap) {
                 try {
                     $this->beatmapService->updateWeightedAverage($beatmap->id);
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     $this->error('Error recalculating for '.$beatmap->id.': '.$e->getMessage());
                 }
             }

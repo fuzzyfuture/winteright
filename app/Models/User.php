@@ -18,6 +18,8 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    public $incrementing = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -30,8 +32,6 @@ class User extends Authenticatable
         'hide_ratings' => HideRatingsOption::class,
         'hide_comments' => HideCommentsOption::class,
     ];
-
-    public $incrementing = false;
 
     public function ratings(): HasMany
     {

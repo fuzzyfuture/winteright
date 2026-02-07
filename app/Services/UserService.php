@@ -48,7 +48,7 @@ class UserService
      */
     public function getByName(string $name): User
     {
-        return user::whereName($name)->firstOrFail();
+        return User::whereName($name)->firstOrFail();
     }
 
     /**
