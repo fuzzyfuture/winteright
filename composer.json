@@ -63,6 +63,10 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "format": [
+            "vendor/bin/pint",
+            "npm run format"
         ]
     },
     "extra": {
