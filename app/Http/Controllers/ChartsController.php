@@ -6,13 +6,14 @@ use App\Services\BeatmapService;
 use App\Services\ChartsService;
 use App\Services\SiteInfoService;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
 class ChartsController extends Controller
 {
     protected ChartsService $chartsService;
+
     protected BeatmapService $beatmapService;
+
     protected SiteInfoService $siteInfoService;
 
     public function __construct(ChartsService $chartsService, BeatmapService $beatmapService, SiteInfoService $siteInfoService)

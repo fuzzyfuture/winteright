@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('beatmaps', function (Blueprint $table) {
-           $table->tinyInteger('status')->default(0)->change();
+            $table->tinyInteger('status')->default(0)->change();
         });
     }
 

@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Helpers\OsuUrl;
 use App\Services\OsuApiService;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\ConnectionException;
 use Laravel\Socialite\Two\AbstractProvider;
 use Laravel\Socialite\Two\ProviderInterface;
@@ -24,7 +23,7 @@ class OsuSocialiteProvider extends AbstractProvider implements ProviderInterface
         return OsuUrl::apiOauthToken();
     }
 
-    protected function getCodeFields($state = null) : array
+    protected function getCodeFields($state = null): array
     {
         return [
             'client_id' => $this->clientId,
@@ -35,7 +34,7 @@ class OsuSocialiteProvider extends AbstractProvider implements ProviderInterface
         ];
     }
 
-    protected function getTokenFields($code) : array
+    protected function getTokenFields($code): array
     {
         return [
             'client_id' => $this->clientId,
@@ -56,9 +55,9 @@ class OsuSocialiteProvider extends AbstractProvider implements ProviderInterface
 
     protected function mapUserToObject(array $user): User
     {
-        return (new User())->setRaw($user)->map([
+        return (new User)->setRaw($user)->map([
             'id' => $user['id'],
-            'name' => $user['username']
+            'name' => $user['username'],
         ]);
     }
 }

@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Auth;
 class BeatmapSetController extends Controller
 {
     protected BeatmapService $beatmapService;
+
     protected RatingService $ratingService;
+
     protected CommentService $commentService;
 
     public function __construct(BeatmapService $beatmapService, RatingService $ratingService, CommentService $commentService)

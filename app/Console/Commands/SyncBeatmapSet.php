@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Services\BeatmapService;
 use App\Services\OsuApiService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
 use Throwable;
 
 class SyncBeatmapSet extends Command
@@ -25,6 +24,7 @@ class SyncBeatmapSet extends Command
     protected $description = 'Sync a single beatmap set from the osu! API.';
 
     protected OsuApiService $osuApiService;
+
     protected BeatmapService $beatmapService;
 
     public function __construct(OsuApiService $osuApiService, BeatmapService $beatmapService)
@@ -50,6 +50,7 @@ class SyncBeatmapSet extends Command
             $fullDetails = $this->osuApiService->getBeatmapSetFullDetails($token, $setId);
         } catch (Throwable $e) {
             $this->error('Error while attempting to fetch beatmap set with ID '.$setId.': '.$e->getMessage());
+
             return;
         }
 
@@ -57,6 +58,7 @@ class SyncBeatmapSet extends Command
             $this->beatmapService->storeBeatmapSetAndBeatmaps($fullDetails, $fullDetails);
         } catch (Throwable $e) {
             $this->error('Error while storing beatmap set with ID '.$setId.': '.$e->getMessage());
+
             return;
         }
 

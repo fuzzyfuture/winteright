@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('beatmap_creators', function (Blueprint $table) {
-           $table->unique(['beatmap_id', 'creator_id']);
+            $table->unique(['beatmap_id', 'creator_id']);
         });
     }
 

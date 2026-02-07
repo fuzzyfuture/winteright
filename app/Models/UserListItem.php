@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class UserListItem extends Model
 {
     protected $fillable = ['list_id', 'item_type', 'item_id', 'description', 'order', 'created_at', 'updated_at'];
+
     protected $casts = ['item_type' => UserListItemType::class];
 
     public function list(): BelongsTo

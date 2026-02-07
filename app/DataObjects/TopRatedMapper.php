@@ -35,7 +35,7 @@ class TopRatedMapper
     {
         if ($this->username) {
             $localLink = '<a href="'.route('users.show', $this->creatorId).'">'.e($this->username).'</a>';
-        } else if ($this->creatorName) {
+        } elseif ($this->creatorName) {
             $localLink = e($this->creatorName);
         } else {
             $localLink = $this->creatorId;

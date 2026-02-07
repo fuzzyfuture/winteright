@@ -17,6 +17,7 @@ use Throwable;
 class UserListController extends Controller
 {
     protected UserListService $userListService;
+
     protected BeatmapService $beatmapService;
 
     public function __construct(UserListService $userListService, BeatmapService $beatmapService)

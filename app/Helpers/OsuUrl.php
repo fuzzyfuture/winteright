@@ -7,7 +7,7 @@ class OsuUrl
     /**
      * Retrieves the osu! URL for a user's avatar.
      *
-     * @param int $userId The user's ID.
+     * @param  int  $userId  The user's ID.
      * @return string The osu! URL to the user's avatar.
      */
     public static function userAvatar(int $userId): string
@@ -18,7 +18,7 @@ class OsuUrl
     /**
      * Retrieves the osu! URl for a user's profile.
      *
-     * @param int $userId The user's ID.
+     * @param  int  $userId  The user's ID.
      * @return string The osu! URL to the user's profile.
      */
     public static function userProfile(int $userId): string
@@ -29,9 +29,9 @@ class OsuUrl
     /**
      * Retrieves the osu! URL for a beatmap set's info page, with a specific beatmap selected.
      *
-     * @param int $setId The beatmap set's ID.
-     * @param string $mode The beatmap's mode.
-     * @param int $beatmapId The beatmap's ID.
+     * @param  int  $setId  The beatmap set's ID.
+     * @param  string  $mode  The beatmap's mode.
+     * @param  int  $beatmapId  The beatmap's ID.
      * @return string The osu! URL for a beatmap's info page.
      */
     public static function beatmapInfo(int $setId, string $mode, int $beatmapId): string
@@ -46,7 +46,7 @@ class OsuUrl
     /**
      * Retrieves the osu! URL for a beatmap set's info page.
      *
-     * @param int $setId The beatmap set's ID.
+     * @param  int  $setId  The beatmap set's ID.
      * @return string The osu! URL for the beatmap set's info page.
      */
     public static function beatmapSetInfo(int $setId): string
@@ -57,7 +57,7 @@ class OsuUrl
     /**
      * Retrieves the osu! URL for a beatmap set's cover (banner / cropped bg) image.
      *
-     * @param int $setId The beatmap set's ID.
+     * @param  int  $setId  The beatmap set's ID.
      * @return string The osu! URL for the beatmap set's cover image.
      */
     public static function beatmapCover(int $setId): string
@@ -68,7 +68,7 @@ class OsuUrl
     /**
      * Retrieves the osu! URL for a beatmap set's audio preview.
      *
-     * @param int $setId The beatmap set's ID.
+     * @param  int  $setId  The beatmap set's ID.
      * @return string The osu! URL for the beatmap set's audio preview.
      */
     public static function beatmapPreview(int $setId): string
@@ -79,7 +79,7 @@ class OsuUrl
     /**
      * Retrieves the osu!direct URL for a beatmap.
      *
-     * @param int $beatmapId The beatmap's ID.
+     * @param  int  $beatmapId  The beatmap's ID.
      * @return string The beatmap's osu!direct URL.
      */
     public static function beatmapDirect(int $beatmapId): string
@@ -130,7 +130,7 @@ class OsuUrl
     /**
      * Retrieves the osu! API user info URL for the specified user.
      *
-     * @param int $id The user's ID.
+     * @param  int  $id  The user's ID.
      * @return string The osu! API user info URL.
      */
     public static function apiUserInfo(int $id): string
@@ -142,8 +142,8 @@ class OsuUrl
     /**
      * Retrieves the osu! API user scores URL for the specified user and score type.
      *
-     * @param int $id The user's ID.
-     * @param string $type The score type.
+     * @param  int  $id  The user's ID.
+     * @param  string  $type  The score type.
      * @return string The osu! API user scores URL.
      */
     public static function apiUserScores(int $id, string $type): string
@@ -159,8 +159,8 @@ class OsuUrl
     /**
      * Retrieves the osu! API user beatmap sets URL for the specified user and beatmap set type.
      *
-     * @param int $id The user's ID.
-     * @param string $type The beatmap set type.
+     * @param  int  $id  The user's ID.
+     * @param  string  $type  The beatmap set type.
      * @return string The osu! API user beatmap sets URL.
      */
     public static function apiUserBeatmapSets(int $id, string $type): string
@@ -186,7 +186,7 @@ class OsuUrl
     /**
      * Retrieves the osu! API beatmap set info URL for the specified beatmap set.
      *
-     * @param int $setId The beatmap set's ID.
+     * @param  int  $setId  The beatmap set's ID.
      * @return string The osu! API beatmap set info URL.
      */
     public static function apiBeatmapSetInfo(int $setId): string

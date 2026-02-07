@@ -20,8 +20,7 @@ class SiteInfoService
     /**
      * Stores the timestamp for the latest time new ranked beatmaps were synced with the osu! API.
      *
-     * @param string $lastSynced The new timestamp.
-     * @return void
+     * @param  string  $lastSynced  The new timestamp.
      */
     public function storeLastSyncedRankedBeatmaps(string $lastSynced): void
     {
@@ -44,8 +43,7 @@ class SiteInfoService
     /**
      * Stores the timestamp for the latest time the charts were updated (bayesian averages were recalculated).
      *
-     * @param string $lastUpdated The new timestamp.
-     * @return void
+     * @param  string  $lastUpdated  The new timestamp.
      */
     public function storeLastUpdatedCharts(string $lastUpdated): void
     {

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\BeatmapService;
-use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +32,7 @@ class MyMapsController extends Controller
         } catch (AuthenticationException) {
             return redirect(route('auth.login'));
         } catch (Throwable $e) {
-            return back()->withErrors('error while retrieving recently played from the osu! API: ' . $e->getMessage());
+            return back()->withErrors('error while retrieving recently played from the osu! API: '.$e->getMessage());
         }
 
         $ratingOptions = ['' => 'unrated', 0 => '0.0', 1 => '0.5', 2 => '1.0', 3 => '1.5', 4 => '2.0', 5 => '2.5',
@@ -52,7 +51,7 @@ class MyMapsController extends Controller
         } catch (AuthenticationException) {
             return redirect(route('auth.login'));
         } catch (Throwable $e) {
-            return back()->withErrors('error while retrieving favorites from the osu! API: ' . $e->getMessage());
+            return back()->withErrors('error while retrieving favorites from the osu! API: '.$e->getMessage());
         }
 
         $current = 'favorites';

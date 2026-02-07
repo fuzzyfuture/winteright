@@ -18,7 +18,7 @@ class CommentController extends Controller
 
     public function postNew(CreateCommentRequest $request, int $beatmapSetId)
     {
-        $userId =  Auth::id();
+        $userId = Auth::id();
         $validated = $request->validated();
 
         try {
@@ -35,7 +35,7 @@ class CommentController extends Controller
     {
         $comment = $this->commentService->get($commentId);
 
-        if (!Auth::user()->can('delete', $comment)) {
+        if (! Auth::user()->can('delete', $comment)) {
             abort(403);
         }
 

@@ -25,6 +25,7 @@ class AddUserListItemRequest extends FormRequest
 
         try {
             $list = $userListService->get($listId);
+
             return Gate::allows('update', $list);
         } catch (Throwable) {
             return false;
@@ -61,19 +62,19 @@ class AddUserListItemRequest extends FormRequest
             if ($enumCase == UserListItemType::USER) {
                 $userService = app(UserService::class);
 
-                if (!$userService->exists($value)) {
+                if (! $userService->exists($value)) {
                     $fail('user with id '.$value.' does not exist.');
                 }
-            } else if ($enumCase == UserListItemType::BEATMAP) {
+            } elseif ($enumCase == UserListItemType::BEATMAP) {
                 $beatmapService = app(BeatmapService::class);
 
-                if (!$beatmapService->exists($value)) {
+                if (! $beatmapService->exists($value)) {
                     $fail('beatmap with id '.$value.' does not exist.');
                 }
-            } else if ($enumCase == UserListItemType::BEATMAP_SET) {
+            } elseif ($enumCase == UserListItemType::BEATMAP_SET) {
                 $beatmapService = app(BeatmapService::class);
 
-                if (!$beatmapService->setExists($value)) {
+                if (! $beatmapService->setExists($value)) {
                     $fail('beatmap set with id '.$value.' does not exist.');
                 }
             }

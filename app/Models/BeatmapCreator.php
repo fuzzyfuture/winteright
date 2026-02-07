@@ -30,7 +30,7 @@ class BeatmapCreator extends Model
     {
         if ($this->user) {
             $localLink = '<a href="'.route('users.show', $this->creator_id).'">'.e($this->user->name).'</a>';
-        } else if ($this->creatorName) {
+        } elseif ($this->creatorName) {
             $localLink = e($this->creatorName->name);
         } else {
             $localLink = $this->creator_id;

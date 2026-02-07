@@ -2,15 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Beatmap;
-use App\Models\Rating;
 use App\Services\ChartsService;
-use App\Services\RatingService;
-use App\Services\SiteInfoService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class RecalculateBayesianAverages extends Command
 {

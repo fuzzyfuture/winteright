@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('beatmap_creator_names', function (Blueprint $table) {
-           $table->bigInteger('id')->unsigned()->unique();
-           $table->string('name');
+            $table->bigInteger('id')->unsigned()->unique();
+            $table->string('name');
         });
     }
 

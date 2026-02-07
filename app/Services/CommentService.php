@@ -15,7 +15,7 @@ class CommentService
     /**
      * Retrieves a comment by ID.
      *
-     * @param int $commentId The comment's ID.
+     * @param  int  $commentId  The comment's ID.
      * @return Comment|null The comment.
      */
     public function get(int $commentId): ?Comment
@@ -26,8 +26,8 @@ class CommentService
     /**
      * Retrieves all comments for a specified beatmap set.
      *
-     * @param int $beatmapSetId The ID of the beatmap set.
-     * @param bool $withTrashed True if soft-deleted comments should be included.
+     * @param  int  $beatmapSetId  The ID of the beatmap set.
+     * @param  bool  $withTrashed  True if soft-deleted comments should be included.
      * @return Collection The beatmap set's comments.
      */
     public function getAllForBeatmapSet(int $beatmapSetId, bool $withTrashed = false): Collection
@@ -49,9 +49,9 @@ class CommentService
     /**
      * Retrieves recent comments for all beatmap sets.
      *
-     * @param int $enabledModes Bitfield of enabled modes.
-     * @param bool $withTrashed True if soft-deleted comments should be included.
-     * @param int $limit The amount of recent comments to retrieve.
+     * @param  int  $enabledModes  Bitfield of enabled modes.
+     * @param  bool  $withTrashed  True if soft-deleted comments should be included.
+     * @param  int  $limit  The amount of recent comments to retrieve.
      * @return Collection The recent comments.
      */
     public function getRecent(int $enabledModes, bool $withTrashed = false, int $limit = 15): Collection
@@ -81,10 +81,11 @@ class CommentService
     /**
      * Creates a new comment.
      *
-     * @param int $userId The user ID of the commenter.
-     * @param int $beatmapSetId The ID of the beatmap set being commented on.
-     * @param string $content The content of the comment.
+     * @param  int  $userId  The user ID of the commenter.
+     * @param  int  $beatmapSetId  The ID of the beatmap set being commented on.
+     * @param  string  $content  The content of the comment.
      * @return Comment The newly created comment.
+     *
      * @throws Throwable
      */
     public function create(int $userId, int $beatmapSetId, string $content): Comment
@@ -101,8 +102,8 @@ class CommentService
     /**
      * Soft-deletes a comment.
      *
-     * @param int $commentId The ID of the comment to be soft-deleted.
-     * @return void
+     * @param  int  $commentId  The ID of the comment to be soft-deleted.
+     *
      * @throws Throwable
      */
     public function delete(int $commentId): void

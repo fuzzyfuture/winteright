@@ -23,6 +23,7 @@ class AuditBlacklist extends Command
     protected $description = 'Check if blacklisted users have any beatmaps not marked as blacklisted';
 
     protected BlacklistService $blacklistService;
+
     protected BeatmapService $beatmapService;
 
     public function __construct(BlacklistService $blacklistService, BeatmapService $beatmapService)
@@ -56,6 +57,7 @@ class AuditBlacklist extends Command
 
         if (empty($problemBeatmaps)) {
             $this->info('All beatmaps by blacklisted users are properly blacklisted.');
+
             return;
         }
 

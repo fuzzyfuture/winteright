@@ -39,10 +39,10 @@ Route::controller(SettingsController::class)
     ->as('settings.')
     ->middleware('auth')
     ->group(function () {
-       Route::get('/settings', 'show')->name('show');
+        Route::get('/settings', 'show')->name('show');
 
-       Route::post('/settings/general/enabled-modes', 'enabledModes')->name('enabled_modes');
-       Route::post('/settings/general/privacy', 'privacy')->name('privacy');
+        Route::post('/settings/general/enabled-modes', 'enabledModes')->name('enabled_modes');
+        Route::post('/settings/general/privacy', 'privacy')->name('privacy');
     });
 
 Route::controller(BeatmapSetController::class)
@@ -109,5 +109,5 @@ Route::controller(AffinitiesController::class)
     ->as('affinities.')
     ->middleware('auth')
     ->group(function () {
-       Route::get('/affinities/mappers', 'mappers')->name('mappers');
+        Route::get('/affinities/mappers', 'mappers')->name('mappers');
     });

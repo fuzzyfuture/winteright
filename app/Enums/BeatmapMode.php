@@ -20,10 +20,18 @@ enum BeatmapMode: int implements JsonSerializable
     {
         $modes = [];
 
-        if ($bitfield & 1) $modes[] = BeatmapMode::OSU;
-        if ($bitfield & 2) $modes[] = BeatmapMode::TAIKO;
-        if ($bitfield & 4) $modes[] = BeatmapMode::FRUITS;
-        if ($bitfield & 8) $modes[] = BeatmapMode::MANIA;
+        if ($bitfield & 1) {
+            $modes[] = BeatmapMode::OSU;
+        }
+        if ($bitfield & 2) {
+            $modes[] = BeatmapMode::TAIKO;
+        }
+        if ($bitfield & 4) {
+            $modes[] = BeatmapMode::FRUITS;
+        }
+        if ($bitfield & 8) {
+            $modes[] = BeatmapMode::MANIA;
+        }
 
         return $modes;
     }

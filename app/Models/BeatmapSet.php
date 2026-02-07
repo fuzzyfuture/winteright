@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\BeatmapMode;
 use App\Helpers\OsuUrl;
-use App\Services\BeatmapService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,7 +13,7 @@ class BeatmapSet extends Model
 {
     protected $fillable = [
         'id', 'creator_id', 'date_ranked', 'genre', 'lang',
-        'artist', 'title', 'has_storyboard', 'has_video'
+        'artist', 'title', 'has_storyboard', 'has_video',
     ];
 
     protected $casts = [
@@ -120,7 +119,7 @@ class BeatmapSet extends Model
     {
         if ($this->creator) {
             $localLink = '<a href="'.route('users.show', $this->creator_id).'">'.e($this->creator->name).'</a>';
-        } else if ($this->creatorName) {
+        } elseif ($this->creatorName) {
             $localLink = e($this->creatorName->name);
         } else {
             $localLink = $this->creator_id;

@@ -3,12 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Ratings\UpdateRatingRequest;
-use App\Models\Rating;
 use App\Services\RatingService;
-use App\Validators\RatingValidator;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\MessageBag;
 use Throwable;
 
 class RatingController extends Controller

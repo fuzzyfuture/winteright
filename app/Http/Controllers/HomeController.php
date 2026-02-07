@@ -12,14 +12,18 @@ use Illuminate\Support\Facades\Auth;
 class HomeController extends Controller
 {
     protected StatsService $statsService;
+
     protected BeatmapService $beatmapService;
+
     protected SiteInfoService $siteInfoService;
+
     protected RatingService $ratingService;
+
     protected CommentService $commentService;
 
     public function __construct(StatsService $statsService, BeatmapService $beatmapService,
-                                SiteInfoService $siteInfoService, RatingService $ratingService,
-                                CommentService $commentService)
+        SiteInfoService $siteInfoService, RatingService $ratingService,
+        CommentService $commentService)
     {
         $this->statsService = $statsService;
         $this->beatmapService = $beatmapService;

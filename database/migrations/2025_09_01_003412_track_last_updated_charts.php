@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('site_info', function (Blueprint $table) {
-           $table->timestamp('last_updated_charts')->nullable();
+            $table->timestamp('last_updated_charts')->nullable();
         });
     }
 

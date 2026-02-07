@@ -8,7 +8,6 @@ use App\Services\SiteInfoService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Throwable;
 
 class SyncRecentRankedBeatmaps extends Command
@@ -28,12 +27,14 @@ class SyncRecentRankedBeatmaps extends Command
     protected $description = 'Sync the most recently ranked beatmaps.';
 
     protected OsuApiService $osuApiService;
+
     protected SiteInfoService $siteInfoService;
+
     protected BeatmapService $beatmapService;
 
     public function __construct(OsuApiService $osuApiService,
-                                SiteInfoService $siteInfoService,
-                                BeatmapService $beatmapService)
+        SiteInfoService $siteInfoService,
+        BeatmapService $beatmapService)
     {
         $this->osuApiService = $osuApiService;
         $this->siteInfoService = $siteInfoService;
@@ -67,6 +68,7 @@ class SyncRecentRankedBeatmaps extends Command
                 $data = $this->osuApiService->searchBeatmapSets($token, 'ranked', 'ranked_desc', true, $cursor);
             } catch (Throwable $e) {
                 $this->error('Error while retrieving latest ranked beatmaps at position '.$cursor.': '.$e->getMessage());
+
                 continue;
             }
 
@@ -81,6 +83,7 @@ class SyncRecentRankedBeatmaps extends Command
 
                 if ($skipUpdates && $this->beatmapService->setExists($setData['id'])) {
                     $this->info('Skipped.');
+
                     continue;
                 }
 
@@ -91,6 +94,7 @@ class SyncRecentRankedBeatmaps extends Command
                     $fullDetails = $this->osuApiService->getBeatmapSetFullDetails($token, $setData['id']);
                 } catch (Throwable $e) {
                     $this->error('Error while retrieving details for beatmap set '.$setData['id'].': '.$e->getMessage());
+
                     continue;
                 }
 
@@ -98,6 +102,7 @@ class SyncRecentRankedBeatmaps extends Command
                     $this->beatmapService->storeBeatmapSetAndBeatmaps($setData, $fullDetails);
                 } catch (Throwable $e) {
                     $this->error('Error while storing beatmap set '.$setData['id'].': '.$e->getMessage());
+
                     continue;
                 }
 

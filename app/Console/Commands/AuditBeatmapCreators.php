@@ -6,7 +6,6 @@ use App\Services\BeatmapService;
 use App\Services\BlacklistService;
 use App\Services\OsuApiService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
 use Throwable;
 
 class AuditBeatmapCreators extends Command
@@ -26,7 +25,9 @@ class AuditBeatmapCreators extends Command
     protected $description = 'Check if any beatmaps are missing creators';
 
     protected BeatmapService $beatmapService;
+
     protected OsuApiService $osuApiService;
+
     protected BlacklistService $blacklistService;
 
     public function __construct(BeatmapService $beatmapService, OsuApiService $osuApiService, BlacklistService $blacklistService)
@@ -47,7 +48,7 @@ class AuditBeatmapCreators extends Command
 
         $beatmapSets = $this->beatmapService->getBeatmapSetsWithoutCreators();
 
-        $this->info('Found '.$beatmapSets->count()." beatmaps sets with missing creators:");
+        $this->info('Found '.$beatmapSets->count().' beatmaps sets with missing creators:');
         $this->newLine();
 
         foreach ($beatmapSets as $set) {
@@ -69,6 +70,7 @@ class AuditBeatmapCreators extends Command
                     $fullDetails = $this->osuApiService->getBeatmapSetFullDetails($token, $id);
                 } catch (Throwable $e) {
                     $this->error('Error while attempting to fetch beatmap set with ID '.$id.': '.$e->getMessage());
+
                     return;
                 }
 
@@ -76,6 +78,7 @@ class AuditBeatmapCreators extends Command
                     $this->beatmapService->storeBeatmapSetAndBeatmaps($fullDetails, $fullDetails);
                 } catch (Throwable $e) {
                     $this->error('Error while updating beatmap set with ID '.$id.': '.$e->getMessage());
+
                     return;
                 }
             }

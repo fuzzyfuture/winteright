@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Beatmap;
 use App\Services\BeatmapService;
-use App\Services\BlacklistService;
 use Illuminate\Console\Command;
 
 class RecalculateWeightedAverages extends Command
