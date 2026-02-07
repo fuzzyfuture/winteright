@@ -34,14 +34,14 @@ class UpdateEnabledModesRequest extends FormRequest
     public function after(): array
     {
         return [
-            $this->validateAtLeastOneMode(...)
+            $this->validateAtLeastOneMode(...),
         ];
     }
 
     private function validateAtLeastOneMode($validator): void
     {
-        if (!$this->boolean('osu') && !$this->boolean('taiko') &&
-            !$this->boolean('fruits') && !$this->boolean('mania')) {
+        if (! $this->boolean('osu') && ! $this->boolean('taiko') &&
+            ! $this->boolean('fruits') && ! $this->boolean('mania')) {
             $validator->errors()->add('modes', 'at least one mode must be selected.');
         }
     }

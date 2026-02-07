@@ -5,7 +5,6 @@ namespace App\Services;
 use App\DataObjects\TopRatedMapper;
 use App\Enums\HideCommentsOption;
 use App\Enums\HideRatingsOption;
-use App\Models\BeatmapCreator;
 use App\Models\Rating;
 use App\Models\User;
 use Carbon\Carbon;
@@ -21,7 +20,8 @@ class UserService
 {
     /**
      * Checks if a user with the given ID exists. Returns true if the user exists.
-     * @param int $id The user ID to check.
+     *
+     * @param  int  $id  The user ID to check.
      * @return bool True if the user exists.
      */
     public function exists(int $id): bool
@@ -32,7 +32,7 @@ class UserService
     /**
      * Retrieves the user with the given ID.
      *
-     * @param int $id The user's ID.
+     * @param  int  $id  The user's ID.
      * @return User The user.
      */
     public function get(int $id): User
@@ -43,7 +43,7 @@ class UserService
     /**
      * Retrieves the user with the specified username.
      *
-     * @param string $name The user's username.
+     * @param  string  $name  The user's username.
      * @return User The user.
      */
     public function getByName(string $name): User
@@ -54,7 +54,8 @@ class UserService
     /**
      * Retrieves a user's name from their ID. Uses the beatmap creator names table as a fallback, if the user is not
      * a winteright user.
-     * @param int $id The user's ID.
+     *
+     * @param  int  $id  The user's ID.
      * @return string The user's name.
      */
     public function getName(int $id): string
@@ -71,7 +72,8 @@ class UserService
     /**
      * Retrieves a user's ID from their name. Uses the beatmap creator names table as a fallback, if the user is not
      * a winteright user.
-     * @param string $name The user's name.
+     *
+     * @param  string  $name  The user's name.
      * @return int The user's ID, or -1 if the user is not a winteright user or in the beatmap creator names table.
      */
     public function getIdByName(string $name): int
@@ -94,7 +96,8 @@ class UserService
     /**
      * Retrieves a user's ID by name. Does not use the beatmap creator names table as a fallback - only retrieves the
      * ID if the user is a winteright user.
-     * @param string $name The user's name.
+     *
+     * @param  string  $name  The user's name.
      * @return int The user's ID if they're a winteright user - otherwise -1.
      */
     public function getIdByNameUsersOnly(string $name): int
@@ -111,22 +114,30 @@ class UserService
     /**
      * Updates a user's enabled beatmap modes.
      *
-     * @param int $userId The user's ID.
-     * @param bool $osu True to enable osu.
-     * @param bool $taiko True to enable taiko.
-     * @param bool $fruits True to enable fruits.
-     * @param bool $mania True to enable mania.
-     * @return void
+     * @param  int  $userId  The user's ID.
+     * @param  bool  $osu  True to enable osu.
+     * @param  bool  $taiko  True to enable taiko.
+     * @param  bool  $fruits  True to enable fruits.
+     * @param  bool  $mania  True to enable mania.
+     *
      * @throws Throwable
      */
     public function updateEnabledModes(int $userId, bool $osu, bool $taiko, bool $fruits, bool $mania): void
     {
         $enabledModes = 0;
 
-        if ($osu) $enabledModes |= (1 << 0);     // 0001 or +1
-        if ($taiko) $enabledModes |= (1 << 1);   // 0010 or +2
-        if ($fruits) $enabledModes |= (1 << 2);  // 0100 or +4
-        if ($mania) $enabledModes |= (1 << 3);   // 1000 or +8
+        if ($osu) {
+            $enabledModes |= (1 << 0);
+        }     // 0001 or +1
+        if ($taiko) {
+            $enabledModes |= (1 << 1);
+        }   // 0010 or +2
+        if ($fruits) {
+            $enabledModes |= (1 << 2);
+        }  // 0100 or +4
+        if ($mania) {
+            $enabledModes |= (1 << 3);
+        }   // 1000 or +8
 
         DB::transaction(function () use ($userId, $enabledModes) {
             User::where('id', $userId)->update(['enabled_modes' => $enabledModes]);
@@ -136,29 +147,31 @@ class UserService
     /**
      * Update's a user's privacy settings.
      *
-     * @param int $userId The user's ID.
-     * @param HideRatingsOption $hideRatingsOption The selected "hide ratings" option.
-     * @param HideCommentsOption $hideCommentsOption The selected "hide comments" option.
+     * @param  int  $userId  The user's ID.
+     * @param  HideRatingsOption  $hideRatingsOption  The selected "hide ratings" option.
+     * @param  HideCommentsOption  $hideCommentsOption  The selected "hide comments" option.
+     *
      * @throws Throwable
      */
     public function updatePrivacySettings(int $userId, HideRatingsOption $hideRatingsOption,
-                                          HideCommentsOption $hideCommentsOption): void
+        HideCommentsOption $hideCommentsOption): void
     {
         DB::transaction(function () use ($userId, $hideRatingsOption, $hideCommentsOption) {
-           User::where('id', $userId)->update([
-               'hide_ratings' => $hideRatingsOption->value,
-               'hide_comments' => $hideCommentsOption->value,
-           ]);
+            User::where('id', $userId)->update([
+                'hide_ratings' => $hideRatingsOption->value,
+                'hide_comments' => $hideCommentsOption->value,
+            ]);
         });
     }
 
     /**
      * Updates a user's stored osu! OAuth tokens.
      *
-     * @param int $userId The user's ID.
-     * @param string $accessToken The user's new access token.
-     * @param string $refreshToken The user's new refresh token.
-     * @param Carbon $expiry The expiry time for the new tokens.
+     * @param  int  $userId  The user's ID.
+     * @param  string  $accessToken  The user's new access token.
+     * @param  string  $refreshToken  The user's new refresh token.
+     * @param  Carbon  $expiry  The expiry time for the new tokens.
+     *
      * @throws Throwable
      */
     public function updateOsuTokens(int $userId, string $accessToken, string $refreshToken, Carbon $expiry): void
@@ -176,8 +189,8 @@ class UserService
      * Retrieves a user's top-rated mappers, calculated using the bayesian average rating that the user has on each
      * mapper's beatmaps.
      *
-     * @param int $userId The user's ID.
-     * @param int $limit The amount of results to retrieve.
+     * @param  int  $userId  The user's ID.
+     * @param  int  $limit  The amount of results to retrieve.
      * @return Collection The user's top-rated mappers.
      */
     public function getTopRatedMappersForUser(int $userId, int $limit = 5): Collection
@@ -185,7 +198,7 @@ class UserService
         $totalRatings = Rating::where('user_id', $userId)->count();
         $averageRating = Rating::where('user_id', $userId)->avg('score') ?? 0;
 
-        return Cache::remember('top_rated_mappers:'.$userId.':'.$limit, 3600, function () use ($userId, $totalRatings, $averageRating, $limit) {
+        return Cache::remember('top_rated_mappers:' . $userId . ':' . $limit, 3600, function () use ($userId, $totalRatings, $averageRating, $limit) {
             $results = $this->getTopRatedMappersForUserBase($userId, $totalRatings, $averageRating)
                 ->limit($limit)
                 ->get();
@@ -207,8 +220,8 @@ class UserService
      * Retrieves and paginates a user's top-rated mappers, calculated using the bayesian average rating that the user
      * has on each mapper's beatmaps.
      *
-     * @param int $userId The user's ID.
-     * @param int $perPage The amount of results to retrieve per-page.
+     * @param  int  $userId  The user's ID.
+     * @param  int  $perPage  The amount of results to retrieve per-page.
      * @return LengthAwarePaginator The user's top-rated mappers, paginated.
      */
     public function getTopRatedMappersForUserPaginated(int $userId, int $perPage = 50): LengthAwarePaginator
@@ -233,9 +246,9 @@ class UserService
     /**
      * Base query for retrieving a user's top-rated mappers.
      *
-     * @param int $userId The user's ID.
-     * @param int $totalRatings The user's total rating count.
-     * @param float $averageRating The user's average rating across all of their ratings.
+     * @param  int  $userId  The user's ID.
+     * @param  int  $totalRatings  The user's total rating count.
+     * @param  float  $averageRating  The user's average rating across all of their ratings.
      * @return Builder The base query for retrieving a user's top-rated mappers.
      */
     private function getTopRatedMappersForUserBase(int $userId, int $totalRatings, float $averageRating): Builder

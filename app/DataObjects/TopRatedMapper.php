@@ -34,14 +34,14 @@ class TopRatedMapper
     public function getLink(): HtmlString
     {
         if ($this->username) {
-            $localLink = '<a href="'.route('users.show', $this->creatorId).'">'.e($this->username).'</a>';
-        } else if ($this->creatorName) {
+            $localLink = '<a href="' . route('users.show', $this->creatorId) . '">' . e($this->username) . '</a>';
+        } elseif ($this->creatorName) {
             $localLink = e($this->creatorName);
         } else {
             $localLink = $this->creatorId;
         }
 
-        $extLink = '<a href="'.$this->getProfileUrl().'"
+        $extLink = '<a href="' . $this->getProfileUrl() . '"
                target="_blank"
                rel="noopener noreferrer"
                title="view on osu!"
@@ -49,6 +49,6 @@ class TopRatedMapper
                 <i class="bi bi-box-arrow-up-right"></i>
             </a>';
 
-        return new HtmlString($localLink.$extLink);
+        return new HtmlString($localLink . $extLink);
     }
 }

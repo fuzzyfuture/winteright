@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use App\Models\Beatmap;
 use App\Services\BeatmapService;
-use App\Services\BlacklistService;
 use Illuminate\Console\Command;
+use Throwable;
 
 class RecalculateWeightedAverages extends Command
 {
@@ -43,8 +43,8 @@ class RecalculateWeightedAverages extends Command
             foreach ($beatmaps as $beatmap) {
                 try {
                     $this->beatmapService->updateWeightedAverage($beatmap->id);
-                } catch (\Throwable $e) {
-                    $this->error('Error recalculating for '.$beatmap->id.': '.$e->getMessage());
+                } catch (Throwable $e) {
+                    $this->error('Error recalculating for ' . $beatmap->id . ': ' . $e->getMessage());
                 }
             }
         });

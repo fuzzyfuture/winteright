@@ -19,7 +19,8 @@ class BeatmapService
     /**
      * Retrieves a beatmap set with the specified ID. Includes the set owner, the ratings for all difficulties, and
      * the current user's rating for all difficulties. Intended for showing full details of a beatmap set.
-     * @param int $setId The ID of the beatmap set to retrieve.
+     *
+     * @param  int  $setId  The ID of the beatmap set to retrieve.
      * @return BeatmapSet The beatmap set.
      */
     public function getBeatmapSet(int $setId): BeatmapSet
@@ -29,14 +30,14 @@ class BeatmapService
             'beatmaps.ratings',
             'beatmaps.userRating',
             'beatmaps.creators.user',
-            'beatmaps.creators.creatorName'
+            'beatmaps.creators.creatorName',
         ])->where('id', $setId)->firstOrFail();
     }
 
     /**
      * Returns true if a beatmap set with the specified ID exists, false if not.
      *
-     * @param int $id The beatmap set ID to check.
+     * @param  int  $id  The beatmap set ID to check.
      * @return bool True if a beatmap set with the specified ID exists, false if not.
      */
     public function exists(int $id): bool
@@ -46,7 +47,8 @@ class BeatmapService
 
     /**
      * Returns true if a beatmap set with the specified ID exists, false if not.
-     * @param int $setId The beatmap set ID to check.
+     *
+     * @param  int  $setId  The beatmap set ID to check.
      * @return bool True if a beatmap set with the specified ID exists, false if not.
      */
     public function setExists(int $setId): bool
@@ -57,17 +59,19 @@ class BeatmapService
     /**
      * Adds a creator name to the beatmap_creator_names table. Used to display mapper names for mappers who are not
      * Winteright users.
-     * @param int $id The ID of the user.
-     * @param string $name The user's name.
+     *
+     * @param  int  $id  The ID of the user.
+     * @param  string  $name  The user's name.
+     *
      * @throws Throwable
      */
     public function addCreatorName(int $id, string $name): void
     {
         DB::transaction(function () use ($id, $name) {
-           DB::table('beatmap_creator_names')->upsert([
-               'id' => $id,
-               'name' => $name
-           ], ['id']);
+            DB::table('beatmap_creator_names')->upsert([
+                'id' => $id,
+                'name' => $name,
+            ], ['id']);
         });
     }
 
@@ -75,7 +79,8 @@ class BeatmapService
      * Retrieves the beatmap's creator name from the beatmap creator names table. Should only be used if it's
      * already known that the beatmap's creator is not a winteright user - otherwise, the name should be pulled from
      * the users table.
-     * @param int $id The beatmap creator's ID.
+     *
+     * @param  int  $id  The beatmap creator's ID.
      * @return string The name of the beatmap creator.
      */
     public function getCreatorName(int $id): string
@@ -84,82 +89,9 @@ class BeatmapService
     }
 
     /**
-     * Stores a beatmap (difficulty) in the database. Intended for use while syncing with the osu! API; assumes the
-     * parameters are structured as received from the osu! API. Should not be called directly - use
-     * `storeBeatmapSetAndBeatmaps()` instead.
-     * @param $map
-     * @param $setId
-     * @param $shouldBlacklist
-     * @return void
-     * @throws Throwable
-     */
-    private function storeBeatmap($map, $setId, $shouldBlacklist): void
-    {
-        DB::transaction(function () use ($map, $setId, $shouldBlacklist) {
-            Beatmap::updateOrCreate(
-                ['id' => $map['id']],
-                [
-                    'set_id' => $setId,
-                    'difficulty_name' => $map['version'],
-                    'mode' => $map['mode_int'],
-                    'status' => $map['ranked'],
-                    'sr' => $map['difficulty_rating'],
-                    'blacklisted' => $shouldBlacklist,
-                    'blacklist_reason' => $shouldBlacklist ? 'Mapper requested blacklist.' : null,
-                ]
-            );
-        });
-    }
-
-    /**
-     * Stores the beatmaps (difficulties) for a particular set in the database. Intended for use while syncing
-     * with the osu! API; assumes the parameters are structured as received from the osu! API. Should not be called
-     * directly - use `storeBeatmapSetAndBeatmaps()` instead.
-     * @param $fullDetails
-     * @param $setData
-     * @return void
-     * @throws Throwable
-     */
-    private function storeBeatmapsForSet($fullDetails, $setData): void
-    {
-        $blacklistService = app(BlacklistService::class);
-        $userService = app(UserService::class);
-
-        $blacklist = $blacklistService->getBlacklist();
-        $existingBeatmapIds = [];
-
-        foreach ($fullDetails['beatmaps'] as $map) {
-            $shouldBlacklist = false;
-            $creatorIds = [];
-            $existingBeatmapIds[] = $map['id'];
-
-            foreach ($map['owners'] as $owner) {
-                $creatorIds[] = $owner['id'];
-
-                if (in_array($owner['id'], $blacklist)) {
-                    $shouldBlacklist = true;
-                }
-
-                if (!$userService->exists($owner['id'])) {
-                    $this->addCreatorName($owner['id'], $owner['username']);
-                }
-            }
-
-            $this->storeBeatmap($map, $setData['id'], $shouldBlacklist);
-            $this->setCreators($map['id'], $creatorIds);
-        }
-
-        Beatmap::where('set_id', $setData['id'])
-            ->whereNotIn('id', $existingBeatmapIds)
-            ->delete();
-    }
-
-    /**
      * Stores a beatmap set in the database, along with its difficulties (beatmaps). Intended for use while syncing
      * with the osu! API; assumes the parameters are structured as received from the osu! API.
-     * @param $setData
-     * @param $fullDetails
-     * @return void
+     *
      * @throws Throwable
      */
     public function storeBeatmapSetAndBeatmaps($setData, $fullDetails): void
@@ -186,18 +118,18 @@ class BeatmapService
     /**
      * Retrieves recently ranked beatmap sets.
      *
-     * @param int $enabledModes Bitfield of enabled modes.
-     * @param int $limit The amount of recently ranked beatmap sets to retrieve. Defaults to 10.
+     * @param  int  $enabledModes  Bitfield of enabled modes.
+     * @param  int  $limit  The amount of recently ranked beatmap sets to retrieve. Defaults to 10.
      * @return Collection The recently ranked beatmap sets.
      */
     public function getRecentBeatmapSets(int $enabledModes, int $limit = 10): Collection
     {
         return Cache::tags('recent_beatmap_sets')
-            ->remember('beatmap_sets:recent:'.$limit.':'.$enabledModes, 600, function () use ($limit, $enabledModes) {
+            ->remember('beatmap_sets:recent:' . $limit . ':' . $enabledModes, 600, function () use ($limit, $enabledModes) {
                 $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
                 return BeatmapSet::with(['creator', 'creatorName', 'beatmaps'])
-                    ->whereHas('beatmaps', function($query) use ($modesArray) {
+                    ->whereHas('beatmaps', function ($query) use ($modesArray) {
                         $query->whereIn('mode', $modesArray);
                     })
                     ->orderByDesc('date_ranked')
@@ -209,9 +141,9 @@ class BeatmapService
     /**
      * Adds a beatmap creator entry. Typically used for crediting guest difficulties, although each beatmap should
      * have a creator entry with its mapset's owner, if the difficulty is not a GD.
-     * @param int $beatmapId The ID of the beatmap.
-     * @param int $creatorId The ID of the creator.
-     * @return void
+     *
+     * @param  int  $beatmapId  The ID of the beatmap.
+     * @param  int  $creatorId  The ID of the creator.
      */
     public function addCreator(int $beatmapId, int $creatorId): void
     {
@@ -222,17 +154,19 @@ class BeatmapService
 
     /**
      * Adds multiple beatmap creators to a single beatmap in one query.
-     * @param int $beatmapId The beatmap ID.
-     * @param array $creatorIds The IDs of the creators.
-     * @return void
+     *
+     * @param  int  $beatmapId  The beatmap ID.
+     * @param  array  $creatorIds  The IDs of the creators.
      */
     public function setCreators(int $beatmapId, array $creatorIds): void
     {
-        if (empty($creatorIds)) return;
+        if (empty($creatorIds)) {
+            return;
+        }
 
-        $rows = array_map(fn($creatorId) => [
+        $rows = array_map(fn ($creatorId) => [
             'beatmap_id' => $beatmapId,
-            'creator_id' => $creatorId
+            'creator_id' => $creatorId,
         ], array_unique($creatorIds));
 
         DB::table('beatmap_creators')->where('beatmap_id', $beatmapId)->delete();
@@ -241,7 +175,8 @@ class BeatmapService
 
     /**
      * Retrieves a list of a user's created beatmaps that are not blacklisted. Used for auditing the blacklist.
-     * @param int $id The user's osu! ID.
+     *
+     * @param  int  $id  The user's osu! ID.
      * @return Collection The list of beatmaps.
      */
     public function getUnblacklistedForUser(int $id): Collection
@@ -256,8 +191,8 @@ class BeatmapService
 
     /**
      * Marks a list of beatmaps as blacklisted.
-     * @param array $beatmapIds The beatmaps to mark as blacklisted.
-     * @return void
+     *
+     * @param  array  $beatmapIds  The beatmaps to mark as blacklisted.
      */
     public function markAsBlacklisted(array $beatmapIds): void
     {
@@ -270,6 +205,7 @@ class BeatmapService
 
     /**
      * Retrieves an array of years when beatmaps were ranked.
+     *
      * @return Collection An array of years when beatmaps were ranked.
      */
     public function getBeatmapYears(): Collection
@@ -285,8 +221,8 @@ class BeatmapService
     /**
      * Updates the weighted average for the specified beatmap.
      *
-     * @param int $id The beatmap's ID.
-     * @return void
+     * @param  int  $id  The beatmap's ID.
+     *
      * @throws Throwable
      */
     public function updateWeightedAverage(int $id): void
@@ -317,15 +253,15 @@ class BeatmapService
     /**
      * Retrieves the beatmap sets created by a specified user.
      *
-     * @param int $userId The user's ID.
-     * @param int $enabledModes Bitfield of enabled modes.
-     * @param int $limit The maximum number of results to return.
+     * @param  int  $userId  The user's ID.
+     * @param  int  $enabledModes  Bitfield of enabled modes.
+     * @param  int  $limit  The maximum number of results to return.
      * @return Collection The user's beatmap sets.
      */
     public function getBeatmapSetsForUser(int $userId, int $enabledModes = 15, int $limit = 5): Collection
     {
         return Cache::tags('user_maps')->remember(
-            'beatmap_sets:user:'.$userId.':'.$enabledModes.':'.$limit,
+            'beatmap_sets:user:' . $userId . ':' . $enabledModes . ':' . $limit,
             3600,
             function () use ($limit, $userId, $enabledModes) {
                 $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
@@ -338,24 +274,24 @@ class BeatmapService
                     ->orderByDesc('date_ranked')
                     ->limit($limit)
                     ->get();
-        });
+            });
     }
 
     /**
      * Retrieves and paginates all beatmap sets created by a specified user.
      *
-     * @param int $userId The user's ID.
-     * @param int $enabledModes Bitfield of enabled modes.
-     * @param int $perPage The amount of beatmap sets to display per-page.
-     * @param int $pageForCache The current page. This parameter is only used for the cache key, it does not determine
-     * the page retrieved from the database.
+     * @param  int  $userId  The user's ID.
+     * @param  int  $enabledModes  Bitfield of enabled modes.
+     * @param  int  $perPage  The amount of beatmap sets to display per-page.
+     * @param  int  $pageForCache  The current page. This parameter is only used for the cache key, it does not determine
+     *                             the page retrieved from the database.
      * @return LengthAwarePaginator The user's paginated beatmap sets.
      */
     public function getBeatmapSetsForUserPaginated(int $userId, int $enabledModes = 15, int $pageForCache = 1,
-                                                   int $perPage = 50): LengthAwarePaginator
+        int $perPage = 50): LengthAwarePaginator
     {
         return Cache::tags('user_maps')->remember(
-            'beatmap_sets:user:'.$userId.':'.$enabledModes.':'.$perPage.':'.$pageForCache,
+            'beatmap_sets:user:' . $userId . ':' . $enabledModes . ':' . $perPage . ':' . $pageForCache,
             3600,
             function () use ($perPage, $userId, $enabledModes) {
                 $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
@@ -374,22 +310,22 @@ class BeatmapService
     /**
      * Retrieves guest difficulties (beatmaps created on another user's set) created by a specified user.
      *
-     * @param int $userId The user's ID.
-     * @param int $enabledModes Bitfield of enabled modes.
-     * @param int $limit The maximum number of results to return.
+     * @param  int  $userId  The user's ID.
+     * @param  int  $enabledModes  Bitfield of enabled modes.
+     * @param  int  $limit  The maximum number of results to return.
      * @return Collection The user's recent guest difficulties.
      */
     public function getGuestDifficultiesForUser(int $userId, int $enabledModes = 15, int $limit = 5): Collection
     {
         return Cache::tags('user_maps')->remember(
-            'beatmaps:user:'.$userId.':'.$enabledModes.':'.$limit,
+            'beatmaps:user:' . $userId . ':' . $enabledModes . ':' . $limit,
             3600,
             function () use ($limit, $userId, $enabledModes) {
                 $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
                 return Beatmap::whereHas('creators', function ($query) use ($userId) {
-                        $query->where('creator_id', $userId);
-                    })
+                    $query->where('creator_id', $userId);
+                })
                     ->whereHas('set', function ($query) use ($userId) {
                         $query->where('creator_id', '!=', $userId);
                     })
@@ -408,18 +344,18 @@ class BeatmapService
      * Retrieves and paginates all guest difficulties (beatmaps created on another user's set) created by a specified
      * user.
      *
-     * @param int $userId The user's ID.
-     * @param int $enabledModes Bitfield of enabled modes.
-     * @param int $perPage The amount of guest difficulties to display per page.
-     * @param int $pageForCache The current page. This parameter is only used for the cache key, it does not determine
-     * the page retrieved from the database.
+     * @param  int  $userId  The user's ID.
+     * @param  int  $enabledModes  Bitfield of enabled modes.
+     * @param  int  $perPage  The amount of guest difficulties to display per page.
+     * @param  int  $pageForCache  The current page. This parameter is only used for the cache key, it does not determine
+     *                             the page retrieved from the database.
      * @return LengthAwarePaginator The paginated guest difficulties.
      */
     public function getGuestDifficultiesForUserPaginated(int $userId, int $enabledModes = 15, int $pageForCache = 1,
-                                                         int $perPage = 50): LengthAwarePaginator
+        int $perPage = 50): LengthAwarePaginator
     {
         return Cache::tags('user_maps')->remember(
-            'beatmaps:user:'.$userId.':'.$enabledModes.':'.$perPage.':'.$pageForCache,
+            'beatmaps:user:' . $userId . ':' . $enabledModes . ':' . $perPage . ':' . $pageForCache,
             3600,
             function () use ($perPage, $userId, $enabledModes) {
                 $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
@@ -443,8 +379,9 @@ class BeatmapService
     /**
      * Retrieves the most recently played beatmaps (last 24 hours) for the specified user.
      *
-     * @param int $userId The ID of the user.
+     * @param  int  $userId  The ID of the user.
      * @return Collection The user's most recently played beatmaps.
+     *
      * @throws ConnectionException
      * @throws AuthenticationException
      * @throws Throwable
@@ -465,10 +402,11 @@ class BeatmapService
     /**
      * Retrieves the beatmap sets that the user has favorited on the osu! website.
      *
-     * @param int $userId The user's ID.
-     * @param int $page The current page.
-     * @param int $perPage The amount of results to include per-page.
+     * @param  int  $userId  The user's ID.
+     * @param  int  $page  The current page.
+     * @param  int  $perPage  The amount of results to include per-page.
      * @return LengthAwarePaginator The paginated beatmap sets.
+     *
      * @throws AuthenticationException
      * @throws ConnectionException
      * @throws Throwable
@@ -479,17 +417,18 @@ class BeatmapService
 
         $offset = ($page - 1) * $perPage;
 
-        $ids = Cache::tags('api:'.$userId)->remember(
-            'api:favorites:'.$userId.':'.$page,
+        $ids = Cache::tags('api:' . $userId)->remember(
+            'api:favorites:' . $userId . ':' . $page,
             86400,
             function () use ($userId, $osuApiService, $perPage, $offset) {
                 $favorites = $osuApiService->getUserBeatmaps($userId, 'favourite', $perPage, $offset);
+
                 return array_map(fn ($item) => $item['id'], $favorites);
             }
         );
 
-        $apiUser = Cache::tags('api:'.$userId)->remember(
-            'api:users:'.$userId,
+        $apiUser = Cache::tags('api:' . $userId)->remember(
+            'api:users:' . $userId,
             86400,
             function () use ($userId, $osuApiService) {
                 return $osuApiService->getUser($userId);
@@ -510,5 +449,71 @@ class BeatmapService
             $page,
             ['path' => request()->url()]
         );
+    }
+
+    /**
+     * Stores a beatmap (difficulty) in the database. Intended for use while syncing with the osu! API; assumes the
+     * parameters are structured as received from the osu! API. Should not be called directly - use
+     * `storeBeatmapSetAndBeatmaps()` instead.
+     *
+     * @throws Throwable
+     */
+    private function storeBeatmap($map, $setId, $shouldBlacklist): void
+    {
+        DB::transaction(function () use ($map, $setId, $shouldBlacklist) {
+            Beatmap::updateOrCreate(
+                ['id' => $map['id']],
+                [
+                    'set_id' => $setId,
+                    'difficulty_name' => $map['version'],
+                    'mode' => $map['mode_int'],
+                    'status' => $map['ranked'],
+                    'sr' => $map['difficulty_rating'],
+                    'blacklisted' => $shouldBlacklist,
+                    'blacklist_reason' => $shouldBlacklist ? 'Mapper requested blacklist.' : null,
+                ]
+            );
+        });
+    }
+
+    /**
+     * Stores the beatmaps (difficulties) for a particular set in the database. Intended for use while syncing
+     * with the osu! API; assumes the parameters are structured as received from the osu! API. Should not be called
+     * directly - use `storeBeatmapSetAndBeatmaps()` instead.
+     *
+     * @throws Throwable
+     */
+    private function storeBeatmapsForSet($fullDetails, $setData): void
+    {
+        $blacklistService = app(BlacklistService::class);
+        $userService = app(UserService::class);
+
+        $blacklist = $blacklistService->getBlacklist();
+        $existingBeatmapIds = [];
+
+        foreach ($fullDetails['beatmaps'] as $map) {
+            $shouldBlacklist = false;
+            $creatorIds = [];
+            $existingBeatmapIds[] = $map['id'];
+
+            foreach ($map['owners'] as $owner) {
+                $creatorIds[] = $owner['id'];
+
+                if (in_array($owner['id'], $blacklist)) {
+                    $shouldBlacklist = true;
+                }
+
+                if (! $userService->exists($owner['id'])) {
+                    $this->addCreatorName($owner['id'], $owner['username']);
+                }
+            }
+
+            $this->storeBeatmap($map, $setData['id'], $shouldBlacklist);
+            $this->setCreators($map['id'], $creatorIds);
+        }
+
+        Beatmap::where('set_id', $setData['id'])
+            ->whereNotIn('id', $existingBeatmapIds)
+            ->delete();
     }
 }

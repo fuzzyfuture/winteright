@@ -39,5 +39,5 @@ return [
         'client_id' => env('OSU_CLIENT_ID'),
         'client_secret' => env('OSU_CLIENT_SECRET'),
         'redirect' => env('OSU_REDIRECT_URI'),
-    ]
+    ],
 ];

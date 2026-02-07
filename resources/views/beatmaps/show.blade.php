@@ -60,7 +60,7 @@
             <div class="list-group">
                 @php($hiddenCount = 0)
                 @foreach ($beatmapSet->beatmaps as $beatmap)
-                    @if(Auth::check() && !Auth::user()->hasModeEnabled($beatmap->mode))
+                    @if (Auth::check() && !Auth::user()->hasModeEnabled($beatmap->mode))
                         @php($hiddenCount++)
                         @continue
                     @endif
@@ -78,7 +78,7 @@
                                 sr: {{ number_format($beatmap->sr, 2) }} |
                                 {{ $beatmap->status_label }}
                                 @if (!$beatmap->blacklisted)
-                                    | ratings: {{ $beatmap->ratings->count()}}
+                                    | ratings: {{ $beatmap->ratings->count() }}
                                 @endif
                             </small>
                         </div>

@@ -20,6 +20,7 @@ class UpdateUserListRequest extends FormRequest
 
         try {
             $list = $userListService->get($listId);
+
             return Gate::allows('update', $list);
         } catch (Throwable) {
             return false;

@@ -2,7 +2,8 @@
 
 namespace App\Enums;
 
-enum HideCommentsOption: int {
+enum HideCommentsOption: int
+{
     case NONE = 0;
     case FRONT_PAGE_ONLY = 1;
     case ALL = 2;
@@ -10,7 +11,7 @@ enum HideCommentsOption: int {
     public static function options(): array
     {
         return collect(self::cases())
-            ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
             ->toArray();
     }
 

@@ -73,7 +73,7 @@
                                 <i class="ms-2 bi bi-chevron-down"></i>
                             </div>
                             <div id="{{ $group->collapseId() }}" class="collapse">
-                                @foreach($group->ratings as $rating)
+                                @foreach ($group->ratings as $rating)
                                     <div class="rating-group-rating p-1 mx-3 d-flex align-items-center {{ $loop->last ? 'pb-2' : '' }}">
                                         <a href="{{ route('beatmaps.show', $rating->beatmap->set->id) }}" class="ms-1 d-flex">
                                             <small>

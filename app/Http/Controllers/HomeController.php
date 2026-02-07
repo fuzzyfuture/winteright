@@ -18,8 +18,8 @@ class HomeController extends Controller
     protected CommentService $commentService;
 
     public function __construct(StatsService $statsService, BeatmapService $beatmapService,
-                                SiteInfoService $siteInfoService, RatingService $ratingService,
-                                CommentService $commentService)
+        SiteInfoService $siteInfoService, RatingService $ratingService,
+        CommentService $commentService)
     {
         $this->statsService = $statsService;
         $this->beatmapService = $beatmapService;
@@ -39,7 +39,13 @@ class HomeController extends Controller
         $lastSynced = $this->siteInfoService->getLastSyncedRankedBeatmaps();
         $recentComments = $this->commentService->getRecent($enabledModes, $user && $user->isAdmin());
 
-        return view('home', compact('user', 'stats', 'recentlyRanked', 'recentRatings',
-            'lastSynced', 'recentComments'));
+        return view('home', [
+            'user' => $user,
+            'stats' => $stats,
+            'recentlyRanked' => $recentlyRanked,
+            'recentRatings' => $recentRatings,
+            'lastSynced' => $lastSynced,
+            'recentComments' => $recentComments,
+        ]);
     }
 }

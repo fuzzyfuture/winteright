@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\BeatmapService;
 use App\Services\SearchService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +26,11 @@ class SearchController extends Controller
             $mapperName, $mapperId, $page);
         $searchResults->appends($request->query());
 
-        return view('search.index', compact('searchResults', 'artistTitle', 'mapperName',
-            'mapperId'));
+        return view('search.index', [
+            'searchResults' => $searchResults,
+            'artistTitle' => $artistTitle,
+            'mapperName' => $mapperName,
+            'mapperId' => $mapperId,
+        ]);
     }
 }

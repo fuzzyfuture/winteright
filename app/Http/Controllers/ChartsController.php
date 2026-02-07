@@ -6,7 +6,6 @@ use App\Services\BeatmapService;
 use App\Services\ChartsService;
 use App\Services\SiteInfoService;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
 class ChartsController extends Controller
@@ -39,7 +38,12 @@ class ChartsController extends Controller
 
         $lastUpdated = $this->siteInfoService->getLastUpdatedCharts();
 
-        return view('charts.index', compact('topBeatmaps', 'yearOptions', 'year',
-            'excludeRated', 'lastUpdated'));
+        return view('charts.index', [
+            'topBeatmaps' => $topBeatmaps,
+            'yearOptions' => $yearOptions,
+            'year' => $year,
+            'excludeRated' => $excludeRated,
+            'lastUpdated' => $lastUpdated,
+        ]);
     }
 }

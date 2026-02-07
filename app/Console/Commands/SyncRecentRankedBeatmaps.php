@@ -8,7 +8,6 @@ use App\Services\SiteInfoService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Throwable;
 
 class SyncRecentRankedBeatmaps extends Command
@@ -32,8 +31,8 @@ class SyncRecentRankedBeatmaps extends Command
     protected BeatmapService $beatmapService;
 
     public function __construct(OsuApiService $osuApiService,
-                                SiteInfoService $siteInfoService,
-                                BeatmapService $beatmapService)
+        SiteInfoService $siteInfoService,
+        BeatmapService $beatmapService)
     {
         $this->osuApiService = $osuApiService;
         $this->siteInfoService = $siteInfoService;
@@ -54,7 +53,7 @@ class SyncRecentRankedBeatmaps extends Command
             ? Carbon::parse($since)->toDateTimeString()
             : $this->siteInfoService->getLastSyncedRankedBeatmaps();
 
-        $this->info('Last synced: '.$lastSynced);
+        $this->info('Last synced: ' . $lastSynced);
 
         $newestRanked = Carbon::parse($lastSynced);
         $token = $this->osuApiService->getPublicAccessToken();
@@ -66,14 +65,15 @@ class SyncRecentRankedBeatmaps extends Command
             try {
                 $data = $this->osuApiService->searchBeatmapSets($token, 'ranked', 'ranked_desc', true, $cursor);
             } catch (Throwable $e) {
-                $this->error('Error while retrieving latest ranked beatmaps at position '.$cursor.': '.$e->getMessage());
+                $this->error('Error while retrieving latest ranked beatmaps at position ' . $cursor . ': ' . $e->getMessage());
+
                 continue;
             }
 
             foreach ($data['beatmapsets'] ?? [] as $setData) {
                 $rankedDate = $setData['ranked_date'];
 
-                $this->info('Importing: '.$setData['artist'].' - '.$setData['title'].', ranked: '.$rankedDate.'...');
+                $this->info('Importing: ' . $setData['artist'] . ' - ' . $setData['title'] . ', ranked: ' . $rankedDate . '...');
 
                 if (Carbon::parse($rankedDate) <= $newestRanked) {
                     break 2;
@@ -81,6 +81,7 @@ class SyncRecentRankedBeatmaps extends Command
 
                 if ($skipUpdates && $this->beatmapService->setExists($setData['id'])) {
                     $this->info('Skipped.');
+
                     continue;
                 }
 
@@ -90,14 +91,16 @@ class SyncRecentRankedBeatmaps extends Command
                 try {
                     $fullDetails = $this->osuApiService->getBeatmapSetFullDetails($token, $setData['id']);
                 } catch (Throwable $e) {
-                    $this->error('Error while retrieving details for beatmap set '.$setData['id'].': '.$e->getMessage());
+                    $this->error('Error while retrieving details for beatmap set ' . $setData['id'] . ': ' . $e->getMessage());
+
                     continue;
                 }
 
                 try {
                     $this->beatmapService->storeBeatmapSetAndBeatmaps($setData, $fullDetails);
                 } catch (Throwable $e) {
-                    $this->error('Error while storing beatmap set '.$setData['id'].': '.$e->getMessage());
+                    $this->error('Error while storing beatmap set ' . $setData['id'] . ': ' . $e->getMessage());
+
                     continue;
                 }
 
@@ -112,6 +115,6 @@ class SyncRecentRankedBeatmaps extends Command
 
         Cache::tags(['recent_beatmap_sets', 'search', 'user_maps'])->flush();
 
-        $this->info('Import complete! Imported '.$imported.' beatmap sets.');
+        $this->info('Import complete! Imported ' . $imported . ' beatmap sets.');
     }
 }

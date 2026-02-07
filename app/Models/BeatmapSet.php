@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\BeatmapMode;
 use App\Helpers\OsuUrl;
-use App\Services\BeatmapService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,7 +13,7 @@ class BeatmapSet extends Model
 {
     protected $fillable = [
         'id', 'creator_id', 'date_ranked', 'genre', 'lang',
-        'artist', 'title', 'has_storyboard', 'has_video'
+        'artist', 'title', 'has_storyboard', 'has_video',
     ];
 
     protected $casts = [
@@ -119,14 +118,14 @@ class BeatmapSet extends Model
     public function getCreatorLabelAttribute(): HtmlString
     {
         if ($this->creator) {
-            $localLink = '<a href="'.route('users.show', $this->creator_id).'">'.e($this->creator->name).'</a>';
-        } else if ($this->creatorName) {
+            $localLink = '<a href="' . route('users.show', $this->creator_id) . '">' . e($this->creator->name) . '</a>';
+        } elseif ($this->creatorName) {
             $localLink = e($this->creatorName->name);
         } else {
             $localLink = $this->creator_id;
         }
 
-        $extLink = '<a href="'.$this->creator_profile_url.'"
+        $extLink = '<a href="' . $this->creator_profile_url . '"
                     target="_blank"
                     rel="noopener noreferrer"
                     title="view on osu!"
@@ -134,16 +133,16 @@ class BeatmapSet extends Model
                         <i class="bi bi-box-arrow-up-right"></i>
                 </a>';
 
-        return new HtmlString($localLink.$extLink);
+        return new HtmlString($localLink . $extLink);
     }
 
     public function getLinkAttribute(): HtmlString
     {
         $localUrl = route('beatmaps.show', $this->id);
-        $text = $this->artist.' - '.$this->title;
+        $text = $this->artist . ' - ' . $this->title;
 
-        $localLink = '<a href="'.$localUrl.'">'.e($text).'</a>';
-        $extLink = '<a href="'.$this->info_url.'"
+        $localLink = '<a href="' . $localUrl . '">' . e($text) . '</a>';
+        $extLink = '<a href="' . $this->info_url . '"
                        target="_blank"
                        rel="noopener noreferrer"
                        title="view on osu!"
@@ -151,7 +150,7 @@ class BeatmapSet extends Model
                         <i class="bi bi-box-arrow-up-right"></i>
                     </a>';
 
-        return new HtmlString($localLink.$extLink);
+        return new HtmlString($localLink . $extLink);
     }
 
     public function getDifficultySpreadAttribute(): HtmlString
@@ -160,15 +159,15 @@ class BeatmapSet extends Model
         $output = $modeCounts->map(function ($count, $mode) {
             $icon = Beatmap::getModeIcon(BeatmapMode::from($mode));
 
-            return '<span class="mode-badge d-flex align-items-center">'.$icon.'<span class="count">'.$count.'</span></span>';
+            return '<span class="mode-badge d-flex align-items-center">' . $icon . '<span class="count">' . $count . '</span></span>';
         })->implode(' ');
 
-        return new HtmlString('<div class="d-flex align-items-center gap-2">'.$output.'</div>');
+        return new HtmlString('<div class="d-flex align-items-center gap-2">' . $output . '</div>');
     }
 
     public function getStatusBadgeAttribute(): HtmlString
     {
-        $output = '<span class="badge text-bg-primary">'.$this->status_label.'</span>';
+        $output = '<span class="badge text-bg-primary">' . $this->status_label . '</span>';
 
         return new HtmlString($output);
     }

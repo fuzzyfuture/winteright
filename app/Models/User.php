@@ -18,6 +18,8 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    public $incrementing = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -29,8 +31,6 @@ class User extends Authenticatable
         'hide_ratings' => HideRatingsOption::class,
         'hide_comments' => HideCommentsOption::class,
     ];
-
-    public $incrementing = false;
 
     public function ratings(): HasMany
     {
@@ -78,8 +78,8 @@ class User extends Authenticatable
     public function getLinkAttribute(): HtmlString
     {
         $localUrl = route('users.show', $this->id);
-        $localLink = '<a href="'.$localUrl.'">'.$this->name.'</a>';
-        $extLink = '<a href="'.$this->profile_url.'"
+        $localLink = '<a href="' . $localUrl . '">' . $this->name . '</a>';
+        $extLink = '<a href="' . $this->profile_url . '"
                target="_blank"
                rel="noopener noreferrer"
                title="view on osu!"
@@ -87,7 +87,7 @@ class User extends Authenticatable
                 <i class="bi bi-box-arrow-up-right"></i>
             </a>';
 
-        return new HtmlString($localLink.$extLink);
+        return new HtmlString($localLink . $extLink);
     }
 
     public function isAdmin(): bool

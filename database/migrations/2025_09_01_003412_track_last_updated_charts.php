@@ -6,19 +6,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('site_info', function (Blueprint $table) {
-           $table->timestamp('last_updated_charts')->nullable();
+            $table->timestamp('last_updated_charts')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('site_info', function (Blueprint $table) {
