@@ -11,10 +11,10 @@
     <div class="container">
         @forelse($items as $item)
             <div class="row p-0 rounded shadow-sm mb-2 chart-beatmap-card">
-                @if($item->isUser())
+                @if ($item->isUser())
                     <div class="col-md-2 p-2">
                         <div class="chart-beatmap-img w-100 h-100"
-                             style="background-image: url('{{ $item->item->avatar_url }}');">
+                            style="background-image: url('{{ $item->item->avatar_url }}');">
                         </div>
                     </div>
                     <div class="col-md-10 p-3 ps-1">
@@ -28,25 +28,25 @@
                                 @endif
                             </div>
                             {{ html()->form('DELETE', route('lists.delete-item', $item->id))->class('ms-auto')->attribute('onsubmit', 'return confirm(\'are you sure you want to delete this item?\')')->open() }}
-                                {{ html()->submit('<i class="bi bi-trash"></i> delete')->class('btn btn-primary') }}
+                            {{ html()->submit('<i class="bi bi-trash"></i> delete')->class('btn btn-primary') }}
                             {{ html()->form()->close() }}
                         </div>
                         {{ html()->form('POST', route('lists.edit-item.post', $item->id))->open() }}
-                            <div class="mb-2">
-                                {{ html()->label('description', 'description')->class('form-label') }}
-                                {{ html()->textarea('description', $item->description)->class('form-control') }}
-                            </div>
-                            <div class="mb-3">
-                                {{ html()->label('order *', 'order')->class('form-label') }}
-                                {{ html()->text('order', $item->order)->class('form-control') }}
-                            </div>
-                            {{ html()->submit('save')->class('btn btn-primary') }}
+                        <div class="mb-2">
+                            {{ html()->label('description', 'description')->class('form-label') }}
+                            {{ html()->textarea('description', $item->description)->class('form-control') }}
+                        </div>
+                        <div class="mb-3">
+                            {{ html()->label('order *', 'order')->class('form-label') }}
+                            {{ html()->text('order', $item->order)->class('form-control') }}
+                        </div>
+                        {{ html()->submit('save')->class('btn btn-primary') }}
                         {{ html()->form()->close() }}
                     </div>
                 @elseif($item->isBeatmap())
                     <div class="col-md-2 p-2">
                         <div class="chart-beatmap-img w-100 h-100"
-                             style="background-image: url('{{ $item->item->bg_url }}');">
+                            style="background-image: url('{{ $item->item->bg_url }}');">
                         </div>
                     </div>
                     <div class="col-md-10 p-3 ps-1">
@@ -57,25 +57,25 @@
                                 <div class="mb-2">mapped by: {{ $item->item->creator_label }}</div>
                             </div>
                             {{ html()->form('DELETE', route('lists.delete-item', $item->id))->class('ms-auto')->attribute('onsubmit', 'return confirm(\'are you sure you want to delete this item?\')')->open() }}
-                                {{ html()->submit('<i class="bi bi-trash"></i> delete')->class('btn btn-primary') }}
+                            {{ html()->submit('<i class="bi bi-trash"></i> delete')->class('btn btn-primary') }}
                             {{ html()->form()->close() }}
                         </div>
                         {{ html()->form('POST', route('lists.edit-item.post', $item->id))->name($item->id)->open() }}
-                            <div class="mb-2">
-                                {{ html()->label('description', 'description')->class('form-label') }}
-                                {{ html()->textarea('description', $item->description)->class('form-control') }}
-                            </div>
-                            <div class="mb-3">
-                                {{ html()->label('order *', 'order')->class('form-label') }}
-                                {{ html()->text('order', $item->order)->class('form-control') }}
-                            </div>
-                            {{ html()->submit('save')->class('btn btn-primary') }}
+                        <div class="mb-2">
+                            {{ html()->label('description', 'description')->class('form-label') }}
+                            {{ html()->textarea('description', $item->description)->class('form-control') }}
+                        </div>
+                        <div class="mb-3">
+                            {{ html()->label('order *', 'order')->class('form-label') }}
+                            {{ html()->text('order', $item->order)->class('form-control') }}
+                        </div>
+                        {{ html()->submit('save')->class('btn btn-primary') }}
                         {{ html()->form()->close() }}
                     </div>
                 @elseif($item->isBeatmapSet())
                     <div class="col-md-2 p-2">
                         <div class="chart-beatmap-img w-100 h-100"
-                             style="background-image: url('{{ $item->item->bg_url }}');">
+                            style="background-image: url('{{ $item->item->bg_url }}');">
                         </div>
                     </div>
                     <div class="col-md-10 p-3 ps-1">
@@ -86,19 +86,19 @@
                                 <div class="mb-3">mapped by: {{ $item->item->creator_label }}</div>
                             </div>
                             {{ html()->form('DELETE', route('lists.delete-item', $item->id))->class('ms-auto')->attribute('onsubmit', 'return confirm(\'are you sure you want to delete this item?\')')->open() }}
-                                {{ html()->submit('<i class="bi bi-trash"></i> delete')->class('btn btn-primary') }}
+                            {{ html()->submit('<i class="bi bi-trash"></i> delete')->class('btn btn-primary') }}
                             {{ html()->form()->close() }}
                         </div>
                         {{ html()->form('POST', route('lists.edit-item.post', $item->id))->open() }}
-                            <div class="mb-2">
-                                {{ html()->label('description', 'description')->class('form-label') }}
-                                {{ html()->textarea('description', $item->description)->class('form-control') }}
-                            </div>
-                            <div class="mb-3">
-                                {{ html()->label('order *', 'order')->class('form-label') }}
-                                {{ html()->text('order', $item->order)->class('form-control') }}
-                            </div>
-                            {{ html()->submit('save')->class('btn btn-primary') }}
+                        <div class="mb-2">
+                            {{ html()->label('description', 'description')->class('form-label') }}
+                            {{ html()->textarea('description', $item->description)->class('form-control') }}
+                        </div>
+                        <div class="mb-3">
+                            {{ html()->label('order *', 'order')->class('form-label') }}
+                            {{ html()->text('order', $item->order)->class('form-control') }}
+                        </div>
+                        {{ html()->submit('save')->class('btn btn-primary') }}
                         {{ html()->form()->close() }}
                     </div>
                 @endif

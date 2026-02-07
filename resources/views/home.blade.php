@@ -1,4 +1,7 @@
-@php use App\Helpers\OsuUrl;use Carbon\Carbon; @endphp
+@php
+    use App\Helpers\OsuUrl;
+    use Carbon\Carbon;
+@endphp
 @extends('layouts.app')
 
 @section('content')
@@ -22,7 +25,7 @@
             </div>
         </div>
     </div>
-    <hr class="mb-4"/>
+    <hr class="mb-4" />
     <div class="row g-4 mb-4">
         <div class="col-lg-7">
             <div class="d-flex align-items-end mb-3">
@@ -34,7 +37,7 @@
             </div>
             <ul class="list-group mb-4">
                 @foreach ($recentlyRanked as $set)
-                    <x-beatmaps.beatmap_set_list_group :set="$set"/>
+                    <x-beatmaps.beatmap_set_list_group :set="$set" />
                 @endforeach
             </ul>
             <div>
@@ -60,9 +63,9 @@
                     @else
                         <div class="list-group-item p-0">
                             <div class="rating-group-header p-2 ps-1 pe-2 cursor-pointer d-flex align-items-center"
-                                 data-bs-toggle="collapse" data-bs-target="#{{ $group->collapseId() }}">
+                                data-bs-toggle="collapse" data-bs-target="#{{ $group->collapseId() }}">
                                 <a href="{{ route('users.show', $group->user->id) }}"
-                                   class="d-flex align-items-start flex-nowrap ms-1">
+                                    class="d-flex align-items-start flex-nowrap ms-1">
                                     <img src="{{ $group->user->avatar_url }}" width="16" height="16" alt="Avatar">
                                     <small class="ms-2">{{ $group->user->name }}</small>
                                 </a>
@@ -73,11 +76,14 @@
                                 <i class="ms-2 bi bi-chevron-down"></i>
                             </div>
                             <div id="{{ $group->collapseId() }}" class="collapse">
-                                @foreach($group->ratings as $rating)
-                                    <div class="rating-group-rating p-1 mx-3 d-flex align-items-center {{ $loop->last ? 'pb-2' : '' }}">
-                                        <a href="{{ route('beatmaps.show', $rating->beatmap->set->id) }}" class="ms-1 d-flex">
+                                @foreach ($group->ratings as $rating)
+                                    <div
+                                        class="rating-group-rating p-1 mx-3 d-flex align-items-center {{ $loop->last ? 'pb-2' : '' }}">
+                                        <a href="{{ route('beatmaps.show', $rating->beatmap->set->id) }}"
+                                            class="ms-1 d-flex">
                                             <small>
-                                                {{ $rating->beatmap->set->title }} [{{ $rating->beatmap->difficulty_name }}]
+                                                {{ $rating->beatmap->set->title }}
+                                                [{{ $rating->beatmap->difficulty_name }}]
                                             </small>
                                         </a>
                                         <small class="ms-auto text-nowrap text-muted" title="{{ $rating->updated_at }}">
@@ -99,7 +105,7 @@
                     <div class="list-group-item {{ $comment->trashed() ? 'opacity-50' : '' }}">
                         <div class="d-flex align-items-start flex-nowrap">
                             <a href="{{ route('users.show', $comment->user->id) }}"
-                               class="d-flex align-items-start flex-nowrap">
+                                class="d-flex align-items-start flex-nowrap">
                                 <img src="{{ $comment->user->avatar_url }}" width="16" height="16" alt="Avatar">
                                 <small class="ms-2">{{ $comment->user->name }}</small>
                             </a>

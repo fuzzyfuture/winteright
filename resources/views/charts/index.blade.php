@@ -8,13 +8,13 @@
             <div class="card">
                 <div class="card-body">
                     {{ html()->form('GET', route('charts.index'))->open() }}
-                        {{ html()->label('year', 'year')->class('form-label') }}
-                        {{ html()->select('year', $yearOptions, $year)->class('form-select mb-2') }}
-                        <div class="form-check mb-2">
-                            {{ html()->checkbox('exclude_rated', $excludeRated)->class('form-check-input') }}
-                            {{ html()->label('exclude rated beatmaps', 'exclude_rated')->class('form-check-label') }}
-                        </div>
-                        {{ html()->submit('filter')->class('btn btn-primary float-end') }}
+                    {{ html()->label('year', 'year')->class('form-label') }}
+                    {{ html()->select('year', $yearOptions, $year)->class('form-select mb-2') }}
+                    <div class="form-check mb-2">
+                        {{ html()->checkbox('exclude_rated', $excludeRated)->class('form-check-input') }}
+                        {{ html()->label('exclude rated beatmaps', 'exclude_rated')->class('form-check-label') }}
+                    </div>
+                    {{ html()->submit('filter')->class('btn btn-primary float-end') }}
                     {{ html()->form()->close() }}
                 </div>
             </div>
@@ -33,7 +33,8 @@
                 @forelse ($topBeatmaps as $beatmap)
                     <div class="row p-0 rounded overflow-hidden shadow-sm mb-2 chart-beatmap-card">
                         <div class="col-md-3 py-2">
-                            <div class="ms-md-1 audio-preview" style="background-image: url({{ $beatmap->set->bg_url }})" data-playing="false">
+                            <div class="ms-md-1 audio-preview" style="background-image: url({{ $beatmap->set->bg_url }})"
+                                data-playing="false">
                                 <audio src="{{ $beatmap->set->preview_url }}"></audio>
                                 <div class="button-overlay">
                                     <i class="bi bi-play-fill h1 mb-0"></i>
@@ -58,7 +59,8 @@
 
                                 <div class="text-end">
                                     <div>
-                                        <span class="badge bg-main fs-5">{{ number_format($beatmap->weighted_avg, 2) }}</span>
+                                        <span
+                                            class="badge bg-main fs-5">{{ number_format($beatmap->weighted_avg, 2) }}</span>
                                     </div>
                                     <div class="mt-1">
                                         {{ $beatmap->ratings_count }} ratings

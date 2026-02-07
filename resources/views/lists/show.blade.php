@@ -7,11 +7,11 @@
             @auth
                 @if (Auth::user()->hasFavorited($list->id))
                     {{ html()->form('POST', route('lists.unfavorite', $list->id))->class('d-inline')->open() }}
-                        {{ html()->submit('<i class="bi bi-heartbreak"></i> unfavorite')->class('ms-1 btn btn-primary') }}
+                    {{ html()->submit('<i class="bi bi-heartbreak"></i> unfavorite')->class('ms-1 btn btn-primary') }}
                     {{ html()->form()->close() }}
                 @else
                     {{ html()->form('POST', route('lists.favorite', $list->id))->class('d-inline')->open() }}
-                        {{ html()->submit('<i class="bi bi-heart"></i> favorite')->class('ms-1 btn btn-primary') }}
+                    {{ html()->submit('<i class="bi bi-heart"></i> favorite')->class('ms-1 btn btn-primary') }}
                     {{ html()->form()->close() }}
                 @endif
             @endauth
@@ -32,19 +32,17 @@
         </div>
     </div>
     <h2>
-        {{ $list->name }} by <a href="{{ url('/users/'.$list->user_id) }}">{{ $list->owner->name }}</a>
-        <a href="{{ $list->owner->profile_url }}"
-           target="_blank"
-           rel="noopener noreferrer"
-           title="view on osu!"
-           class="opacity-50 small">
+        {{ $list->name }} by <a href="{{ url('/users/' . $list->user_id) }}">{{ $list->owner->name }}</a>
+        <a href="{{ $list->owner->profile_url }}" target="_blank" rel="noopener noreferrer" title="view on osu!"
+            class="opacity-50 small">
             <i class="bi bi-box-arrow-up-right"></i>
         </a>
     </h2>
     <div class="mb-3">
         <small class="text-muted">
-            {{ $list->is_public ? 'public' : 'private' }} list | {{ $list->items_count }} items | {{ $list->favorites_count }} favs <br/>
-            created: {{ $list->created_at->toFormattedDateString() }}<br/>
+            {{ $list->is_public ? 'public' : 'private' }} list | {{ $list->items_count }} items |
+            {{ $list->favorites_count }} favs <br />
+            created: {{ $list->created_at->toFormattedDateString() }}<br />
             last updated: {{ $list->updated_at?->toFormattedDateString() ?? 'never' }}
         </small>
     </div>
@@ -57,16 +55,16 @@
     <div class="container">
         @forelse($items as $item)
             <div class="row p-0 rounded shadow-sm mb-2 chart-beatmap-card">
-                @if($item->item == null)
+                @if ($item->item == null)
                     [item does not exist on winteright]
                     id: {{ $item->item_id }}
                     type: {{ $item->item_type }}
                     @continue
                 @endif
-                @if($item->isUser())
+                @if ($item->isUser())
                     <div class="col-md-2 p-2">
                         <div class="chart-beatmap-img w-100 h-100"
-                             style="background-image: url('{{ $item->item->avatar_url }}');">
+                            style="background-image: url('{{ $item->item->avatar_url }}');">
                         </div>
                     </div>
                     <div class="col-md-10 p-3 ps-1">
@@ -76,7 +74,8 @@
                     </div>
                 @elseif($item->isBeatmap())
                     <div class="col-md-2 p-2">
-                        <div class="ms-md-1 audio-preview" style="background-image: url({{ $item->item->bg_url }})" data-playing="false">
+                        <div class="ms-md-1 audio-preview" style="background-image: url({{ $item->item->bg_url }})"
+                            data-playing="false">
                             <audio src="{{ $item->item->preview_url }}"></audio>
                             <div class="button-overlay">
                                 <i class="bi bi-play-fill h1 mb-0"></i>
@@ -91,7 +90,8 @@
                     </div>
                 @elseif($item->isBeatmapSet())
                     <div class="col-md-2 p-2">
-                        <div class="ms-md-1 audio-preview" style="background-image: url({{ $item->item->bg_url }})" data-playing="false">
+                        <div class="ms-md-1 audio-preview" style="background-image: url({{ $item->item->bg_url }})"
+                            data-playing="false">
                             <audio src="{{ $item->item->preview_url }}"></audio>
                             <div class="button-overlay">
                                 <i class="bi bi-play-fill h1 mb-0"></i>

@@ -5,17 +5,17 @@
     <div class="card mb-4">
         <div class="card-body">
             {{ html()->form('GET', route('lists.index'))->open() }}
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        {{ html()->label('name contains', 'name')->class('form-label') }}
-                        {{ html()->text('name', $name)->class('form-control') }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ html()->label('creator name is', 'creator_name')->class('form-label') }}
-                        {{ html()->text('creator_name', $creatorName)->class('form-control mb-3') }}
-                    </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ html()->label('name contains', 'name')->class('form-label') }}
+                    {{ html()->text('name', $name)->class('form-control') }}
                 </div>
-                {{ html()->submit('search')->class('btn btn-primary float-end') }}
+                <div class="col-md-6">
+                    {{ html()->label('creator name is', 'creator_name')->class('form-label') }}
+                    {{ html()->text('creator_name', $creatorName)->class('form-control mb-3') }}
+                </div>
+            </div>
+            {{ html()->submit('search')->class('btn btn-primary float-end') }}
             {{ html()->form()->close() }}
         </div>
     </div>
@@ -45,7 +45,8 @@
                 <div><small>by {{ $list->owner->link }}</small></div>
                 <div>
                     <small class="text-muted">
-                        {{ $list->items_count }} items | {{ $list->favorites_count }} favs | last updated: {{ $list->updated_at?->toFormattedDateString() ?? 'never' }}
+                        {{ $list->items_count }} items | {{ $list->favorites_count }} favs | last updated:
+                        {{ $list->updated_at?->toFormattedDateString() ?? 'never' }}
                     </small>
                 </div>
             </div>

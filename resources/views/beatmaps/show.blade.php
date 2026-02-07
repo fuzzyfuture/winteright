@@ -11,7 +11,7 @@
                 <strong>{!! $beatmapSet->creator_label !!}</strong>
             </p>
             <div class="audio-preview rounded shadow-sm mb-4"
-                 style="height: 175px; background-image: url({{ $beatmapSet->bg_url }})">
+                style="height: 175px; background-image: url({{ $beatmapSet->bg_url }})">
                 <audio src="{{ $beatmapSet->preview_url }}"></audio>
                 <div class="button-overlay">
                     <i class="bi bi-play-fill h1 mb-0"></i>
@@ -39,7 +39,7 @@
             <div class="d-flex">
                 @auth
                     <a href="{{ route('lists.add', ['item_type' => UserListItemType::BEATMAP_SET, 'item_id' => $beatmapSet->id]) }}"
-                       class="ms-auto btn btn-outline-primary">
+                        class="ms-auto btn btn-outline-primary">
                         <i class="bi bi-plus"></i><i class="bi bi-list"></i>
                         add to list
                     </a>
@@ -53,14 +53,15 @@
             <h4 class="mb-3">difficulties</h4>
             @if ($beatmapSet->beatmaps->contains('blacklisted', true))
                 <div class="alert alert-sm alert-primary" data-bs-theme="dark">
-                    note: some beatmaps in this set are blacklisted - you are still able to rate them, but their average ratings
+                    note: some beatmaps in this set are blacklisted - you are still able to rate them, but their average
+                    ratings
                     are hidden and they will not appear on the charts.
                 </div>
             @endif
             <div class="list-group">
                 @php($hiddenCount = 0)
                 @foreach ($beatmapSet->beatmaps as $beatmap)
-                    @if(Auth::check() && !Auth::user()->hasModeEnabled($beatmap->mode))
+                    @if (Auth::check() && !Auth::user()->hasModeEnabled($beatmap->mode))
                         @php($hiddenCount++)
                         @continue
                     @endif
@@ -73,19 +74,19 @@
                                     by {{ $beatmap->creator_label }}
                                 </small>
                             </div>
-                            <br/>
+                            <br />
                             <small class="text-muted">
                                 sr: {{ number_format($beatmap->sr, 2) }} |
                                 {{ $beatmap->status_label }}
                                 @if (!$beatmap->blacklisted)
-                                    | ratings: {{ $beatmap->ratings->count()}}
+                                    | ratings: {{ $beatmap->ratings->count() }}
                                 @endif
                             </small>
                         </div>
                         <div class="ms-auto text-end d-flex flex-row align-items-center">
                             @auth
                                 <a href="{{ route('lists.add', ['item_type' => UserListItemType::BEATMAP, 'item_id' => $beatmap->id]) }}"
-                                   class="ms-2 btn btn-sm btn-outline-primary p-1 py-0 opacity-50">
+                                    class="ms-2 btn btn-sm btn-outline-primary p-1 py-0 opacity-50">
                                     <i class="bi bi-plus"></i><i class="bi bi-list"></i>
                                 </a>
                             @endauth
@@ -94,7 +95,7 @@
                             @endif
                             @auth
                                 {{ html()->form('POST', route('ratings.update', $beatmap->id))->class('d-flex align-items-center gap-2 ms-3')->open() }}
-                                    {{ html()->select('score', $ratingOptions, $beatmap->userRating?->score ?? '')->class('form-select form-select-sm w-auto')->attribute('onchange', 'this.form.submit()') }}
+                                {{ html()->select('score', $ratingOptions, $beatmap->userRating?->score ?? '')->class('form-select form-select-sm w-auto')->attribute('onchange', 'this.form.submit()') }}
                                 {{ html()->form()->close() }}
                             @endauth
                         </div>
@@ -117,16 +118,15 @@
     <h4 class="mb-3">comments</h4>
     @auth
         {{ html()->form('POST', route('comments.new.post', ['id' => $beatmapSet->id]))->class('mb-3')->open() }}
-            {{ html()->textarea('content')->class('form-control mb-2') }}
-            {{ html()->submit('submit')->class('btn btn-primary') }}
+        {{ html()->textarea('content')->class('form-control mb-2') }}
+        {{ html()->submit('submit')->class('btn btn-primary') }}
         {{ html()->form()->close() }}
     @endauth
     <div class="list-group comments-box">
         @foreach ($comments as $comment)
             <div class="list-group-item {{ $comment->trashed() ? 'opacity-50' : '' }}">
                 <div class="d-flex align-items-start flex-nowrap">
-                    <a href="{{ route('users.show', $comment->user->id) }}"
-                       class="d-flex align-items-start flex-nowrap">
+                    <a href="{{ route('users.show', $comment->user->id) }}" class="d-flex align-items-start flex-nowrap">
                         <img src="{{ $comment->user->avatar_url }}" width="16" height="16" alt="Avatar">
                         <small class="ms-2">{{ $comment->user->name }}</small>
                     </a>

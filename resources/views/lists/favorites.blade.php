@@ -12,12 +12,13 @@
                     <div><small>by {{ $list->owner->link }}</small></div>
                     <div>
                         <small class="text-muted">
-                            {{ $list->items_count }} items | {{ $list->favorites_count }} favs | last updated: {{ $list->updated_at?->toFormattedDateString() ?? 'never' }}
+                            {{ $list->items_count }} items | {{ $list->favorites_count }} favs | last updated:
+                            {{ $list->updated_at?->toFormattedDateString() ?? 'never' }}
                         </small>
                     </div>
                 </div>
                 {{ html()->form('POST', route('lists.unfavorite', $list->id))->class('ms-auto')->open() }}
-                    {{ html()->submit('<i class="bi bi-heartbreak"></i> unfavorite')->class('ms-1 btn btn-primary') }}
+                {{ html()->submit('<i class="bi bi-heartbreak"></i> unfavorite')->class('ms-1 btn btn-primary') }}
                 {{ html()->form()->close() }}
             </div>
         @empty

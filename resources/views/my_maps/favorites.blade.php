@@ -9,8 +9,7 @@
             <div class="list-group-item">
                 <div class="row g-2">
                     <div class="col-md-2">
-                        <div class="audio-preview" style="background-image: url({{ $set->bg_url }})"
-                             data-playing="false">
+                        <div class="audio-preview" style="background-image: url({{ $set->bg_url }})" data-playing="false">
                             <audio src="{{ $set->preview_url }}"></audio>
                             <div class="button-overlay">
                                 <i class="bi bi-play-fill h1 mb-0"></i>
@@ -32,7 +31,7 @@
                             </div>
                             <div class="ms-auto d-flex flex-row align-items-center">
                                 <a href="{{ route('lists.add', ['item_type' => UserListItemType::BEATMAP_SET, 'item_id' => $set->id]) }}"
-                                   class="ms-2 btn btn-sm btn-outline-primary p-1 py-0 opacity-50">
+                                    class="ms-2 btn btn-sm btn-outline-primary p-1 py-0 opacity-50">
                                     <i class="bi bi-plus"></i><i class="bi bi-list"></i>
                                 </a>
                             </div>

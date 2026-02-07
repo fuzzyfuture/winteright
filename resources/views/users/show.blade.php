@@ -1,4 +1,7 @@
-@php use App\Enums\HideRatingsOption;use App\Enums\UserListItemType; @endphp
+@php
+    use App\Enums\HideRatingsOption;
+    use App\Enums\UserListItemType;
+@endphp
 @extends('layouts.app')
 
 @section('content')
@@ -7,11 +10,8 @@
         <div>
             <h2 class="mb-0">
                 {{ $user->name }}
-                <a href="{{ $user->profile_url }}"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   title="view on osu!"
-                   class="opacity-50 small">
+                <a href="{{ $user->profile_url }}" target="_blank" rel="noopener noreferrer" title="view on osu!"
+                    class="opacity-50 small">
                     <i class="bi bi-box-arrow-up-right"></i>
                 </a>
             </h2>
@@ -21,7 +21,7 @@
         </div>
         @auth
             <a href="{{ route('lists.add', ['item_type' => UserListItemType::USER, 'item_id' => $user->id]) }}"
-               class="ms-auto btn btn-outline-primary align-self-start">
+                class="ms-auto btn btn-outline-primary align-self-start">
                 <i class="bi bi-plus"></i><i class="bi bi-list"></i>
                 add to list
             </a>
@@ -43,14 +43,14 @@
                             $width = ($count / $max) * 100;
                         @endphp
 
-                        <a href="{{ url('/users/'.$user->id.'/ratings?score='.number_format($rating, 1)) }}"
-                           class="rating-bar d-flex align-items-center">
+                        <a href="{{ url('/users/' . $user->id . '/ratings?score=' . number_format($rating, 1)) }}"
+                            class="rating-bar d-flex align-items-center">
                             <div class="me-2" style="width: 3em;">
                                 {{ number_format($rating, 1) }}
                             </div>
                             <div class="progress flex-grow-1 bg-main d-flex align-items-center" style="height: 24px;">
                                 <div class="progress-bar" role="progressbar"
-                                     style="width: {{ $width }}%; height: 100%;"></div>
+                                    style="width: {{ $width }}%; height: 100%;"></div>
                                 <small class="ms-2">{{ $count }}</small>
                             </div>
                         </a>
@@ -61,7 +61,7 @@
                 <h4 class="mb-3">recently rated</h4>
                 <div class="list-group">
                     @forelse ($recentRatings as $rating)
-                        <x-ratings.rating_list_group :rating="$rating"/>
+                        <x-ratings.rating_list_group :rating="$rating" />
                     @empty
                         <div class="text-muted">no ratings found.</div>
                     @endforelse
@@ -84,7 +84,7 @@
             <h4 class="mb-3">top-rated mappers</h4>
             <div class="list-group">
                 @forelse ($topRatedMappers as $mapper)
-                    <x-users.top_rated_mapper_list_group :mapper="$mapper"/>
+                    <x-users.top_rated_mapper_list_group :mapper="$mapper" />
                 @empty
                     <div class="text-muted">no ratings found.</div>
                 @endforelse
@@ -99,7 +99,7 @@
             <h4 class="mb-3">lists</h4>
             <div class="list-group">
                 @forelse ($lists as $list)
-                    <x-lists.list_list_group :list="$list"/>
+                    <x-lists.list_list_group :list="$list" />
                 @empty
                     <div class="text-muted">no lists found.</div>
                 @endforelse
@@ -116,7 +116,7 @@
             <h4 class="mb-3">mapped beatmap sets</h4>
             <div class="list-group">
                 @forelse ($beatmapSets as $set)
-                    <x-beatmaps.beatmap_set_list_group :set="$set"/>
+                    <x-beatmaps.beatmap_set_list_group :set="$set" />
                 @empty
                     <div class="text-muted">no mapsets found.</div>
                 @endforelse
@@ -131,7 +131,7 @@
             <h4 class="mb-3">mapped guest difficulties</h4>
             <div class="list-group">
                 @forelse ($guestDifficulties as $map)
-                    <x-beatmaps.beatmap_list_group :map="$map"/>
+                    <x-beatmaps.beatmap_list_group :map="$map" />
                 @empty
                     <div class="text-muted">no guest difficulties found.</div>
                 @endforelse

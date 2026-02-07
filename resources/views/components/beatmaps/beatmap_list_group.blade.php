@@ -1,7 +1,7 @@
 <div class="list-group-item">
     <div class="row g-2">
         <div class="col-md-3">
-            <div class="audio-preview" style="background-image: url({{ $map->bg_url }})"  data-playing="false">
+            <div class="audio-preview" style="background-image: url({{ $map->bg_url }})" data-playing="false">
                 <audio src="{{ $map->preview_url }}"></audio>
                 <div class="button-overlay">
                     <i class="bi bi-play-fill h1 mb-0"></i>

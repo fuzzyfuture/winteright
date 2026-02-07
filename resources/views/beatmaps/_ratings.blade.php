@@ -1,13 +1,14 @@
 <ul id="ratings-list" class="list-group mb-3">
     @foreach ($ratings as $rating)
         <div class="list-group-item d-flex align-items-center ps-1 pe-2">
-            <a href="{{ url("/users/".$rating->user->id) }}" class="d-flex align-items-start flex-nowrap ms-1">
+            <a href="{{ url('/users/' . $rating->user->id) }}" class="d-flex align-items-start flex-nowrap ms-1">
                 <img src="{{ $rating->user->avatar_url }}" width="16" height="16" alt="Avatar">
                 <small class="ms-2">{{ $rating->user->name }}</small>
             </a>
             <small class="ms-1">rated <strong>[{{ $rating->beatmap->difficulty_name }}]</strong></small>
             <span class="ms-auto badge bg-main fs-6"><small>{{ number_format($rating->score / 2, 1) }}</small></span>
-            <small class="ms-2 text-nowrap" title="{{ $rating->updated_at }}">{{ $rating->updated_at->diffForHumans() }}</small>
+            <small class="ms-2 text-nowrap"
+                title="{{ $rating->updated_at }}">{{ $rating->updated_at->diffForHumans() }}</small>
         </div>
     @endforeach
 </ul>
