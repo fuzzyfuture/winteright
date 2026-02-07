@@ -39,7 +39,11 @@ class MyMapsController extends Controller
             6 => '3.0', 7 => '3.5', 8 => '4.0', 9 => '4.5', 10 => '5.0'];
         $current = 'recent';
 
-        return view('my_maps.recent', compact('current', 'beatmaps', 'ratingOptions'));
+        return view('my_maps.recent', [
+            'current' => $current,
+            'beatmaps' => $beatmaps,
+            'ratingOptions' => $ratingOptions,
+        ]);
     }
 
     public function favorites(Request $request)
@@ -56,6 +60,6 @@ class MyMapsController extends Controller
 
         $current = 'favorites';
 
-        return view('my_maps.favorites', compact('current', 'sets'));
+        return view('my_maps.favorites', ['current' => $current, 'sets' => $sets]);
     }
 }

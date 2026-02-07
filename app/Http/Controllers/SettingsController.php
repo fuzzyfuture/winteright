@@ -21,10 +21,10 @@ class SettingsController extends Controller
 
     public function show()
     {
-        $hideRatingsOptions = HideRatingsOption::options();
-        $hideCommentsOptions = HideCommentsOption::options();
-
-        return view('settings.show', compact('hideRatingsOptions', 'hideCommentsOptions'));
+        return view('settings.show', [
+            'hideRatingsOptions' => HideRatingsOption::options(),
+            'hideCommentsOptions' => HideCommentsOption::options(),
+        ]);
     }
 
     public function enabledModes(UpdateEnabledModesRequest $request)

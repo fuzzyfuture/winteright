@@ -40,8 +40,15 @@ class UserController extends Controller
         $beatmapSets = $this->beatmapService->getBeatmapSetsForUser($user->id, $enabledModes);
         $guestDifficulties = $this->beatmapService->getGuestDifficultiesForUser($user->id, $enabledModes);
 
-        return view('users.show', compact('user', 'ratingSpread', 'recentRatings', 'lists',
-            'beatmapSets', 'guestDifficulties', 'topRatedMappers'));
+        return view('users.show', [
+            'user' => $user,
+            'ratingSpread' => $ratingSpread,
+            'recentRatings' => $recentRatings,
+            'lists' => $lists,
+            'beatmapSets' => $beatmapSets,
+            'guestDifficulties' => $guestDifficulties,
+            'topRatedMappers' => $topRatedMappers,
+        ]);
     }
 
     public function ratings(Request $request, int $id)
@@ -60,7 +67,11 @@ class UserController extends Controller
         $ratings = $this->ratingService->getForUserPaginated($enabledModes, $id, $score ? floatval($score) : null);
         $ratings->appends($request->query());
 
-        return view('users.ratings', compact('user', 'ratings', 'score'));
+        return view('users.ratings', [
+            'user' => $user,
+            'ratings' => $ratings,
+            'score' => $score,
+        ]);
     }
 
     public function lists(int $id)
@@ -68,7 +79,7 @@ class UserController extends Controller
         $user = $this->userService->get($id);
         $lists = $this->userListService->getForUserPaginated($id, Auth::check() && Auth::id() == $id);
 
-        return view('users.lists', compact('user', 'lists'));
+        return view('users.lists', ['user' => $user, 'lists' => $lists]);
     }
 
     public function mapsets(Request $request, int $id)
@@ -79,7 +90,7 @@ class UserController extends Controller
 
         $mapsets = $this->beatmapService->getBeatmapSetsForUserPaginated($id, $enabledModes, $page);
 
-        return view('users.mapsets', compact('user', 'mapsets'));
+        return view('users.mapsets', ['user' => $user, 'mapsets' => $mapsets]);
     }
 
     public function gds(Request $request, int $id)
@@ -90,6 +101,6 @@ class UserController extends Controller
 
         $gds = $this->beatmapService->getGuestDifficultiesForUserPaginated($id, $enabledModes, $page);
 
-        return view('users.gds', compact('user', 'gds'));
+        return view('users.gds', ['user' => $user, 'gds' => $gds]);
     }
 }

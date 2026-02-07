@@ -26,7 +26,11 @@ class SearchController extends Controller
             $mapperName, $mapperId, $page);
         $searchResults->appends($request->query());
 
-        return view('search.index', compact('searchResults', 'artistTitle', 'mapperName',
-            'mapperId'));
+        return view('search.index', [
+            'searchResults' => $searchResults,
+            'artistTitle' => $artistTitle,
+            'mapperName' => $mapperName,
+            'mapperId' => $mapperId,
+        ]);
     }
 }

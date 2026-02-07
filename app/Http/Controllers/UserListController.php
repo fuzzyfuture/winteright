@@ -33,7 +33,7 @@ class UserListController extends Controller
         $lists = $this->userListService->search($name, $creatorName);
         $lists->appends($request->query());
 
-        return view('lists.index', compact('lists', 'name', 'creatorName'));
+        return view('lists.index', ['lists' => $lists, 'name' => $name, 'creatorName' => $creatorName]);
     }
 
     public function show($listId)
@@ -44,9 +44,10 @@ class UserListController extends Controller
             abort(403);
         }
 
-        $items = $this->userListService->getItems($listId);
-
-        return view('lists.show', compact('list', 'items'));
+        return view('lists.show', [
+            'list' => $list,
+            'items' => $this->userListService->getItems($listId),
+        ]);
     }
 
     public function getNew()
@@ -78,7 +79,7 @@ class UserListController extends Controller
             abort(403);
         }
 
-        return view('lists.edit', compact('list'));
+        return view('lists.edit', ['list' => $list]);
     }
 
     public function postEdit(UpdateUserListRequest $request, $listId)
@@ -122,12 +123,13 @@ class UserListController extends Controller
             ->mapWithKeys(fn ($case) => [$case->value => $case->name])
             ->toArray();
 
-        $listId = $request->query('list_id');
-        $itemType = $request->query('item_type');
-        $itemId = $request->query('item_id');
-
-        return view('lists.add_item', compact('listOptions', 'itemTypeOptions', 'listId',
-            'itemType', 'itemId'));
+        return view('lists.add_item', [
+            'listOptions' => $listOptions,
+            'itemTypeOptions' => $itemTypeOptions,
+            'listId' => $request->query('list_id'),
+            'itemType' => $request->query('item_type'),
+            'itemId' => $request->query('item_id'),
+        ]);
     }
 
     public function postAddItem(AddUserListItemRequest $request)
@@ -156,7 +158,7 @@ class UserListController extends Controller
 
         $items = $this->userListService->getItems($listId);
 
-        return view('lists.edit_items', compact('list', 'items'));
+        return view('lists.edit_items', ['list' => $list, 'items' => $items]);
     }
 
     public function postEditItem(UpdateUserListItemRequest $request, $itemId)
@@ -227,6 +229,6 @@ class UserListController extends Controller
     {
         $lists = $this->userListService->getFavorites(Auth::id());
 
-        return view('lists.favorites', compact('lists'));
+        return view('lists.favorites', ['lists' => $lists]);
     }
 }

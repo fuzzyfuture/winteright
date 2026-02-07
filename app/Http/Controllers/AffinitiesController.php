@@ -16,6 +16,9 @@ class AffinitiesController extends Controller
         $user = Auth::user();
         $topRatedMappers = $this->userService->getTopRatedMappersForUserPaginated($user->id);
 
-        return view('affinities.mappers', compact('user', 'topRatedMappers'));
+        return view('affinities.mappers', [
+            'user' => $user,
+            'topRatedMappers' => $topRatedMappers,
+        ]);
     }
 }

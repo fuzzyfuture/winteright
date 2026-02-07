@@ -40,7 +40,12 @@ class BeatmapSetController extends Controller
         $ratingOptions = ['' => 'unrated', 0 => '0.0', 1 => '0.5', 2 => '1.0', 3 => '1.5', 4 => '2.0', 5 => '2.5',
             6 => '3.0', 7 => '3.5', 8 => '4.0', 9 => '4.5', 10 => '5.0'];
 
-        return view('beatmaps.show', compact('beatmapSet', 'ratings', 'ratingOptions', 'comments'));
+        return view('beatmaps.show', [
+            'beatmapSet' => $beatmapSet,
+            'ratings' => $ratings,
+            'comments' => $comments,
+            'ratingOptions' => $ratingOptions,
+        ]);
     }
 
     public function ratings($setId)
@@ -51,6 +56,6 @@ class BeatmapSetController extends Controller
         $ratings = $this->ratingService->getForBeatmaps($beatmapIds, Auth::user()->enabled_modes ?? 15, 10);
         $ratings->withPath('/mapsets/' . $setId . '/ratings');
 
-        return view('beatmaps._ratings', compact('ratings'));
+        return view('beatmaps._ratings', ['ratings' => $ratings]);
     }
 }

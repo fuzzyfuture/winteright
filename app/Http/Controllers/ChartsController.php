@@ -38,7 +38,12 @@ class ChartsController extends Controller
 
         $lastUpdated = $this->siteInfoService->getLastUpdatedCharts();
 
-        return view('charts.index', compact('topBeatmaps', 'yearOptions', 'year',
-            'excludeRated', 'lastUpdated'));
+        return view('charts.index', [
+            'topBeatmaps' => $topBeatmaps,
+            'yearOptions' => $yearOptions,
+            'year' => $year,
+            'excludeRated' => $excludeRated,
+            'lastUpdated' => $lastUpdated,
+        ]);
     }
 }
