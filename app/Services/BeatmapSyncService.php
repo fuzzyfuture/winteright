@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\BeatmapSet;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
@@ -34,6 +35,30 @@ class BeatmapSyncService
         $beatmapService = app(BeatmapService::class);
 
         return $beatmapService->storeBeatmapSetAndBeatmaps($fullDetails, $fullDetails);
+    }
+
+    /**
+     * Retrieves a beatmap set from the osu! API and stores it in the winteright database. Updates the map if it
+     *  already exists in the winteright database.
+     *
+     * @param  string  $url  The URL of the beatmap set to sync.
+     * @param  ?int  $userId  The ID of the user making the request. Should be null if the sync is requested by
+     *                        winteright's backend.
+     * @return BeatmapSet The newly synced beatmap set.
+     *
+     * @throws AuthenticationException
+     * @throws ConnectionException
+     * @throws Throwable
+     */
+    public function syncBeatmapSetFromUrl(string $url, ?int $userId = null): BeatmapSet
+    {
+        if (preg_match('(\d+)', $url, $matches)) {
+            $id = $matches[0];
+
+            return $this->syncBeatmapSet($id, $userId);
+        }
+
+        throw new Exception('could not parse beatmap set url');
     }
 
     /**
