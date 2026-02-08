@@ -48,6 +48,12 @@ Route::controller(SettingsController::class)
 Route::controller(BeatmapSetController::class)
     ->as('beatmaps.')
     ->group(function () {
+        Route::middleware('auth')->group(function () {
+            Route::get('mapsets/add', 'add')->name('add');
+            Route::post('mapsets/add', 'postAdd')->name('add.post');
+            Route::post('mapsets/{set}/sync', 'sync')->name('sync');
+        });
+
         Route::get('mapsets/{set}', 'show')->name('show');
         Route::get('mapsets/{set}/ratings', 'ratings')->name('ratings');
     });
@@ -61,12 +67,24 @@ Route::controller(MyMapsController::class)
         Route::get('my-maps/favorites', 'favorites')->name('favorites');
     });
 
-Route::get('charts', [ChartsController::class, 'index'])->name('charts.index');
-Route::get('search', [SearchController::class, 'index'])->name('search.index');
+Route::controller(ChartsController::class)
+    ->as('charts.')
+    ->group(function () {
+        Route::get('charts', 'index')->name('index');
+    });
 
-Route::middleware('auth')->group(function () {
-    Route::post('beatmaps/{id}/rate', [RatingController::class, 'update'])->name('ratings.update');
-});
+Route::controller(SearchController::class)
+    ->as('search.')
+    ->group(function () {
+        Route::get('search', 'index')->name('index');
+    });
+
+Route::controller(RatingController::class)
+    ->as('ratings.')
+    ->middleware('auth')
+    ->group(function () {
+        Route::post('beatmaps/{id}/rate', 'update')->name('update');
+    });
 
 Route::controller(UserListController::class)
     ->as('lists.')

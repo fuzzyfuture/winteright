@@ -2,9 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Services\BeatmapService;
-use App\Services\OsuApiService;
+use App\Services\BeatmapSyncService;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Console\Command;
+use Illuminate\Http\Client\ConnectionException;
 use Throwable;
 
 class SyncBeatmapSet extends Command
@@ -14,7 +15,7 @@ class SyncBeatmapSet extends Command
      *
      * @var string
      */
-    protected $signature = 'beatmaps:sync-beatmap-set {setId : The beatmap set ID}';
+    protected $signature = 'beatmaps:sync-set {setId : The beatmap set ID}';
 
     /**
      * The console command description.
@@ -23,13 +24,11 @@ class SyncBeatmapSet extends Command
      */
     protected $description = 'Sync a single beatmap set from the osu! API.';
 
-    protected OsuApiService $osuApiService;
-    protected BeatmapService $beatmapService;
+    protected BeatmapSyncService $beatmapSyncService;
 
-    public function __construct(OsuApiService $osuApiService, BeatmapService $beatmapService)
+    public function __construct(BeatmapSyncService $beatmapSyncService)
     {
-        $this->osuApiService = $osuApiService;
-        $this->beatmapService = $beatmapService;
+        $this->beatmapSyncService = $beatmapSyncService;
 
         parent::__construct();
     }
@@ -43,24 +42,22 @@ class SyncBeatmapSet extends Command
 
         $this->info('Fetching beatmap set ' . $setId . '...');
 
-        $token = $this->osuApiService->getPublicAccessToken();
-
         try {
-            $fullDetails = $this->osuApiService->getBeatmapSetFullDetails($token, $setId);
-        } catch (Throwable $e) {
+            $beatmapSet = $this->beatmapSyncService->syncBeatmapSet($setId);
+        } catch (AuthenticationException $e) {
             $this->error('Error while attempting to fetch beatmap set with ID ' . $setId . ': ' . $e->getMessage());
 
             return;
-        }
-
-        try {
-            $this->beatmapService->storeBeatmapSetAndBeatmaps($fullDetails, $fullDetails);
-        } catch (Throwable $e) {
+        } catch (ConnectionException $e) {
             $this->error('Error while storing beatmap set with ID ' . $setId . ': ' . $e->getMessage());
+
+            return;
+        } catch (Throwable $e) {
+            $this->error('Error while attempting to sync beatmap set with ID ' . $setId . ': ' . $e->getMessage());
 
             return;
         }
 
-        $this->info('Successfully synced beatmap set ' . $fullDetails['artist'] . ' - ' . $fullDetails['title'] . '.');
+        $this->info('Successfully synced beatmap set ' . $beatmapSet->artist . ' - ' . $beatmapSet->title . '.');
     }
 }

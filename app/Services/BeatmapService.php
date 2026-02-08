@@ -92,12 +92,14 @@ class BeatmapService
      * Stores a beatmap set in the database, along with its difficulties (beatmaps). Intended for use while syncing
      * with the osu! API; assumes the parameters are structured as received from the osu! API.
      *
+     * @return BeatmapSet The new beatmap set.
+     *
      * @throws Throwable
      */
-    public function storeBeatmapSetAndBeatmaps($setData, $fullDetails): void
+    public function storeBeatmapSetAndBeatmaps($setData, $fullDetails): BeatmapSet
     {
         DB::transaction(function () use ($setData, $fullDetails) {
-            return BeatmapSet::updateOrCreate(
+            BeatmapSet::updateOrCreate(
                 ['id' => $setData['id']],
                 [
                     'title' => $setData['title'],
@@ -113,6 +115,8 @@ class BeatmapService
         });
 
         $this->storeBeatmapsForSet($fullDetails, $setData);
+
+        return BeatmapSet::find($setData['id']);
     }
 
     /**

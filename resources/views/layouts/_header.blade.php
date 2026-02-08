@@ -13,6 +13,9 @@
                     <a class="nav-link" href="{{ route('search.index') }}">search</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('beatmaps.add') }}">add</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ route('lists.index') }}">lists</a>
                 </li>
             </ul>
