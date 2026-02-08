@@ -61,12 +61,24 @@ Route::controller(MyMapsController::class)
         Route::get('my-maps/favorites', 'favorites')->name('favorites');
     });
 
-Route::get('charts', [ChartsController::class, 'index'])->name('charts.index');
-Route::get('search', [SearchController::class, 'index'])->name('search.index');
+Route::controller(ChartsController::class)
+    ->as('charts.')
+    ->group(function () {
+        Route::get('charts', 'index')->name('index');
+    });
 
-Route::middleware('auth')->group(function () {
-    Route::post('beatmaps/{id}/rate', [RatingController::class, 'update'])->name('ratings.update');
-});
+Route::controller(SearchController::class)
+    ->as('search.')
+    ->group(function () {
+        Route::get('search', 'index')->name('index');
+    });
+
+Route::controller(RatingController::class)
+    ->as('ratings.')
+    ->middleware('auth')
+    ->group(function () {
+        Route::post('beatmaps/{id}/rate', 'update')->name('update');
+    });
 
 Route::controller(UserListController::class)
     ->as('lists.')
