@@ -2,13 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Services\BeatmapService;
 use App\Services\BeatmapSyncService;
-use App\Services\OsuApiService;
 use App\Services\SiteInfoService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
 use Throwable;
 
 class SyncRecentRankedBeatmaps extends Command
