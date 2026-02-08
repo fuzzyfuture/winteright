@@ -21,7 +21,9 @@
         <div class="col-md-3">
             <h4>info</h4>
             <ul class="list-unstyled">
-                <li><strong>date ranked:</strong> {{ $beatmapSet->date_ranked->toFormattedDateString() }}</li>
+                @if ($beatmapSet->date_ranked)
+                    <li><strong>date ranked:</strong> {{ $beatmapSet->date_ranked->toFormattedDateString() }}</li>
+                @endif
                 <li><strong>genre:</strong> {{ $beatmapSet->genre_label }}</li>
                 <li><strong>language:</strong> {{ $beatmapSet->language_label }}</li>
                 <li><strong>storyboard:</strong> {{ $beatmapSet->has_storyboard ? 'yes' : 'no' }}</li>
@@ -43,6 +45,9 @@
                         <i class="bi bi-plus"></i><i class="bi bi-list"></i>
                         add to list
                     </a>
+                    {{ html()->form('POST', route('beatmaps.sync', ['set' => $beatmapSet->id]))->class('ms-2')->open() }}
+                        {{ html()->submit('<i class="bi bi-arrow-repeat"></i> sync')->class('btn btn-primary') }}
+                    {{ html()->form()->close() }}
                 @endauth
             </div>
         </div>
