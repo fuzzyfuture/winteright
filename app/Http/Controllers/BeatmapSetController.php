@@ -2,22 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BeatmapSets\AddBeatmapSetRequest;
 use App\Services\BeatmapService;
+use App\Services\BeatmapSyncService;
 use App\Services\CommentService;
 use App\Services\RatingService;
 use Illuminate\Support\Facades\Auth;
+use Throwable;
 
 class BeatmapSetController extends Controller
 {
     protected BeatmapService $beatmapService;
     protected RatingService $ratingService;
     protected CommentService $commentService;
+    protected BeatmapSyncService $beatmapSyncService;
 
-    public function __construct(BeatmapService $beatmapService, RatingService $ratingService, CommentService $commentService)
+    public function __construct(BeatmapService $beatmapService, RatingService $ratingService,
+        CommentService $commentService, BeatmapSyncService $beatmapSyncService)
     {
         $this->beatmapService = $beatmapService;
         $this->ratingService = $ratingService;
         $this->commentService = $commentService;
+        $this->beatmapSyncService = $beatmapSyncService;
     }
 
     public function show($setId)
@@ -57,5 +63,37 @@ class BeatmapSetController extends Controller
         $ratings->withPath('/mapsets/' . $setId . '/ratings');
 
         return view('beatmaps._ratings', ['ratings' => $ratings]);
+    }
+
+    public function add()
+    {
+        return view('beatmaps.add');
+    }
+
+    public function postAdd(AddBeatmapSetRequest $request)
+    {
+        $userId = Auth::id();
+        $validated = $request->validated();
+
+        try {
+            $beatmapSet = $this->beatmapSyncService->syncBeatmapSetFromUrl($validated['url'], $userId);
+        } catch (Throwable $e) {
+            return back()->withErrors('error syncing beatmap set at ' . $validated['url'] . ': ' . $e->getMessage());
+        }
+
+        return redirect()->route('beatmaps.show', ['set' => $beatmapSet->id])->with('success', 'beatmap set synced successfully!');
+    }
+
+    public function sync($setId)
+    {
+        $userId = Auth::id();
+
+        try {
+            $this->beatmapSyncService->syncBeatmapSet($setId, $userId);
+        } catch (Throwable $e) {
+            return back()->withErrors('error syncing beatmap set: ' . $e->getMessage());
+        }
+
+        return back()->with('success', 'beatmap set synced successfully!');
     }
 }
