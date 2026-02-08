@@ -14,4 +14,4 @@ jobs:
       - name: "duster"
         uses: tighten/duster-action@v3
         with:
-          args: lint
+          args: fix
