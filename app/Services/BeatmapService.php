@@ -93,12 +93,13 @@ class BeatmapService
      * with the osu! API; assumes the parameters are structured as received from the osu! API.
      *
      * @return BeatmapSet The new beatmap set.
+     *
      * @throws Throwable
      */
     public function storeBeatmapSetAndBeatmaps($setData, $fullDetails): BeatmapSet
     {
-        $beatmapSet = DB::transaction(function () use ($setData, $fullDetails) {
-            return BeatmapSet::updateOrCreate(
+        DB::transaction(function () use ($setData, $fullDetails) {
+            BeatmapSet::updateOrCreate(
                 ['id' => $setData['id']],
                 [
                     'title' => $setData['title'],
@@ -115,7 +116,7 @@ class BeatmapService
 
         $this->storeBeatmapsForSet($fullDetails, $setData);
 
-        return $beatmapSet;
+        return BeatmapSet::find($setData['id']);
     }
 
     /**
