@@ -48,6 +48,12 @@ Route::controller(SettingsController::class)
 Route::controller(BeatmapSetController::class)
     ->as('beatmaps.')
     ->group(function () {
+        Route::middleware('auth')->group(function () {
+            Route::get('mapsets/add', 'add')->name('add');
+            Route::post('mapsets/add', 'postAdd')->name('add.post');
+            Route::post('mapsets/{set}/sync', 'sync')->name('sync');
+        });
+
         Route::get('mapsets/{set}', 'show')->name('show');
         Route::get('mapsets/{set}/ratings', 'ratings')->name('ratings');
     });
