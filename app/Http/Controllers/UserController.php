@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Ratings\GetUserRatingsRequest;
 use App\Services\BeatmapService;
 use App\Services\RatingService;
 use App\Services\UserListService;
@@ -51,26 +52,47 @@ class UserController extends Controller
         ]);
     }
 
-    public function ratings(Request $request, int $id)
+    public function ratings(GetUserRatingsRequest $request, int $id)
     {
         $user = $this->userService->get($id);
-
-        $validScores = ['0.0', '0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0'];
-        $score = $request->query('score');
-
-        if (! is_null($score) && ! in_array($score, $validScores)) {
-            $score = '0.0';
-        }
-
         $enabledModes = Auth::user()->enabled_modes ?? 15;
+        $score = $request->query('score');
+        $srMin = $request->query('sr_min');
+        $srMax = $request->query('sr_max');
+        $yearMin = $request->query('year_min');
+        $yearMax = $request->query('year_max');
+        $mapperNameOrId = $request->query('mapper');
+        $sort = $request->query('sort');
+        $sortDirection = $request->query('sort_dir');
 
-        $ratings = $this->ratingService->getForUserPaginated($enabledModes, $id, $score ? floatval($score) : null);
+        $ratings = $this->ratingService->getForUserPaginated($enabledModes, $id, $score, $srMin, $srMax, $yearMin,
+            $yearMax, $mapperNameOrId, $sort, $sortDirection, Auth::id() === $id);
         $ratings->appends($request->query());
+
+        $ratingOptions = ['' => 'any', '0.0' => '0.0', '0.5' => '0.5', '1.0' => '1.0', '1.5' => '1.5', '2.0' => '2.0', '2.5' => '2.5',
+            '3.0' => '3.0', '3.5' => '3.5', '4.0' => '4.0', '4.5' => '4.5', '5.0' => '5.0'];
+        $yearOptions = ['' => 'any'] + $this->beatmapService->getBeatmapYears()
+            ->mapWithKeys(fn ($year) => [$year => $year])
+            ->toArray();
+        $sortOptions = ['' => 'rated date', 'score' => 'score', 'sr' => 'star rating',
+            'ranked_date' => 'ranked date'];
+        $sortDirectionOptions = ['desc' => 'desc', 'asc' => 'asc'];
 
         return view('users.ratings', [
             'user' => $user,
             'ratings' => $ratings,
             'score' => $score,
+            'srMin' => $srMin,
+            'srMax' => $srMax,
+            'yearMin' => $yearMin,
+            'yearMax' => $yearMax,
+            'mapperNameOrId' => $mapperNameOrId,
+            'sort' => $sort,
+            'sortDirection' => $sortDirection,
+            'ratingOptions' => $ratingOptions,
+            'yearOptions' => $yearOptions,
+            'sortOptions' => $sortOptions,
+            'sortDirectionOptions' => $sortDirectionOptions,
         ]);
     }
 
