@@ -1,4 +1,4 @@
-<div class="list-group-item">
+<div class="list-group-item {{ $rating->beatmap->blacklisted ? "opacity-50" : "" }}">
     <div class="row g-2">
         <div class="col-md-3">
             <div class="audio-preview" style="background-image: url({{ $rating->beatmap->bg_url }})"  data-playing="false">
