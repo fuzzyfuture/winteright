@@ -162,23 +162,81 @@ class RatingService
      * @param  int  $enabledModes  Bitfield of enabled modes.
      * @param  int  $userId  The user's ID.
      * @param  int  $perPage  The amount of ratings to display per page.
+     * @param  ?int  $score  The score value to optionally filter to.
+     * @param  ?float  $srMin  The minimum star rating to optionally filter to.
+     * @param  ?float  $srMax  The maximum star rating to optionally filter to.
+     * @param  ?int  $yearMin  The minimum ranked year to optionally filter to.
+     * @param  ?int  $yearMax  The maximum ranked year to optionally filter to.
+     * @param  ?string  $mapperNameOrId  The mapper name (or ID) to optionally filter to.
+     * @param  ?string  $sort  The column to optionally sort by.
+     * @param  ?string  $sortDirection  The sort direction.
      * @return LengthAwarePaginator The paginated ratings.
      */
-    public function getForUserPaginated(int $enabledModes, int $userId, ?float $score,
+    public function getForUserPaginated(int $enabledModes, int $userId, ?int $score, ?float $srMin, ?float $srMax,
+        ?int $yearMin, ?int $yearMax, ?string $mapperNameOrId, ?string $sort, ?string $sortDirection,
         int $perPage = 50): LengthAwarePaginator
     {
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
         $query = Rating::where('user_id', $userId)
             ->with(['beatmap.set', 'beatmap.creators.user', 'beatmap.creators.creatorName'])
-            ->whereHas('beatmap', function ($query) use ($modesArray) {
+            ->whereHas('beatmap', function ($query) use ($modesArray, $srMin, $srMax) {
                 $query->whereIn('mode', $modesArray)
                     ->where('blacklisted', false);
-            })
-            ->orderByDesc('updated_at');
 
-        if (! is_null($score)) {
-            $query->whereRaw('score / 2 = ' . $score);
+                if (! blank($srMin)) {
+                    $query->where('sr', '>=', $srMin);
+                }
+
+                if (! blank($srMax)) {
+                    $query->where('sr', '<=', $srMax);
+                }
+            });
+
+        if (! blank($yearMin) || ! blank($yearMax)) {
+            $query->whereHas('beatmap.set', function ($query) use ($yearMin, $yearMax) {
+                if (! blank($yearMin)) {
+                    $query->whereYear('date_ranked', '>=', $yearMin);
+                }
+
+                if (! blank($yearMax)) {
+                    $query->whereYear('date_ranked', '<=', $yearMax);
+                }
+            });
+        }
+
+        if (! blank($mapperNameOrId)) {
+            $userService = app(UserService::class);
+            $mapperId = $userService->getIdByName($mapperNameOrId);
+
+            if ($mapperId == -1) {
+                $mapperId = intval($mapperNameOrId);
+            }
+
+            $query->whereHas('beatmap.creators', function ($query) use ($mapperId) {
+                $query->where('creator_id', $mapperId);
+            });
+        }
+
+        if (! blank($score)) {
+            $query->where('score', $score);
+        }
+
+        if (blank($sortDirection)) {
+            $sortDirection = 'desc';
+        }
+
+        if ($sort === 'score') {
+            $query->orderBy('score', $sortDirection);
+        } elseif ($sort === 'sr') {
+            $query->join('beatmaps', 'ratings.beatmap_id', '=', 'beatmaps.id')
+                ->orderBy('beatmaps.sr', $sortDirection);
+        } elseif ($sort === 'ranked_date') {
+            $query->join('beatmaps', 'ratings.beatmap_id', '=', 'beatmaps.id')
+                ->join('beatmap_sets', 'beatmaps.set_id', '=', 'beatmap_sets.id')
+                ->orderBy('beatmap_sets.date_ranked', $sortDirection);
+        } else {
+            $query->orderBy('updated_at', $sortDirection);
         }
 
         return $query->paginate($perPage);
