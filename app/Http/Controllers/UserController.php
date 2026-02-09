@@ -76,7 +76,7 @@ class UserController extends Controller
             ->toArray();
         $sortOptions = ['' => 'rated date', 'score' => 'score', 'sr' => 'star rating',
             'ranked_date' => 'ranked date'];
-        $sortDirectionOptions = ['desc' => 'desc', 'asc' => 'asc'];
+        $sortDirectionOptions = ['' => 'desc', 'asc' => 'asc'];
 
         return view('users.ratings', [
             'user' => $user,
