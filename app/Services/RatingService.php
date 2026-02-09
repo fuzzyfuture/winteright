@@ -174,15 +174,18 @@ class RatingService
      */
     public function getForUserPaginated(int $enabledModes, int $userId, ?float $score, ?float $srMin, ?float $srMax,
         ?int $yearMin, ?int $yearMax, ?string $mapperNameOrId, ?string $sort, ?string $sortDirection,
-        int $perPage = 50): LengthAwarePaginator
+        bool $includeBlacklisted = false, int $perPage = 50): LengthAwarePaginator
     {
         $modesArray = BeatmapMode::bitfieldToArray($enabledModes);
 
         $query = Rating::where('user_id', $userId)
             ->with(['beatmap.set', 'beatmap.creators.user', 'beatmap.creators.creatorName'])
-            ->whereHas('beatmap', function ($query) use ($modesArray, $srMin, $srMax) {
-                $query->whereIn('mode', $modesArray)
-                    ->where('blacklisted', false);
+            ->whereHas('beatmap', function ($query) use ($modesArray, $includeBlacklisted, $srMin, $srMax) {
+                $query->whereIn('mode', $modesArray);
+
+                if (! $includeBlacklisted) {
+                    $query->where('blacklisted', false);
+                }
 
                 if (! blank($srMin)) {
                     $query->where('sr', '>=', $srMin);
