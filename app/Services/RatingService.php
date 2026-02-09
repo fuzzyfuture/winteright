@@ -162,7 +162,7 @@ class RatingService
      * @param  int  $enabledModes  Bitfield of enabled modes.
      * @param  int  $userId  The user's ID.
      * @param  int  $perPage  The amount of ratings to display per page.
-     * @param  ?int  $score  The score value to optionally filter to.
+     * @param  ?float  $score  The score value to optionally filter to.
      * @param  ?float  $srMin  The minimum star rating to optionally filter to.
      * @param  ?float  $srMax  The maximum star rating to optionally filter to.
      * @param  ?int  $yearMin  The minimum ranked year to optionally filter to.
@@ -172,7 +172,7 @@ class RatingService
      * @param  ?string  $sortDirection  The sort direction.
      * @return LengthAwarePaginator The paginated ratings.
      */
-    public function getForUserPaginated(int $enabledModes, int $userId, ?int $score, ?float $srMin, ?float $srMax,
+    public function getForUserPaginated(int $enabledModes, int $userId, ?float $score, ?float $srMin, ?float $srMax,
         ?int $yearMin, ?int $yearMax, ?string $mapperNameOrId, ?string $sort, ?string $sortDirection,
         int $perPage = 50): LengthAwarePaginator
     {
@@ -219,7 +219,7 @@ class RatingService
         }
 
         if (! blank($score)) {
-            $query->where('score', $score);
+            $query->where('score', intval($score * 2));
         }
 
         if (blank($sortDirection)) {
