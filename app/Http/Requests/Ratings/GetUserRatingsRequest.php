@@ -22,8 +22,8 @@ class GetUserRatingsRequest extends FormRequest
             'dateMax' => ['nullable', 'date'],
             'mapperName' => ['nullable', 'string'],
             'mapperId' => ['nullable', 'integer'],
-            'sort' => ['nullable', 'string'],
-            'sortDirection' => ['nullable', 'string'],
+            'sort' => ['nullable', 'string', 'in:score,sr,ranked_date'],
+            'sortDirection' => ['nullable', 'string', 'in:desc,asc'],
         ];
     }
 }
