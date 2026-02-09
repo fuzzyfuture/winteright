@@ -65,7 +65,7 @@ class UserController extends Controller
         $sort = $request->query('sort');
         $sortDirection = $request->query('sort_dir');
 
-        $ratings = $this->ratingService->getForUserPaginated($enabledModes, $id, $score * 2, $srMin, $srMax, $yearMin,
+        $ratings = $this->ratingService->getForUserPaginated($enabledModes, $id, $score, $srMin, $srMax, $yearMin,
             $yearMax, $mapperNameOrId, $sort, $sortDirection);
         $ratings->appends($request->query());
 
