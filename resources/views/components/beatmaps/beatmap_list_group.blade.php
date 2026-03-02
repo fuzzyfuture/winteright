@@ -19,7 +19,7 @@
                 </small>
                 <div class="mt-1 d-flex align-items-center gap-2">
                     {{ $map->status_badge }}
-                    <small class="text-muted">{{ $map->set->date_ranked->format('Y-m-d') }}</small>
+                    <small class="text-muted">{{ $map->set->date_ranked?->format('Y-m-d') }}</small>
                 </div>
             </div>
         </div>

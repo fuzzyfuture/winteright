@@ -16,7 +16,7 @@
                 </small>
                 <div class="mt-1 d-flex align-items-center gap-2">
                     {{ $set->status_badge }}
-                    <small class="text-muted">{{ $set->date_ranked->format('Y-m-d') }}</small>
+                    <small class="text-muted">{{ $set->date_ranked?->format('Y-m-d') }}</small>
                     <small class="text-muted">{{ $set->difficulty_spread }}</small>
                 </div>
             </div>
